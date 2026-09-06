@@ -35,7 +35,7 @@ test('bundled plugin registers with ModSDK and handles a visitor through actual 
   sandbox.window = sandbox; sandbox.ChatRoomCharacter = [sandbox.Player];
   const context = vm.createContext(sandbox);
   vm.runInContext('let MainCanvas = globalThis.__drawing;', context);
-  const script = readFileSync(new URL('../dist/Responsive_Liko.js', import.meta.url), 'utf8');
+  const script = readFileSync(new URL('../dist/main.js', import.meta.url), 'utf8');
   vm.runInContext(script, context);
   await new Promise(resolve => setImmediate(resolve));
   assert.equal(sandbox.Liko[ID].getState().ready, true);

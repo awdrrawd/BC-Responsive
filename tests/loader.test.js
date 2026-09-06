@@ -17,7 +17,7 @@ function fixture(local = false) {
 
 test('production loader targets the configured repository and prevents duplicates', () => {
   const f = fixture(); f.run();
-  assert.equal(f.appended[0].src, 'https://cdn.jsdelivr.net/gh/awdrrawd/BC-Responsive@main/dist/Responsive_Liko.js');
+  assert.equal(f.appended[0].src, 'https://cdn.jsdelivr.net/gh/awdrrawd/BC-Responsive@main/dist/main.js');
   f.run(); assert.equal(f.appended.length, 1);
   f.sandbox.Liko.Responsive_Liko = {};
   f.appended[0].onload(); assert.equal(f.sandbox.Liko.Responsive_LikoLoader.status, 'loaded'); assert.equal(f.timers.size, 0);

@@ -18,7 +18,7 @@
     console.info('[Responsive_Liko] Already loaded or loading; skipped duplicate loader.');
     return;
   }
-  const url = new URL("https://cdn.jsdelivr.net/gh/awdrrawd/BC-Responsive@main/dist/Responsive_Liko.js");
+  const url = new URL("https://cdn.jsdelivr.net/gh/awdrrawd/BC-Responsive@main/dist/main.js");
   // The main branch CDN may cache updates; use the local loader for development.
   const state = root.Responsive_LikoLoader = { url: url.href, status: 'loading', error: null };
   const script = document.createElement('script');
@@ -39,7 +39,7 @@
     state.status = 'loaded';
     script.remove();
   };
-  script.onerror = () => fail("Build could not be loaded. Check that main/dist/Responsive_Liko.js has been pushed to GitHub." );
+  script.onerror = () => fail("Build could not be loaded. Check that dist/main.js has been pushed to GitHub." );
   timer = setTimeout(() => fail('Loading timed out after 20 seconds.'), 20000);
   (document.head || document.documentElement).appendChild(script);
 })();

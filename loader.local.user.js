@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name 本地測試 - HSC
+// @name 本地測試 - Responsive
 // @namespace https://github.com/awdrrawd/BC-Responsive
 // @version 0.1.0
 // @description Load the local development build of Responsive_Liko
@@ -18,7 +18,7 @@
     console.info('[Responsive_Liko] Already loaded or loading; skipped duplicate loader.');
     return;
   }
-  const url = new URL("http://127.0.0.1:5175/Responsive_Liko.js");
+  const url = new URL("http://127.0.0.1:5175/main.js");
   url.searchParams.set('t', String(Date.now()));
   const state = root.Responsive_LikoLoader = { url: url.href, status: 'loading', error: null };
   const script = document.createElement('script');

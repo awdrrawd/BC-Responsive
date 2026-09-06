@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 const root = new URL('../', import.meta.url);
 http.createServer(async (req, res) => {
   const pathname = new URL(req.url, 'http://localhost').pathname;
-  const allowed = { '/': ['dev/preview.html', 'text/html'], '/preview.js': ['dev/preview.js', 'text/javascript'], '/Responsive_Liko.js': ['dist/Responsive_Liko.js', 'text/javascript'], '/Responsive_Liko.user.js': ['dist/Responsive_Liko.user.js', 'text/javascript'], '/loader.user.js': ['loader.user.js', 'text/javascript'], '/loader.local.user.js': ['loader.local.user.js', 'text/javascript'] };
+  const allowed = { '/': ['dev/preview.html', 'text/html'], '/preview.js': ['dev/preview.js', 'text/javascript'], '/main.js': ['dist/main.js', 'text/javascript'], '/loader.user.js': ['loader.user.js', 'text/javascript'], '/loader.local.user.js': ['loader.local.user.js', 'text/javascript'] };
   const route = allowed[pathname]; if (!route) { res.writeHead(404); res.end(); return; }
   try {
     const content = await readFile(new URL(route[0], root));

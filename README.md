@@ -8,11 +8,12 @@
 
 三種安裝方式擇一，避免同時開啟不同版本：
 
-- **正式 loader**：安裝根目錄的 `loader.user.js`，由 jsDelivr 讀取 `awdrrawd/BC-Responsive@main/dist/Responsive_Liko.js`。必須先把建置產物推送到 GitHub；本次建置不會自動推送。CDN 更新可能有快取延遲。
-- **本機測試 loader**：在根目錄執行 `npm run dev`，再安裝 `loader.local.user.js`。每次重新整理 BC，都從 `http://127.0.0.1:5175/Responsive_Liko.js` 載入。修改程式後另開終端執行 `npm run build`，再重新整理 BC；目前不是自動監看模式。
-- **完整離線檔**：安裝 `dist/Responsive_Liko.user.js`，已包含依賴，無須啟動本機伺服器或下載遠端主程式。
+- **正式 loader**：安裝根目錄的 `loader.user.js`，由 jsDelivr 讀取 `awdrrawd/BC-Responsive@main/dist/main.js`。必須先把建置產物推送到 GitHub；CDN 更新可能有快取延遲。
+- **本機測試 loader**：在根目錄執行 `npm run dev`，再安裝 `loader.local.user.js`。每次重新整理 BC，都從 `http://127.0.0.1:5175/main.js` 載入。
 
-載入後在偏好設定內開啟 **Responsive_Liko**。正式與本機 URL 在 `package.json` 的 `config` 設定，修改後重跑建置會更新 loader；不要直接修改產生的 loader。
+載入後在偏好設定內開啟 **Responsive_Liko**。`npm run build` 只建立 `dist/main.js` 與 `dist/main.js.map`，不會修改任何 loader。正式與本機 loader 是獨立、人工維護的入口。
+
+其他插件管理器只要載入 `https://cdn.jsdelivr.net/gh/awdrrawd/BC-Responsive@main/dist/main.js`。等待腳本完成後，可用 `window.Liko?.Responsive_Liko?.getState()` 確認初始化；重複載入會由插件自身阻止。
 
 Loader 可防止重複載入，載入失敗時會在 console 記錄原因。`window.Liko.Responsive_LikoLoader` 提供下載狀態；引擎就緒狀態仍以 `window.Liko.Responsive_Liko.getState()` 為準。本機來源若被瀏覽器限制，需依瀏覽器提示處理 localhost 連線權限。
 

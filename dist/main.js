@@ -2849,7 +2849,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       return { close() {
       } };
     }
-    let root, page = "home", deleteMode = false, ruleDeleteMode = false, selectedRuleId = null, draft = null, sessionBaseline = null, pickerGroup = "ItemHead", pickerScope = "current", pickerSelected = /* @__PURE__ */ new Set(), pickerQuery = "", pickerInput = "", pickerMode = "trigger", responseDelete = false, modal = null, filter = "all", ruleQuery = "", inlineEdit = null, notice = "";
+    let root, page = "home", deleteMode = false, ruleDeleteMode = false, selectedRuleId = null, draft = null, sessionBaseline = null, pickerGroup = "ItemHead", pickerScope = "current", pickerSelected = /* @__PURE__ */ new Set(), pickerQuery = "", pickerInput = "", pickerMode = "trigger", responseDelete = false, modal = null, filter = "all", ruleQuery = "", inlineEdit = null, notice = "", ruleScrollTop = 0;
     const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
     const fmt = (key, vars = {}) => Object.entries(vars).reduce((s, [k, v]) => s.replaceAll(`{${k}}`, String(v)), t(key));
     const sw = (on, small = false) => `<button class="rl-switch ${small ? "rl-small-switch" : ""} ${on ? "on" : ""}" aria-label="${esc(t(on ? "on" : "off"))}"></button>`;
@@ -2964,7 +2964,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     function render() {
       if (!root) return;
+      const oldRuleList = root.querySelector(".rl-rule-list");
+      if (oldRuleList) ruleScrollTop = oldRuleList.scrollTop;
       root.innerHTML = shell(page === "home" ? homeHtml() : rulesHtml(), page === "rules" ? active().name : "");
+      const newRuleList = root.querySelector(".rl-rule-list");
+      if (newRuleList) newRuleList.scrollTop = ruleScrollTop;
       bind();
       position();
       const inline = root.querySelector("[data-inline-edit]");
@@ -3629,4 +3633,4 @@ One of mods you are using is using an old version of SDK. It will work for now b
     });
   }
 })();
-//# sourceMappingURL=Responsive_Liko.js.map
+//# sourceMappingURL=main.js.map
