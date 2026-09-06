@@ -1,0 +1,27 @@
+{
+  "name": "responsive-liko",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/awdrrawd/BC-Responsive.git"
+  },
+  "config": {
+    "loaderUrl": "https://cdn.jsdelivr.net/gh/awdrrawd/BC-Responsive@main/dist/Responsive_Liko.js",
+    "localLoaderUrl": "http://127.0.0.1:5175/Responsive_Liko.js"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/*.test.js",
+    "serve": "node scripts/serve.mjs",
+    "dev": "npm run build && npm run serve"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.9"
+  },
+  "dependencies": {
+    "bondage-club-mod-sdk": "1.2.0",
+    "lz-string": "1.5.0"
+  }
+}
