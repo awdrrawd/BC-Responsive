@@ -2493,7 +2493,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     return [...labels];
   }
-  function* catalogRows(host = globalThis) {
+  function* catalogRows(host = globalThis, selectedGroup = null) {
     let activities;
     try {
       activities = host.AssetAllActivities?.(host.Player?.AssetFamily ?? "Female3DCG");
@@ -2516,7 +2516,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     };
     for (const a of activities) {
       const groups = [a.Target, a.TargetSelf === true ? a.Target : a.TargetSelf].flat().filter((g) => typeof g === "string");
-      for (const group of groups) if (typeof a.Name === "string" && !result.has(`${group}|${a.Name}`)) {
+      for (const group of groups) if ((!selectedGroup || canonicalGroup(group) === canonicalGroup(selectedGroup)) && typeof a.Name === "string" && !result.has(`${group}|${a.Name}`)) {
         const label = activityLabelKeys(a.Name, group, host.Player).map(lookup).find((value) => !missing(value)) ?? a.Name.replace(/^[A-Za-z]{2,12}_/, "");
         const row = { name: a.Name, group, label, searchLabels: activitySearchLabels(a.Name, group, host, host.Player, lookup) };
         result.set(`${group}|${a.Name}`, row);
@@ -2524,12 +2524,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
     }
   }
-  async function activityOptionsAsync(host = globalThis, cancelled = () => false) {
+  async function activityOptionsAsync(host = globalThis, cancelled = () => false, group = null) {
     const rows = [];
     await new Promise((resolve) => setTimeout(resolve, 16));
     if (cancelled()) return null;
     let deadline = performance.now() + 4;
-    for (const row of catalogRows(host)) {
+    for (const row of catalogRows(host, group)) {
       if (cancelled()) return null;
       rows.push(row);
       if (performance.now() >= deadline) {
@@ -3409,31 +3409,39 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
       return `<main class="rl-work"><aside class="rl-panel rl-browser"><div class="rl-head"><button class="primary rl-grow" data-act="newRule">\uFF0B ${esc(t("addRule"))}</button><button data-act="lists">${esc(t("listSettings"))}</button></div><input class="rl-search" data-rule-search value="${esc(ruleQuery)}" placeholder="${esc(t("searchRules"))}"><div class="rl-cats">${[["all", "all"], ["activity", "activity"], ["orgasm", "orgasm"], ["spicer", "spicer"], ["event", "event"], ["speech", "speech"]].map(([v, k]) => `<button class="${filter === v ? "on" : ""}" data-filter="${v}">${esc(t(k))}</button>`).join("")}</div><div class="rl-rule-list">${list}</div></aside><section class="rl-panel rl-editor">${editor}</section></main>`;
     }
-    let pickerIndexModal = null, pickerIndexLanguage = null, pickerSearch = null;
+    let pickerIndexModal = null, pickerIndexLanguage = null, pickerSearch = null, pickerIndexScope = null;
+    const pickerScopes = /* @__PURE__ */ new Map();
     function pickerRows() {
+      const scope = pickerScope === "all" ? "all" : canonicalGroup(pickerGroup);
       if (pickerIndexModal !== modal || pickerIndexLanguage !== host.TranslationLanguage) {
-        const current = modal, language = host.TranslationLanguage;
-        pickerIndexModal = current;
-        pickerIndexLanguage = language;
-        pickerSearch = null;
-        const cancelled = () => !root || modal !== current || host.TranslationLanguage !== language;
-        activityOptionsAsync(host, cancelled).then(async (rows2) => {
-          if (!rows2 || cancelled()) return;
-          const search = await createActivitySearchAsync(rows2, cancelled);
-          if (!search || cancelled()) return;
-          pickerSearch = search;
-          updatePickerResults();
-          root.querySelectorAll('[data-act="selectAll"],[data-act="confirmPicker"]').forEach((b) => b.disabled = false);
-        }).catch((error) => {
-          if (!cancelled()) {
-            const el = root.querySelector(".rl-actions");
-            if (el) el.textContent = String(error.message || error);
-          }
-        });
+        pickerScopes.clear();
+        pickerIndexModal = modal;
+        pickerIndexLanguage = host.TranslationLanguage;
+        pickerIndexScope = null;
       }
-      if (!pickerSearch) return [];
-      const rows = pickerSearch(pickerQuery);
-      return pickerScope === "all" ? rows : rows.filter((a) => canonicalGroup(a.group) === canonicalGroup(pickerGroup));
+      if (pickerIndexScope !== scope) {
+        pickerIndexScope = scope;
+        pickerSearch = pickerScopes.get(scope) ?? null;
+        if (!pickerSearch) {
+          const current = modal, language = host.TranslationLanguage;
+          const cancelled = () => !root || modal !== current || host.TranslationLanguage !== language || pickerIndexScope !== scope;
+          activityOptionsAsync(host, cancelled, scope === "all" ? null : scope).then(async (rows) => {
+            if (!rows || cancelled()) return;
+            const search = await createActivitySearchAsync(rows, cancelled);
+            if (!search || cancelled()) return;
+            pickerScopes.set(scope, search);
+            pickerSearch = search;
+            updatePickerResults();
+            root.querySelectorAll('[data-act="selectAll"],[data-act="confirmPicker"]').forEach((b) => b.disabled = false);
+          }).catch((error) => {
+            if (!cancelled()) {
+              const el = root.querySelector(".rl-actions");
+              if (el) el.textContent = String(error.message || error);
+            }
+          });
+        }
+      }
+      return pickerSearch ? pickerSearch(pickerQuery) : [];
     }
     function pickerActions(rows) {
       if (!pickerSearch) return `<div class="rl-muted" role="status">${esc(t("loadingActivities"))}</div>`;
@@ -3443,16 +3451,32 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }).join("") || `<div class="rl-muted">${esc(t("noAvailableActivities"))}</div>`;
     }
     function updatePickerResults() {
-      const container = root?.querySelector(".rl-actions");
-      if (!container) return;
-      container.innerHTML = pickerActions(pickerRows());
+      const rows = pickerRows(), container = root?.querySelector(".rl-actions");
+      if (!container || !pickerSearch) return;
+      if (container._pickerSearch !== pickerSearch) {
+        const all = pickerSearch("");
+        container.innerHTML = (all.length ? pickerActions(all) : "") + '<div class="rl-muted" data-picker-empty>' + esc(t("noAvailableActivities")) + "</div>";
+        container._pickerSearch = pickerSearch;
+        container._pickerCards = [...container.querySelectorAll("[data-action]")];
+        container.onclick = (event) => {
+          const b = event.target.closest("[data-action]");
+          if (!b || !container.contains(b)) return;
+          pickerSelected.has(b.dataset.action) ? pickerSelected.delete(b.dataset.action) : pickerSelected.add(b.dataset.action);
+          b.classList.toggle("on", pickerSelected.has(b.dataset.action));
+          const count = root.querySelector("[data-picker-count]");
+          if (count) count.textContent = fmt("selectedActivityCount", { count: pickerSelected.size });
+        };
+      }
+      const visible = new Set(rows.map((a) => a.group + "|" + a.name));
+      for (const b of container._pickerCards) {
+        const display = visible.has(b.dataset.action) ? "" : "none";
+        if (b.style.display !== display) {
+          if (display) b.style.setProperty("display", display, "important");
+          else b.style.removeProperty("display");
+        }
+      }
+      container.querySelector("[data-picker-empty]").style.display = rows.length ? "none" : "";
       container.scrollTop = 0;
-      container.querySelectorAll("[data-action]").forEach((b) => b.onclick = () => {
-        pickerSelected.has(b.dataset.action) ? pickerSelected.delete(b.dataset.action) : pickerSelected.add(b.dataset.action);
-        b.classList.toggle("on", pickerSelected.has(b.dataset.action));
-        const count = root.querySelector("[data-picker-count]");
-        if (count) count.textContent = fmt("selectedActivityCount", { count: pickerSelected.size });
-      });
     }
     function animationModalBody() {
       return `<div class="rl-segments">${animationGroups().map((g) => `<button data-animation-group="${g}" class="${modal.tracks.some((x) => x.group === g) ? "on" : ""}">${esc(groupLabel(g))}</button>`).join("")}</div><div class="rl-animation-tracks">${modal.tracks.map((track, i) => `<div class="rl-settings-group rl-animation-track"><h3>${esc(groupLabel(track.group))}</h3>${["A", "B"].map((state) => `<div class="rl-field"><span>${esc(t("animationState" + state))}</span><select class="rl-select" data-track="${i}" data-state="${state}">${state === "B" ? `<option value="__same__" ${track.stateB.sameAsset ? "selected" : ""}>${esc(t("sameClothing"))}</option>` : ""}${animationAssets(track.group).map((a) => `<option value="${esc(a.name)}" ${!(state === "B" && track.stateB.sameAsset) && a.name === track["state" + state].asset ? "selected" : ""}>${esc(a.label)}</option>`).join("")}</select><button data-wardrobe="${i}" data-state="${state}">${esc(t("editAppearance"))}</button></div>`).join("")}</div>`).join("")}</div><div class="rl-animation-grid"><span>${esc(t("animationCount"))}</span><input class="rl-input rl-number" type="number" min="1" max="100" data-animation-field="count" value="${modal.count}"><span>${esc(t("animationSeconds"))}</span><input class="rl-input rl-number" type="number" min="0.1" max="120" step="0.1" data-animation-seconds value="${modal.durationMs / 1e3}"></div><div class="rl-animation-message"><div class="rl-muted">${esc(t("animationMessageHint"))}</div><div class="rl-choice-row">${["chat", "emote", "action"].map((x) => `<button class="${modal.messageType === x ? "on" : ""}" data-animation-message-type="${x}">${esc(t(x))}</button>`).join("")}</div><textarea class="rl-textarea" style="height:90px" data-animation-field="text">${esc(modal.text)}</textarea><div class="rl-tools"><button data-animation-token="{Self}">${esc(t("insertSelfName"))}</button><button data-animation-token="{Other}">${esc(t("insertOtherName"))}</button></div></div>`;
@@ -3495,6 +3519,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const newRuleList = root.querySelector(".rl-rule-list");
       if (newRuleList) newRuleList.scrollTop = ruleScrollTop;
       bind();
+      if (modal?.type === "picker") updatePickerResults();
       position();
       const inline = root.querySelector("[data-inline-edit]");
       if (inline) {

@@ -40,7 +40,7 @@ export function activitySearchLabels(name, group, host = globalThis, character =
   }
   return [...labels];
 }
-function* catalogRows(host = globalThis) {
+function* catalogRows(host = globalThis, selectedGroup = null) {
   let activities;
   try { activities = host.AssetAllActivities?.(host.Player?.AssetFamily ?? 'Female3DCG'); } catch { /* fallback */ }
   activities ??= host.ActivityFemale3DCG ?? [];
@@ -57,7 +57,7 @@ function* catalogRows(host = globalThis) {
   };
   for (const a of activities) {
     const groups = [a.Target, a.TargetSelf === true ? a.Target : a.TargetSelf].flat().filter(g => typeof g === 'string');
-    for (const group of groups) if (typeof a.Name === 'string' && !result.has(`${group}|${a.Name}`)) {
+    for (const group of groups) if ((!selectedGroup || canonicalGroup(group) === canonicalGroup(selectedGroup)) && typeof a.Name === 'string' && !result.has(`${group}|${a.Name}`)) {
       const label = activityLabelKeys(a.Name, group, host.Player).map(lookup).find(value => !missing(value)) ?? a.Name.replace(/^[A-Za-z]{2,12}_/, '');
       const row = { name: a.Name, group, label, searchLabels: activitySearchLabels(a.Name, group, host, host.Player, lookup) };
       result.set(`${group}|${a.Name}`, row);
@@ -68,13 +68,13 @@ function* catalogRows(host = globalThis) {
 export function catalog(host = globalThis) {
   return [...catalogRows(host)].sort((a, b) => a.label.localeCompare(b.label));
 }
-export async function activityOptionsAsync(host = globalThis, cancelled = () => false) {
+export async function activityOptionsAsync(host = globalThis, cancelled = () => false, group = null) {
   const rows = [];
   // Yield before resource work and between small batches so the dialog can paint.
   await new Promise(resolve => setTimeout(resolve, 16));
   if (cancelled()) return null;
   let deadline = performance.now() + 4;
-  for (const row of catalogRows(host)) {
+  for (const row of catalogRows(host, group)) {
     if (cancelled()) return null;
     rows.push(row);
     if (performance.now() >= deadline) {

@@ -51,3 +51,18 @@ test('picker resource work yields before lookup, preserves search results, and c
   assert.equal(calls,0,'cancelled dialogs must not start resource lookups');
   assert.equal(await createActivitySearchAsync(rows,()=>true),null);
 });
+
+test('selected body part resolves only its labels, including aliases; all includes every part', async () => {
+  const keys=[];
+  const host={ActivityFemale3DCG:[
+    {Name:'Touch',Target:['ItemHands','ItemHead']},
+    {Name:'Hold',Target:['ItemHandheld']},
+    {Name:'Pet',Target:['ItemEars']},
+  ],ActivityDictionaryText(key){keys.push(key);return key;}};
+  const hands=await activityOptionsAsync(host,()=>false,'ItemHands');
+  assert.deepEqual(new Set(hands.map(r=>r.group)),new Set(['ItemHands','ItemHandheld']));
+  assert.ok(keys.every(key=>!key.includes('ItemHead')&&!key.includes('ItemEars')));
+  const all=await activityOptionsAsync(host);
+  assert.equal(all.length,4);
+  assert.deepEqual(hands,activityOptions(host,'ItemHands'));
+});
