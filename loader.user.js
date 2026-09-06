@@ -13,7 +13,7 @@
 
 (() => {
   'use strict';
-  const root = globalThis.Liko ??= {};
+  const root = (globalThis.Liko ??= {});
   if (root.Responsive_Liko || root.Responsive_LikoLoader?.status === 'loading') {
     console.info('[Responsive_Liko] Already loaded or loading; skipped duplicate loader.');
     return;
@@ -22,15 +22,21 @@
     'https://awdrrawd.github.io/BC-Responsive/dist/main.js',
     'https://cdn.jsdelivr.net/gh/awdrrawd/BC-Responsive@main/dist/main.js',
   ];
-  const state = root.Responsive_LikoLoader = { urls: [...urls], url: '', attempt: 0, status: 'loading', error: null };
+  const state = (root.Responsive_LikoLoader = {
+    urls: [...urls],
+    url: '',
+    attempt: 0,
+    status: 'loading',
+    error: null,
+  });
   let timer;
-  const load = index => {
+  const load = (index) => {
     state.attempt = index + 1;
     state.url = urls[index];
     const script = document.createElement('script');
     script.src = state.url;
     script.crossOrigin = 'anonymous';
-    const retry = reason => {
+    const retry = (reason) => {
       if (state.status !== 'loading' || script.src !== state.url) return;
       clearTimeout(timer);
       script.remove();

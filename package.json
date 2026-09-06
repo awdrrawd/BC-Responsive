@@ -1,6 +1,6 @@
 {
   "name": "responsive-liko",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "type": "module",
   "repository": {
@@ -11,10 +11,13 @@
     "build": "node scripts/build.mjs",
     "test": "node --test tests/*.test.js",
     "serve": "node scripts/serve.mjs",
-    "dev": "npm run build && npm run serve"
+    "dev": "npm run build && npm run serve",
+    "format": "prettier --write src Translation tests scripts dev integrations *.user.js",
+    "format:check": "prettier --check src Translation tests scripts dev integrations *.user.js"
   },
   "devDependencies": {
-    "esbuild": "0.25.9"
+    "esbuild": "0.25.9",
+    "prettier": "^3.9.6"
   },
   "dependencies": {
     "bondage-club-mod-sdk": "1.2.0",

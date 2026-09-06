@@ -98,13 +98,7 @@ npm run serve
 - `lastDiagnostic`：最近跳過／錯誤原因。
 - 瀏覽器事件 `Responsive_Liko:state` 用於插件晚載入發現。
 
-原版 LCE 沒有接收端；若偵測其同類功能開啟，本插件不會競爭接管。此倉庫附有小型 LCE 接收端與可重複執行的連接腳本：
-
-```sh
-node scripts/link-lce.mjs <BC-LCE倉庫路徑>
-```
-
-連接後須重新建置及載入 LCE。LCE 設定值不變；Responsive 接管時停止對應功能，釋放時恢復。LCE 原引擎將表情與姿勢綁在同一循環，因此初版接管表情時會一併暫停該循環。新版只宣告實際具備的能力，不會假裝已接管耳尾等尚未提供的功能。
+原版 LCE 沒有接收端；若偵測其同類功能開啟，本插件不會競爭接管。支援協調的插件可透過 `registerConsumer` 主動註冊，`integrations/lce-responsive-compat.js` 提供接收端參考。本專案不再提供修改外部插件原始碼的補丁腳本。新版只宣告實際具備的能力。
 
 ## 邊界與後續
 

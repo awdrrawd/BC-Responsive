@@ -4,38 +4,88 @@ import { checkBCX } from '../integrations/bcx.js';
 import { snapshotItem, wearState, animationState } from './appearance.js';
 export function renderText(text, event, host = globalThis) {
   const me = host.Player;
-  const other = host.ChatRoomCharacter?.find(c => c.MemberNumber === event.actor) ?? event.actorCharacter;
-  const nickname = c => c ? host.CharacterNickname(c) : '?';
-  const pronoun = c => {
+  const other = host.ChatRoomCharacter?.find((c) => c.MemberNumber === event.actor) ?? event.actorCharacter;
+  const nickname = (c) => (c ? host.CharacterNickname(c) : '?');
+  const pronoun = (c) => {
     const p = c && host.CharacterPronounDescription?.(c);
-    return p === 'She/Her' ? ['she', 'her', 'her', 'herself'] : p === 'He/Him' ? ['he', 'his', 'him', 'himself'] : ['they', 'their', 'them', 'themself'];
+    return p === 'She/Her'
+      ? ['she', 'her', 'her', 'herself']
+      : p === 'He/Him'
+        ? ['he', 'his', 'him', 'himself']
+        : ['they', 'their', 'them', 'themself'];
   };
-  const mp = pronoun(me), op = pronoun(other);
-  const values = { '{me}': nickname(me), '{self}': nickname(me), '{Self}': nickname(me), '{other}': nickname(other), '{Other}': nickname(other), '%TARGET%': nickname(me), '%SOURCE%': nickname(other), '%name%': nickname(other), '%TARGET_PRONOUN%': mp[0], '%TARGET_POSSESIVE%': mp[1], '%TARGET_INTENSIVE%': mp[2], '%SOURCE_PRONOUN%': op[0], '%SOURCE_POSSESIVE%': op[1], '%SOURCE_INTENSIVE%': other?.MemberNumber === me?.MemberNumber ? op[3] : op[2] };
-  return text.replace(/\{(?:me|self|Self|other|Other)\}|%[A-Z_]+%|%name%/g, token => values[token] ?? token);
+  const mp = pronoun(me),
+    op = pronoun(other);
+  const values = {
+    '{me}': nickname(me),
+    '{self}': nickname(me),
+    '{Self}': nickname(me),
+    '{other}': nickname(other),
+    '{Other}': nickname(other),
+    '%TARGET%': nickname(me),
+    '%SOURCE%': nickname(other),
+    '%name%': nickname(other),
+    '%TARGET_PRONOUN%': mp[0],
+    '%TARGET_POSSESIVE%': mp[1],
+    '%TARGET_INTENSIVE%': mp[2],
+    '%SOURCE_PRONOUN%': op[0],
+    '%SOURCE_POSSESIVE%': op[1],
+    '%SOURCE_INTENSIVE%': other?.MemberNumber === me?.MemberNumber ? op[3] : op[2],
+  };
+  return text.replace(
+    /\{(?:me|self|Self|other|Other)\}|%[A-Z_]+%|%name%/g,
+    (token) => values[token] ?? token,
+  );
 }
 export function createOutput({ store, host = globalThis, owns, report }) {
-  const restores = new Set(); const activitySeen = new Map(); const animations = new Map();
+  const restores = new Set();
+  const activitySeen = new Map();
+  const animations = new Map();
   function textMessage(step, event) {
-    const text = renderText(step.text, event, host).trim(); if (!text) return;
+    const text = renderText(step.text, event, host).trim();
+    if (!text) return;
     if (step.type === 'action') {
-      host.ServerSend('ChatRoomChat', { Type: 'Action', Content: `${ID}_Action`, Dictionary: [{ Tag: `MISSING TEXT IN "Interface.csv": ${ID}_Action`, Text: text }] }); return;
+      host.ServerSend('ChatRoomChat', {
+        Type: 'Action',
+        Content: `${ID}_Action`,
+        Dictionary: [{ Tag: `MISSING TEXT IN "Interface.csv": ${ID}_Action`, Text: text }],
+      });
+      return;
     }
     // Never reinterpret imported text as a command. Emotes have their own explicit type.
-    if (step.type === 'chat' && /^[\/!*(@.]/.test(text)) { report('Command-like chat skipped; use Emote/Action for narration.'); return; }
-    const draft = host.ElementValue('InputChat'); const target = host.ChatRoomTargetMemberNumber;
-    const canInterrupt = step.type === 'chat' && store.data.settings.interruption && target < 0 && draft.trim() && !/^[\/!*(@.]|^https?:/i.test(draft.trimStart());
+    if (step.type === 'chat' && /^[\/!*(@.]/.test(text)) {
+      report('Command-like chat skipped; use Emote/Action for narration.');
+      return;
+    }
+    const draft = host.ElementValue('InputChat');
+    const target = host.ChatRoomTargetMemberNumber;
+    const canInterrupt =
+      step.type === 'chat' &&
+      store.data.settings.interruption &&
+      target < 0 &&
+      draft.trim() &&
+      !/^[\/!*(@.]|^https?:/i.test(draft.trimStart());
     host.ChatRoomSetTarget(-1);
     try {
-      host.ElementValue('InputChat', step.type === 'emote' ? '*' + text : canInterrupt ? draft + '... ' + text : text);
+      host.ElementValue(
+        'InputChat',
+        step.type === 'emote' ? '*' + text : canInterrupt ? draft + '... ' + text : text,
+      );
       host.ChatRoomSendChat();
       // A blocked send leaves the input intact; restore the user's original draft then too.
       if (!canInterrupt || host.ElementValue('InputChat').trim()) host.ElementValue('InputChat', draft);
-    } catch (error) { host.ElementValue('InputChat', draft); throw error; }
-    finally { host.ChatRoomSetTarget(target); }
+    } catch (error) {
+      host.ElementValue('InputChat', draft);
+      throw error;
+    } finally {
+      host.ChatRoomSetTarget(target);
+    }
   }
   function expression(step) {
-    if (!owns('expressions')) { report('Expression ownership unavailable'); return; }
+    if (!owns('expressions')) {
+      report('Expression ownership unavailable');
+      return;
+    }
     const item = host.InventoryGet(host.Player, step.group);
     if (!item || (step.value && !item.Asset.Group.AllowExpression?.includes(step.value))) return;
     const previous = item.Property?.Expression ?? null;
@@ -45,71 +95,144 @@ export function createOutput({ store, host = globalThis, owns, report }) {
     host.CharacterSetFacialExpression(host.Player, step.group, step.value);
     let timer;
     const restore = () => {
-      clearTimeout(timer); restores.delete(restore);
+      clearTimeout(timer);
+      restores.delete(restore);
       const current = host.InventoryGet(host.Player, step.group);
-      if (current === item && (current.Property?.Expression ?? null) === step.value) host.CharacterSetFacialExpression(host.Player, step.group === 'Eyes' ? 'Eyes1' : step.group, previous);
-      if (paired && host.InventoryGet(host.Player, 'Eyes2') === paired && (paired.Property?.Expression ?? null) === step.value) host.CharacterSetFacialExpression(host.Player, 'Eyes2', pairedPrevious);
+      if (current === item && (current.Property?.Expression ?? null) === step.value)
+        host.CharacterSetFacialExpression(
+          host.Player,
+          step.group === 'Eyes' ? 'Eyes1' : step.group,
+          previous,
+        );
+      if (
+        paired &&
+        host.InventoryGet(host.Player, 'Eyes2') === paired &&
+        (paired.Property?.Expression ?? null) === step.value
+      )
+        host.CharacterSetFacialExpression(host.Player, 'Eyes2', pairedPrevious);
     };
-    timer = setTimeout(restore, step.durationMs); restores.add(restore);
+    timer = setTimeout(restore, step.durationMs);
+    restores.add(restore);
   }
   function animation(step, event) {
-    if (step.tracks) {
-      const tracks = step.tracks;
-      for (const track of tracks) animations.get(track.group)?.();
-      const originals = tracks.map(track => snapshotItem(host.InventoryGet(host.Player, track.group)));
-      const timers = [], later = host.setTimeout ?? setTimeout;
-      const update = (track, state) => { wearState(host, track.group, state); host.CharacterRefresh(host.Player, false); host.ChatRoomCharacterItemUpdate(host.Player, track.group); };
-      const cleanup = () => { restores.delete(restore); tracks.forEach(track => { if (animations.get(track.group) === restore) animations.delete(track.group); }); };
-      const restore = () => { timers.forEach(timer => (host.clearTimeout ?? clearTimeout)(timer)); tracks.forEach((track, i) => update(track, originals[i])); cleanup(); };
-      restores.add(restore); tracks.forEach(track => animations.set(track.group, restore));
-      for (let i = 0; i < step.count; i++) timers.push(later(() => tracks.forEach(track => update(track, animationState(track, i % 2 ? 'A' : 'B'))), Math.round(i * step.durationMs / step.count)));
-      timers.push(later(() => { tracks.forEach(track => update(track, track.stateA)); cleanup(); }, step.durationMs));
-      if (step.text.trim()) { const message = { type: step.messageType, text: step.text }, check = checkBCX(message, store.data.settings.bcx, host); if (check.allowed) textMessage(message, event); else report(check.reason); }
-      return;
+    const groups = step.tracks?.map((track) => track.group) ?? [step.group];
+    for (const group of groups) animations.get(group)?.();
+    const originals = groups.map((group) => snapshotItem(host.InventoryGet(host.Player, group)));
+    // Convert legacy input once, then use the same scheduler and restoration path.
+    const tracks = step.tracks ?? [
+      {
+        group: step.group,
+        stateA: { ...originals[0], asset: step.assetA },
+        stateB: { ...originals[0], asset: step.assetB },
+      },
+    ];
+    const timers = [],
+      later = host.setTimeout ?? setTimeout;
+    let finished = false;
+    function cleanup() {
+      finished = true;
+      timers.forEach((timer) => (host.clearTimeout ?? clearTimeout)(timer));
+      restores.delete(restore);
+      for (const group of groups) if (animations.get(group) === restore) animations.delete(group);
     }
-    const current = host.InventoryGet(host.Player, step.group);
-    const original = current ? { asset: current.Asset?.Name, color: JSON.parse(JSON.stringify(current.Color ?? 'Default')), property: JSON.parse(JSON.stringify(current.Property ?? null)) } : null;
-    const timers = [];
-    const apply = asset => {
-      const item = host.InventoryWear(host.Player, asset, step.group, original?.color ?? 'Default', undefined, undefined, undefined, false);
-      if (item && original?.property) item.Property = JSON.parse(JSON.stringify(original.property));
-      host.CharacterRefresh(host.Player, false); host.ChatRoomCharacterItemUpdate(host.Player, step.group);
-    };
-    const restore = () => {
-      timers.forEach(timer => (host.clearTimeout ?? clearTimeout)(timer)); restores.delete(restore);
-      if (original?.asset) { const item = host.InventoryWear(host.Player, original.asset, step.group, original.color, undefined, undefined, undefined, false); if (item && original.property) item.Property = original.property; }
-      else host.InventoryRemove?.(host.Player, step.group, false);
-      host.CharacterRefresh(host.Player, false); host.ChatRoomCharacterItemUpdate(host.Player, step.group);
-    };
+    function apply(states) {
+      tracks.forEach((track, i) => wearState(host, track.group, states[i]));
+      // Rebuild the character once per frame, even for three tracks.
+      host.CharacterRefresh(host.Player, false);
+      tracks.forEach((track) => host.ChatRoomCharacterItemUpdate(host.Player, track.group));
+    }
+    function restore() {
+      if (finished) return;
+      cleanup();
+      // An unavailable asset must not prevent the remaining groups from restoring.
+      tracks.forEach((track, i) => {
+        try {
+          wearState(host, track.group, originals[i]);
+        } catch (error) {
+          report(error);
+        }
+      });
+      host.CharacterRefresh(host.Player, false);
+      tracks.forEach((track) => host.ChatRoomCharacterItemUpdate(host.Player, track.group));
+    }
+    function frame(states, last = false) {
+      if (finished) return;
+      try {
+        apply(states);
+        if (last) cleanup();
+      } catch (error) {
+        report(error);
+        restore();
+      }
+    }
     restores.add(restore);
-    const later = host.setTimeout ?? setTimeout, interval = step.durationMs / step.count;
-    for (let i = 0; i < step.count; i++) timers.push(later(() => apply(i % 2 === 0 ? step.assetB : step.assetA), Math.round(i * interval)));
-    timers.push(later(() => { apply(step.assetA); restores.delete(restore); }, step.durationMs));
+    groups.forEach((group) => animations.set(group, restore));
+    for (let i = 0; i < step.count; i++)
+      timers.push(
+        later(
+          () => frame(tracks.map((track) => animationState(track, i % 2 ? 'A' : 'B'))),
+          Math.round((i * step.durationMs) / step.count),
+        ),
+      );
+    timers.push(
+      later(
+        () =>
+          frame(
+            tracks.map((track) => track.stateA),
+            true,
+          ),
+        step.durationMs,
+      ),
+    );
     if (step.text.trim()) {
-      const message = { type: step.messageType, text: step.text }, check = checkBCX(message, store.data.settings.bcx, host);
-      if (check.allowed) textMessage(message, event); else report(check.reason);
+      const message = { type: step.messageType, text: step.text };
+      const check = checkBCX(message, store.data.settings.bcx, host);
+      if (check.allowed) textMessage(message, event);
+      else report(check.reason);
     }
   }
+
   return {
-    clear() { [...restores].forEach(fn => fn()); activitySeen.clear(); },
+    clear() {
+      for (const restore of [...restores]) {
+        try {
+          restore();
+        } catch (error) {
+          report(error);
+        }
+      }
+      activitySeen.clear();
+    },
     execute(step, event) {
       const check = checkBCX(step, store.data.settings.bcx, host);
-      if (!check.allowed) { report(check.reason); return; }
+      if (!check.allowed) {
+        report(check.reason);
+        return;
+      }
       if (['chat', 'emote', 'action'].includes(step.type)) return textMessage(step, event);
       if (step.type === 'expression') return expression(step);
       if (step.type === 'animation') return animation(step, event);
       if (step.type === 'activity') {
-        const target = host.ChatRoomCharacter.find(c => c.MemberNumber === event.actor);
+        const target = host.ChatRoomCharacter.find((c) => c.MemberNumber === event.actor);
         if (!target || event.event === 'leave') return;
         const key = `${event.room}|${event.actor}|${step.group}|${step.activity}`;
-        const time = Date.now(); for (const [k, expires] of activitySeen) if (expires <= time) activitySeen.delete(k);
+        const time = Date.now();
+        for (const [k, expires] of activitySeen) if (expires <= time) activitySeen.delete(k);
         if (activitySeen.has(key)) return;
         const activity = allowedActivity(target, step.activity, step.group, host);
-        if (!activity) { report(`Unavailable activity: ${step.activity}`); return; }
+        if (!activity) {
+          report(`Unavailable activity: ${step.activity}`);
+          return;
+        }
         // Per recipient/action circuit breaker; no global cooldown across different people.
         activitySeen.set(key, time + 5000);
-        host.ActivityRun(host.Player, target, host.ActivityGetGroupOrMirror(host.Player.AssetFamily, step.group), activity);
+        host.ActivityRun(
+          host.Player,
+          target,
+          host.ActivityGetGroupOrMirror(host.Player.AssetFamily, step.group),
+          activity,
+        );
       }
-    }
+    },
   };
 }
