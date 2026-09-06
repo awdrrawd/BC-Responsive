@@ -2,7 +2,7 @@
 // @name Responsive_Liko (Loader)
 // @namespace https://github.com/awdrrawd/BC-Responsive
 // @version 0.1.0
-// @description Load Responsive_Liko from the GitHub main build via jsDelivr
+// @description Load Responsive_Liko from GitHub Pages with a jsDelivr fallback
 // @homepageURL https://github.com/awdrrawd/BC-Responsive
 // @include      /^https:\/\/(www\.)?bondage(projects\.elementfx|-(europe|asia))\.com\/.*/
 // @icon         https://raw.githubusercontent.com/awdrrawd/liko-tool-Image-storage/refs/heads/main/Images/LOGO_2.png
@@ -18,28 +18,41 @@
     console.info('[Responsive_Liko] Already loaded or loading; skipped duplicate loader.');
     return;
   }
-  const url = new URL("https://cdn.jsdelivr.net/gh/awdrrawd/BC-Responsive@main/dist/main.js");
-  // The main branch CDN may cache updates; use the local loader for development.
-  const state = root.Responsive_LikoLoader = { url: url.href, status: 'loading', error: null };
-  const script = document.createElement('script');
-  script.src = url.href;
-  script.crossOrigin = 'anonymous';
+  const urls = [
+    'https://awdrrawd.github.io/BC-Responsive/dist/main.js',
+    'https://cdn.jsdelivr.net/gh/awdrrawd/BC-Responsive@main/dist/main.js',
+  ];
+  const state = root.Responsive_LikoLoader = { urls: [...urls], url: '', attempt: 0, status: 'loading', error: null };
   let timer;
-  const fail = reason => {
-    if (state.status !== 'loading') return;
-    clearTimeout(timer);
-    state.status = 'error'; state.error = reason;
-    script.remove();
-    console.error('[Responsive_Liko] ' + reason, state.url);
+  const load = index => {
+    state.attempt = index + 1;
+    state.url = urls[index];
+    const script = document.createElement('script');
+    script.src = state.url;
+    script.crossOrigin = 'anonymous';
+    const retry = reason => {
+      if (state.status !== 'loading' || script.src !== state.url) return;
+      clearTimeout(timer);
+      script.remove();
+      if (index + 1 < urls.length) {
+        console.info('[Responsive_Liko] ' + reason + ' Trying fallback.', state.url);
+        load(index + 1);
+        return;
+      }
+      state.status = 'error';
+      state.error = reason;
+      console.error('[Responsive_Liko] ' + reason, state.url);
+    };
+    script.onload = () => {
+      if (state.status !== 'loading' || script.src !== state.url) return;
+      clearTimeout(timer);
+      if (!root.Responsive_Liko) return retry('Downloaded script did not initialize Responsive_Liko.');
+      state.status = 'loaded';
+      script.remove();
+    };
+    script.onerror = () => retry('Build could not be loaded.');
+    timer = setTimeout(() => retry('Loading timed out after 20 seconds.'), 20000);
+    (document.head || document.documentElement).appendChild(script);
   };
-  script.onload = () => {
-    if (state.status !== 'loading') return;
-    clearTimeout(timer);
-    if (!root.Responsive_Liko) return fail('Downloaded script did not initialize Responsive_Liko.');
-    state.status = 'loaded';
-    script.remove();
-  };
-  script.onerror = () => fail("Build could not be loaded. Check that dist/main.js has been pushed to GitHub." );
-  timer = setTimeout(() => fail('Loading timed out after 20 seconds.'), 20000);
-  (document.head || document.documentElement).appendChild(script);
+  load(0);
 })();

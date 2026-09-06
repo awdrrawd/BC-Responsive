@@ -17,11 +17,22 @@ function fixture(local = false) {
 
 test('production loader targets the configured repository and prevents duplicates', () => {
   const f = fixture(); f.run();
-  assert.equal(f.appended[0].src, 'https://cdn.jsdelivr.net/gh/awdrrawd/BC-Responsive@main/dist/main.js');
+  assert.equal(f.appended[0].src, 'https://awdrrawd.github.io/BC-Responsive/dist/main.js');
   f.run(); assert.equal(f.appended.length, 1);
   f.sandbox.Liko.Responsive_Liko = {};
   f.appended[0].onload(); assert.equal(f.sandbox.Liko.Responsive_LikoLoader.status, 'loaded'); assert.equal(f.timers.size, 0);
   f.run(); assert.equal(f.appended.length, 1);
+});
+
+test('production loader falls back from Pages to jsDelivr', () => {
+  const f = fixture(); f.run();
+  f.appended[0].onerror();
+  assert.equal(f.appended[0].removed, true);
+  assert.equal(f.appended[1].src, 'https://cdn.jsdelivr.net/gh/awdrrawd/BC-Responsive@main/dist/main.js');
+  assert.equal(f.sandbox.Liko.Responsive_LikoLoader.attempt, 2);
+  f.sandbox.Liko.Responsive_Liko = {};
+  f.appended[1].onload();
+  assert.equal(f.sandbox.Liko.Responsive_LikoLoader.status, 'loaded');
 });
 
 test('local loader cache-busts localhost and allows retry after a failed load', () => {
@@ -33,13 +44,15 @@ test('local loader cache-busts localhost and allows retry after a failed load', 
 });
 
 test('a fetched script without the plugin namespace is not marked successful', () => {
-  const f = fixture(); f.run(); f.appended[0].onload();
+  const f = fixture(); f.run(); f.appended[0].onload(); f.appended[1].onload();
   assert.equal(f.sandbox.Liko.Responsive_LikoLoader.status, 'error'); assert.equal(f.timers.size, 0);
 });
 
 test('timeout clears the script and does not allow a late onload to report success', () => {
   const f = fixture(); f.run(); [...f.timers.values()][0]();
-  assert.equal(f.sandbox.Liko.Responsive_LikoLoader.status, 'error'); assert.equal(f.appended[0].removed, true);
-  f.sandbox.Liko.Responsive_Liko = {}; f.appended[0].onload();
+  assert.equal(f.appended.length, 2); assert.equal(f.appended[0].removed, true);
+  [...f.timers.values()][0]();
+  assert.equal(f.sandbox.Liko.Responsive_LikoLoader.status, 'error'); assert.equal(f.appended[1].removed, true);
+  f.sandbox.Liko.Responsive_Liko = {}; f.appended[1].onload();
   assert.equal(f.sandbox.Liko.Responsive_LikoLoader.status, 'error');
 });
