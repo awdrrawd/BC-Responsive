@@ -1,6 +1,7 @@
+import { gameLanguage } from './language.js';
 import { ID, clone, defaults, starterPersona, validateData } from './model.js';
 export function createStore(host = globalThis) {
-  let data = defaults(host.Player?.MemberNumber); let loaded = false; const listeners = new Set();
+  let data = defaults(host.Player?.MemberNumber, gameLanguage(host)); let loaded = false; const listeners = new Set();
   const notify = () => listeners.forEach(fn => fn(data));
   return {
     get data() { return data; }, get loaded() { return loaded; },
@@ -13,14 +14,14 @@ export function createStore(host = globalThis) {
         data = validateData(JSON.parse(decoded));
         if (data.starterVersion < 1) {
           if (data.personas.length === 1 && data.personas[0].rules.length === 0) {
-            data.personas[0].rules = starterPersona(data.personas[0].name).rules;
+            data.personas[0].rules = starterPersona(data.personas[0].name, host.Player?.MemberNumber, gameLanguage(host)).rules;
             if (Number.isSafeInteger(host.Player?.MemberNumber) && !data.personas[0].blackList.includes(host.Player.MemberNumber)) data.personas[0].blackList.push(host.Player.MemberNumber);
           }
           data.starterVersion = 1;
           host.Player.ExtensionSettings[ID] = host.LZString.compressToBase64(JSON.stringify(data));
           host.ServerPlayerExtensionSettingsSync(ID);
         }
-      } else data = defaults(host.Player?.MemberNumber);
+      } else data = defaults(host.Player?.MemberNumber, gameLanguage(host));
       loaded = true; notify();
     },
     update(change) {

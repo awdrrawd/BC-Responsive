@@ -1,4 +1,5 @@
 export default {
+  loadingActivities: "Chargement des activités…",
   "title": "Responsive_Liko",
   "home": "Paramètres",
   "enabled": "Activer le module",

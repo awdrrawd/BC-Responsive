@@ -1,4 +1,5 @@
 export default {
+  loadingActivities: "Aktivitäten werden geladen…",
   "title": "Responsive_Liko",
   "home": "Einstellungen",
   "enabled": "Modul aktivieren",

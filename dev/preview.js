@@ -4,7 +4,11 @@ let MainCanvas = document.getElementById('MainCanvas').getContext('2d');
 var TranslationLanguage = 'TW', CurrentScreen = 'ChatRoom', MouseX = 0, MouseY = 0, ChatRoomTargetMemberNumber = -1;
 var Player = { MemberNumber: 1, Name: 'Player', ExtensionSettings: {}, GhostList: [], AssetFamily: 'Female3DCG', ArousalSettings: { Progress: 0 } };
 var ChatRoomCharacter = [Player], ChatRoomData = { Name: 'Offline preview' }, ActivityDictionary = [];
-var ActivityFemale3DCG = [{ Name: 'Hug', Target: ['ItemArms'] }, { Name: 'Handshake', Target: ['ItemHands'] }];
+var ActivityFemale3DCG = [{ Name: 'Hug', Target: ['ItemArms'] }, { Name: 'Handshake', Target: ['ItemHands'] }, { Name: 'Pet', Target: ['ItemHead'] }, { Name: 'BellRing', Target: ['ItemNeck'] }];
+var AssetGroup = [['HairAccessory2','耳朵'],['TailStraps','尾巴'],['Wings','翅膀']].map(([Name,Description])=>({Name,Description,Family:'Female3DCG'}));
+var Asset = AssetGroup.flatMap(Group=>['A','B'].map(state=>({Name:Group.Name+state,Description:Group.Description+' '+state,Group})));
+AssetGroup.push(...[['ItemHead','頭部',[160,30,180,160]],['ItemNeck','脖子',[195,195,110,70]],['ItemArms','手臂',[75,280,80,240]],['ItemHands','手部',[60,525,90,110]]].map(([Name,Description,Zone])=>({Name,Description,Zone:[Zone],Family:'Female3DCG'})));
+function AssetGroupGet(family,name){return AssetGroup.find(g=>g.Family===family&&g.Name===name)}
 var activePreference, handlers = [];
 function log(value) { document.getElementById('log').textContent = JSON.stringify(value, null, 2); }
 function DrawButton(x, y, w, h, text, color, icon) { MainCanvas.save(); MainCanvas.fillStyle = color; MainCanvas.fillRect(x, y, w, h); MainCanvas.strokeStyle = '#111'; MainCanvas.lineWidth = 2; MainCanvas.strokeRect(x, y, w, h); MainCanvas.textAlign = 'center'; MainCanvas.textBaseline = 'middle'; MainCanvas.font = '28px sans-serif'; MainCanvas.fillStyle = '#111'; MainCanvas.fillText(icon?.includes('Exit') ? '×' : text, x + w / 2, y + h / 2, w - 14); MainCanvas.restore(); }
@@ -27,7 +31,7 @@ function ChatRoomSetTarget(id) { ChatRoomTargetMemberNumber = id; }
 function ChatRoomSendChat() { log({ text: ElementValue('InputChat'), target: ChatRoomTargetMemberNumber }); ElementValue('InputChat', ''); }
 function ServerSend(type, data) { log({ type, data }); }
 function AssetAllActivities() { return ActivityFemale3DCG; }
-function ActivityDictionaryText(key) { return key.includes('Hug') ? '擁抱' : key.includes('Handshake') ? '握手' : 'MISSING TEXT IN dictionary'; }
+function ActivityDictionaryText(key) { return key.includes('Hug') ? '擁抱' : key.includes('Handshake') ? '握手' : key.includes('Pet') ? '摸頭' : key.includes('BellRing') ? '拨动铃铛' : 'MISSING TEXT IN dictionary'; }
 function ActivityAllowedForGroup(c, group) { return ActivityFemale3DCG.filter(a => a.Target.includes(group)).map(Activity => ({ Activity })); }
 function ActivityGetGroupOrMirror(family, group) { return { Name: group }; }
 function ActivityRun(actor, target, group, item) { log({ activity: item.Activity.Name, target: target.Name, group }); }

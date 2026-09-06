@@ -7,6 +7,7 @@ import { createScheduler } from './core/engine.js';
 import { initI18n } from './core/i18n.js';
 import { createOutput } from './features/output.js';
 import { createMouth } from './features/mouth.js';
+import { installSpeech } from './features/speech.js';
 import { installEvents } from './integrations/events.js';
 import { installSettings } from './ui/dom-settings.js';
 
@@ -25,6 +26,7 @@ export function start(namespace, host = globalThis) {
     if (!ready()) { setTimeout(initialize, 500); return; }
     try {
       store.load(); account = host.Player.MemberNumber;
+      installSpeech({ sdk, store, host, enabled: () => !stopped && store.loaded && store.data.settings.enabled && host.Player.MemberNumber === account });
       output = createOutput({ store, host, owns: coordination.owns, report });
       mouth = createMouth({ sdk, owns: coordination.owns, host });
       const valid = event => !stopped && store.loaded && store.data.settings.enabled && store.data.settings.reactions && host.CurrentScreen === 'ChatRoom' && host.Player.MemberNumber === account && event.room === events.roomKey() && !host.Player.GhostList?.includes(event.actor) && (event.event === 'leave' || host.ChatRoomCharacter.some(c => c.MemberNumber === event.actor));

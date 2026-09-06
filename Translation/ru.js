@@ -1,4 +1,5 @@
 export default {
+  loadingActivities: "Загрузка действий…",
   "title": "Responsive_Liko",
   "home": "Настройки",
   "enabled": "Включить модуль",

@@ -1,3 +1,4 @@
+import starters from '../../Translation/starters.js';
 export const VERSION = '0.1.0';
 export const ID = 'Responsive_Liko';
 export const clone = value => JSON.parse(JSON.stringify(value));
@@ -9,8 +10,9 @@ const starterRule = (name, trigger, texts, type = 'chat') => ({
   id: uid(), name, enabled: true, trigger, dedupeMs: 0, delayMs: 0,
   choices: texts.map(text => choice(type, text)),
 });
-export function starterPersona(name = 'Default', selfMember) {
-  const p = persona(name, selfMember);
+export function starterPersona(name, selfMember, language = 'EN') {
+  const localized = starters[language];
+  const p = persona(name ?? localized?.[0] ?? 'Default', selfMember);
   p.rules = [
     starterRule('Gentle touch', { kind: 'activity', activities: ['Pet', 'Caress'], groups: ['ItemHead', 'ItemNose', 'ItemEars'], members: [], self: false }, ['Mmm...', 'That feels nice.', 'Mm, keep going.']),
     starterRule('Pain', { kind: 'activity', activities: ['Slap', 'Bite', 'Spank', 'Kick', 'Pinch', 'SpankItem', 'ShockItem'], groups: [], members: [], self: false }, ['Ouch!', 'Ah!', 'Nnh...']),
@@ -20,16 +22,18 @@ export function starterPersona(name = 'Default', selfMember) {
     starterRule('Climax', { kind: 'orgasm', outcome: 'Any', members: [] }, ['Aah...!', 'Mmmh...!', 'HaaAAaah!']),
     starterRule('Welcome visitor', { kind: 'event', event: 'visitor', roomMode: 'any', roomNames: [], members: [] }, ['Welcome, {Other}.']),
   ];
+  if (localized) p.rules.forEach((r, i) => { r.name = localized[1][i]; r.choices.forEach((c, j) => { c.steps[0].text = localized[2][i][j]; }); });
   return p;
 }
-export function defaults(selfMember) {
-  const p = starterPersona('Default', selfMember);
+export const supportsRuleMembers = t => ['activity', 'spicer'].includes(t.kind) || (t.kind === 'event' && t.event === 'visitor');
+export function defaults(selfMember, language = 'EN') {
+  const p = starterPersona(undefined, selfMember, language);
   return { schemaVersion: 1, starterVersion: 1, settings: { enabled: true, reactions: true, mouth: false, interruption: false, bcx: true }, activePersona: p.id, personas: [p] };
 }
 export function rule() {
   return { id: uid(), name: 'New rule', enabled: true, trigger: { kind: 'activity', activities: [], groups: [], members: [], self: false }, dedupeMs: 3000, delayMs: 0, choices: [{ id: uid(), steps: [{ type: 'chat', text: '' }] }] };
 }
-const kinds = ['activity', 'orgasm', 'spicer', 'event'];
+const kinds = ['activity', 'orgasm', 'spicer', 'event', 'speech'];
 const types = ['chat', 'emote', 'action', 'activity', 'expression', 'animation'];
 function assert(ok, message) { if (!ok) throw new Error(message); }
 function strings(v) { return Array.isArray(v) && v.every(x => typeof x === 'string'); }
@@ -55,6 +59,14 @@ export function validatePersona(input) {
     assert(typeof r.name === 'string' && typeof r.enabled === 'boolean', 'Invalid rule name/enabled');
     const t = r.trigger;
     assert(kinds.includes(t.kind), 'Unknown trigger');
+    if (!supportsRuleMembers(t)) delete t.members;
+    if (t.kind === 'speech') {
+      delete t.members;
+      t.channel ??= 'all'; t.chance ??= 100; t.severity ??= 'weak';
+      assert(['all', 'chat', 'whisper'].includes(t.channel), 'Invalid speech channel');
+      assert(['weak', 'medium', 'strong', 'addicted'].includes(t.severity), 'Invalid speech severity');
+      assert(Number.isFinite(t.chance) && t.chance >= 0 && t.chance <= 100, 'Invalid speech chance');
+    }
     for (const key of ['activities', 'groups']) if (t[key] !== undefined) assert(strings(t[key]), `Invalid ${key}`);
     if (t.members !== undefined) assert(members(t.members), 'Invalid members');
     if (t.self !== undefined) assert(typeof t.self === 'boolean', 'Invalid self condition');
@@ -71,16 +83,31 @@ export function validatePersona(input) {
     r.dedupeMs ??= 3000; r.delayMs ??= 0;
     for (const key of ['dedupeMs', 'delayMs']) assert(Number.isFinite(r[key]) && r[key] >= 0 && r[key] <= 600000, `Invalid ${key}`);
     assert(Array.isArray(r.choices) && r.choices.length <= 1000, 'Invalid choices');
+    assert(r.choices.filter(c => c.always).length <= 1, 'Only one guaranteed response per rule');
     for (const c of r.choices) {
       assert(object(c), 'Invalid choice'); c.id ||= uid();
+      if (c.always !== undefined) assert(typeof c.always === 'boolean', 'Invalid guaranteed response');
       assert(Array.isArray(c.steps) && c.steps.length > 0 && c.steps.length <= 10, 'A choice needs 1–10 steps');
       for (const s of c.steps) {
         assert(object(s) && types.includes(s.type), 'Unknown response type');
+        if (t.kind === 'speech') assert(s.type === 'chat', 'Speech habits accept text phrases only');
         if (['chat', 'emote', 'action'].includes(s.type)) assert(typeof s.text === 'string' && s.text.length <= 4000, 'Invalid message');
         if (s.type === 'activity') assert(typeof s.activity === 'string' && !!s.activity && typeof s.group === 'string' && !!s.group, 'Activity and group required');
         if (s.type === 'expression') assert(typeof s.group === 'string' && (s.value === null || typeof s.value === 'string') && Number.isFinite(s.durationMs) && s.durationMs >= 100 && s.durationMs <= 60000, 'Invalid expression');
         if (s.type === 'animation') {
-          assert(typeof s.group === 'string' && !!s.group && typeof s.assetA === 'string' && !!s.assetA && typeof s.assetB === 'string' && !!s.assetB, 'Animation assets required');
+          const tracks = s.tracks ?? [{ group: s.group, stateA: { asset: s.assetA }, stateB: { asset: s.assetB } }];
+          assert(Array.isArray(tracks) && tracks.length >= 1 && tracks.length <= 3, 'Choose 1–3 animation groups');
+          assert(new Set(tracks.map(x => x.group)).size === tracks.length, 'Duplicate animation group');
+          for (const track of tracks) {
+            assert(['HairAccessory2', 'TailStraps', 'Wings'].includes(track.group), 'Invalid animation group');
+            for (const state of [track.stateA, track.stateB]) {
+              assert(object(state) && typeof state.asset === 'string' && !!state.asset, 'Animation assets required');
+              if (state.color !== undefined) assert(typeof state.color === 'string' || strings(state.color), 'Invalid animation color');
+              if (state.property != null) assert(object(state.property), 'Invalid animation property');
+              if (state.craft != null) assert(object(state.craft), 'Invalid animation craft');
+              if (state.sameAsset !== undefined) assert(typeof state.sameAsset === 'boolean', 'Invalid same clothing flag');
+            }
+          }
           assert(Number.isSafeInteger(s.count) && s.count >= 1 && s.count <= 100, 'Invalid animation count');
           assert(Number.isFinite(s.durationMs) && s.durationMs >= 100 && s.durationMs <= 120000, 'Invalid animation duration');
           assert(['chat', 'emote', 'action'].includes(s.messageType) && typeof s.text === 'string' && s.text.length <= 4000, 'Invalid animation message');

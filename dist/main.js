@@ -651,12 +651,28 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
   });
 
+  // Translation/starters.js
+  var starters_default;
+  var init_starters = __esm({
+    "Translation/starters.js"() {
+      starters_default = {
+        TW: ["\u9810\u8A2D", ["\u6EAB\u67D4\u64AB\u6478", "\u75BC\u75DB", "\u6414\u7662", "\u4F4E\u8208\u596E\u53CD\u61C9", "\u9AD8\u8208\u596E\u53CD\u61C9", "\u9AD8\u6F6E", "\u6B61\u8FCE\u8A2A\u5BA2"], [["\u55EF\u2026\u2026", "\u597D\u8212\u670D\u3002", "\u55EF\uFF0C\u7E7C\u7E8C\u3002"], ["\u597D\u75DB\uFF01", "\u554A\uFF01", "\u5514\u2026\u2026"], ["\u54C8\u54C8\uFF01", "\u4E0D\u3001\u4E0D\u8981\uFF0C\u597D\u7662\uFF01", "\u554A\u54C8\u54C8\u2026\u2026"], ["\u55EF\u2026\u2026", "\u554A\u2026\u2026"], ["\u55EF\u2665", "\u54C8\u554A\u2026\u2026\u2665", "\u5514\u2026\u2026\u554A\u2665"], ["\u554A\u554A\u2026\u2026\uFF01", "\u55EF\u55EF\u2026\u2026\uFF01", "\u54C8\u554A\u554A\u554A\uFF01"], ["\u6B61\u8FCE\uFF0C{Other}\u3002"]]],
+        CN: ["\u9ED8\u8BA4", ["\u6E29\u67D4\u629A\u6478", "\u75BC\u75DB", "\u6320\u75D2", "\u4F4E\u5174\u594B\u53CD\u5E94", "\u9AD8\u5174\u594B\u53CD\u5E94", "\u9AD8\u6F6E", "\u6B22\u8FCE\u8BBF\u5BA2"], [["\u55EF\u2026\u2026", "\u597D\u8212\u670D\u3002", "\u55EF\uFF0C\u7EE7\u7EED\u3002"], ["\u597D\u75DB\uFF01", "\u554A\uFF01", "\u5514\u2026\u2026"], ["\u54C8\u54C8\uFF01", "\u4E0D\u3001\u4E0D\u8981\uFF0C\u597D\u75D2\uFF01", "\u554A\u54C8\u54C8\u2026\u2026"], ["\u55EF\u2026\u2026", "\u554A\u2026\u2026"], ["\u55EF\u2665", "\u54C8\u554A\u2026\u2026\u2665", "\u5514\u2026\u2026\u554A\u2665"], ["\u554A\u554A\u2026\u2026\uFF01", "\u55EF\u55EF\u2026\u2026\uFF01", "\u54C8\u554A\u554A\u554A\uFF01"], ["\u6B22\u8FCE\uFF0C{Other}\u3002"]]],
+        DE: ["Standard", ["Sanfte Ber\xFChrung", "Schmerz", "Kitzeln", "Geringe Erregung", "Hohe Erregung", "Orgasmus", "Besucher begr\xFC\xDFen"], [["Mmm...", "Das f\xFChlt sich gut an.", "Mm, mach weiter."], ["Aua!", "Ah!", "Nnh..."], ["Haha!", "N-nein, das kitzelt!", "Ahaha..."], ["Mm...", "Ah..."], ["Mmh\u2665", "Haa...\u2665", "Nnh... ah\u2665"], ["Aah...!", "Mmmh...!", "HaaAAaah!"], ["Willkommen, {Other}."]]],
+        FR: ["Par d\xE9faut", ["Douce caresse", "Douleur", "Chatouilles", "Faible excitation", "Forte excitation", "Orgasme", "Accueillir les visiteurs"], [["Mmm...", "\xC7a fait du bien.", "Mm, continue."], ["A\xEFe !", "Ah !", "Nnh..."], ["Haha !", "N-non, \xE7a chatouille !", "Ahaha..."], ["Mm...", "Ah..."], ["Mmh\u2665", "Haa...\u2665", "Nnh... ah\u2665"], ["Aah... !", "Mmmh... !", "HaaAAaah !"], ["Bienvenue, {Other}."]]],
+        RU: ["\u041F\u043E \u0443\u043C\u043E\u043B\u0447\u0430\u043D\u0438\u044E", ["\u041D\u0435\u0436\u043D\u043E\u0435 \u043F\u0440\u0438\u043A\u043E\u0441\u043D\u043E\u0432\u0435\u043D\u0438\u0435", "\u0411\u043E\u043B\u044C", "\u0429\u0435\u043A\u043E\u0442\u043A\u0430", "\u0421\u043B\u0430\u0431\u043E\u0435 \u0432\u043E\u0437\u0431\u0443\u0436\u0434\u0435\u043D\u0438\u0435", "\u0421\u0438\u043B\u044C\u043D\u043E\u0435 \u0432\u043E\u0437\u0431\u0443\u0436\u0434\u0435\u043D\u0438\u0435", "\u041E\u0440\u0433\u0430\u0437\u043C", "\u041F\u0440\u0438\u0432\u0435\u0442\u0441\u0442\u0432\u0438\u0435 \u0433\u043E\u0441\u0442\u0435\u0439"], [["\u041C\u043C\u043C...", "\u041A\u0430\u043A \u043F\u0440\u0438\u044F\u0442\u043D\u043E.", "\u041C\u043C, \u043F\u0440\u043E\u0434\u043E\u043B\u0436\u0430\u0439."], ["\u041E\u0439!", "\u0410\u0445!", "\u041C\u043C..."], ["\u0425\u0430\u0445\u0430!", "\u041D-\u043D\u0435\u0442, \u0449\u0435\u043A\u043E\u0442\u043D\u043E!", "\u0410\u0445\u0430\u0445\u0430..."], ["\u041C\u043C...", "\u0410\u0445..."], ["\u041C\u043C\u2665", "\u0410\u0430\u0445...\u2665", "\u041C\u043C... \u0430\u0445\u2665"], ["\u0410\u0430\u0445...!", "\u041C\u043C\u043C...!", "\u0410\u0430\u0430\u0430\u0445!"], ["\u0414\u043E\u0431\u0440\u043E \u043F\u043E\u0436\u0430\u043B\u043E\u0432\u0430\u0442\u044C, {Other}."]]],
+        UA: ["\u0417\u0430 \u0437\u0430\u043C\u043E\u0432\u0447\u0443\u0432\u0430\u043D\u043D\u044F\u043C", ["\u041D\u0456\u0436\u043D\u0438\u0439 \u0434\u043E\u0442\u0438\u043A", "\u0411\u0456\u043B\u044C", "\u041B\u043E\u0441\u043A\u043E\u0442\u0430\u043D\u043D\u044F", "\u0421\u043B\u0430\u0431\u043A\u0435 \u0437\u0431\u0443\u0434\u0436\u0435\u043D\u043D\u044F", "\u0421\u0438\u043B\u044C\u043D\u0435 \u0437\u0431\u0443\u0434\u0436\u0435\u043D\u043D\u044F", "\u041E\u0440\u0433\u0430\u0437\u043C", "\u041F\u0440\u0438\u0432\u0456\u0442\u0430\u043D\u043D\u044F \u0433\u043E\u0441\u0442\u0435\u0439"], [["\u041C\u043C\u043C...", "\u042F\u043A \u043F\u0440\u0438\u0454\u043C\u043D\u043E.", "\u041C\u043C, \u043F\u0440\u043E\u0434\u043E\u0432\u0436\u0443\u0439."], ["\u041E\u0439!", "\u0410\u0445!", "\u041C\u043C..."], ["\u0425\u0430\u0445\u0430!", "\u041D-\u043D\u0456, \u043B\u043E\u0441\u043A\u043E\u0442\u043D\u043E!", "\u0410\u0445\u0430\u0445\u0430..."], ["\u041C\u043C...", "\u0410\u0445..."], ["\u041C\u043C\u2665", "\u0410\u0430\u0445...\u2665", "\u041C\u043C... \u0430\u0445\u2665"], ["\u0410\u0430\u0445...!", "\u041C\u043C\u043C...!", "\u0410\u0430\u0430\u0430\u0445!"], ["\u041B\u0430\u0441\u043A\u0430\u0432\u043E \u043F\u0440\u043E\u0441\u0438\u043C\u043E, {Other}."]]]
+      };
+    }
+  });
+
   // src/core/model.js
   function persona(name = "Default", selfMember) {
     return { id: uid(), name, listMode: "blacklist", whiteList: [], blackList: Number.isSafeInteger(selfMember) ? [selfMember] : [], rules: [] };
   }
-  function starterPersona(name = "Default", selfMember) {
-    const p = persona(name, selfMember);
+  function starterPersona(name, selfMember, language = "EN") {
+    const localized = starters_default[language];
+    const p = persona(name ?? localized?.[0] ?? "Default", selfMember);
     p.rules = [
       starterRule("Gentle touch", { kind: "activity", activities: ["Pet", "Caress"], groups: ["ItemHead", "ItemNose", "ItemEars"], members: [], self: false }, ["Mmm...", "That feels nice.", "Mm, keep going."]),
       starterRule("Pain", { kind: "activity", activities: ["Slap", "Bite", "Spank", "Kick", "Pinch", "SpankItem", "ShockItem"], groups: [], members: [], self: false }, ["Ouch!", "Ah!", "Nnh..."]),
@@ -666,10 +682,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
       starterRule("Climax", { kind: "orgasm", outcome: "Any", members: [] }, ["Aah...!", "Mmmh...!", "HaaAAaah!"]),
       starterRule("Welcome visitor", { kind: "event", event: "visitor", roomMode: "any", roomNames: [], members: [] }, ["Welcome, {Other}."])
     ];
+    if (localized) p.rules.forEach((r, i) => {
+      r.name = localized[1][i];
+      r.choices.forEach((c, j) => {
+        c.steps[0].text = localized[2][i][j];
+      });
+    });
     return p;
   }
-  function defaults(selfMember) {
-    const p = starterPersona("Default", selfMember);
+  function defaults(selfMember, language = "EN") {
+    const p = starterPersona(void 0, selfMember, language);
     return { schemaVersion: 1, starterVersion: 1, settings: { enabled: true, reactions: true, mouth: false, interruption: false, bcx: true }, activePersona: p.id, personas: [p] };
   }
   function rule() {
@@ -706,6 +728,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
       assert(typeof r.name === "string" && typeof r.enabled === "boolean", "Invalid rule name/enabled");
       const t = r.trigger;
       assert(kinds.includes(t.kind), "Unknown trigger");
+      if (!supportsRuleMembers(t)) delete t.members;
+      if (t.kind === "speech") {
+        delete t.members;
+        t.channel ??= "all";
+        t.chance ??= 100;
+        t.severity ??= "weak";
+        assert(["all", "chat", "whisper"].includes(t.channel), "Invalid speech channel");
+        assert(["weak", "medium", "strong", "addicted"].includes(t.severity), "Invalid speech severity");
+        assert(Number.isFinite(t.chance) && t.chance >= 0 && t.chance <= 100, "Invalid speech chance");
+      }
       for (const key of ["activities", "groups"]) if (t[key] !== void 0) assert(strings(t[key]), `Invalid ${key}`);
       if (t.members !== void 0) assert(members(t.members), "Invalid members");
       if (t.self !== void 0) assert(typeof t.self === "boolean", "Invalid self condition");
@@ -724,17 +756,32 @@ One of mods you are using is using an old version of SDK. It will work for now b
       r.delayMs ??= 0;
       for (const key of ["dedupeMs", "delayMs"]) assert(Number.isFinite(r[key]) && r[key] >= 0 && r[key] <= 6e5, `Invalid ${key}`);
       assert(Array.isArray(r.choices) && r.choices.length <= 1e3, "Invalid choices");
+      assert(r.choices.filter((c) => c.always).length <= 1, "Only one guaranteed response per rule");
       for (const c of r.choices) {
         assert(object(c), "Invalid choice");
         c.id ||= uid();
+        if (c.always !== void 0) assert(typeof c.always === "boolean", "Invalid guaranteed response");
         assert(Array.isArray(c.steps) && c.steps.length > 0 && c.steps.length <= 10, "A choice needs 1\u201310 steps");
         for (const s of c.steps) {
           assert(object(s) && types.includes(s.type), "Unknown response type");
+          if (t.kind === "speech") assert(s.type === "chat", "Speech habits accept text phrases only");
           if (["chat", "emote", "action"].includes(s.type)) assert(typeof s.text === "string" && s.text.length <= 4e3, "Invalid message");
           if (s.type === "activity") assert(typeof s.activity === "string" && !!s.activity && typeof s.group === "string" && !!s.group, "Activity and group required");
           if (s.type === "expression") assert(typeof s.group === "string" && (s.value === null || typeof s.value === "string") && Number.isFinite(s.durationMs) && s.durationMs >= 100 && s.durationMs <= 6e4, "Invalid expression");
           if (s.type === "animation") {
-            assert(typeof s.group === "string" && !!s.group && typeof s.assetA === "string" && !!s.assetA && typeof s.assetB === "string" && !!s.assetB, "Animation assets required");
+            const tracks = s.tracks ?? [{ group: s.group, stateA: { asset: s.assetA }, stateB: { asset: s.assetB } }];
+            assert(Array.isArray(tracks) && tracks.length >= 1 && tracks.length <= 3, "Choose 1\u20133 animation groups");
+            assert(new Set(tracks.map((x) => x.group)).size === tracks.length, "Duplicate animation group");
+            for (const track of tracks) {
+              assert(["HairAccessory2", "TailStraps", "Wings"].includes(track.group), "Invalid animation group");
+              for (const state of [track.stateA, track.stateB]) {
+                assert(object(state) && typeof state.asset === "string" && !!state.asset, "Animation assets required");
+                if (state.color !== void 0) assert(typeof state.color === "string" || strings(state.color), "Invalid animation color");
+                if (state.property != null) assert(object(state.property), "Invalid animation property");
+                if (state.craft != null) assert(object(state.craft), "Invalid animation craft");
+                if (state.sameAsset !== void 0) assert(typeof state.sameAsset === "boolean", "Invalid same clothing flag");
+              }
+            }
             assert(Number.isSafeInteger(s.count) && s.count >= 1 && s.count <= 100, "Invalid animation count");
             assert(Number.isFinite(s.durationMs) && s.durationMs >= 100 && s.durationMs <= 12e4, "Invalid animation duration");
             assert(["chat", "emote", "action"].includes(s.messageType) && typeof s.text === "string" && s.text.length <= 4e3, "Invalid animation message");
@@ -756,9 +803,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
     assert(result.personas.some((p) => p.id === result.activePersona), "Active persona missing");
     return result;
   }
-  var VERSION, ID, clone, uid, object, choice, starterRule, kinds, types;
+  var VERSION, ID, clone, uid, object, choice, starterRule, supportsRuleMembers, kinds, types;
   var init_model = __esm({
     "src/core/model.js"() {
+      init_starters();
       VERSION = "0.1.0";
       ID = "Responsive_Liko";
       clone = (value) => JSON.parse(JSON.stringify(value));
@@ -774,14 +822,32 @@ One of mods you are using is using an old version of SDK. It will work for now b
         delayMs: 0,
         choices: texts.map((text) => choice(type, text))
       });
-      kinds = ["activity", "orgasm", "spicer", "event"];
+      supportsRuleMembers = (t) => ["activity", "spicer"].includes(t.kind) || t.kind === "event" && t.event === "visitor";
+      kinds = ["activity", "orgasm", "spicer", "event", "speech"];
       types = ["chat", "emote", "action", "activity", "expression", "animation"];
+    }
+  });
+
+  // src/core/language.js
+  function gameLanguage(host = globalThis) {
+    let saved;
+    try {
+      saved = host.localStorage?.getItem("BondageClubLanguage");
+    } catch {
+    }
+    const value = String(saved || host.TranslationLanguage || host.navigator?.language || "EN").toUpperCase();
+    if (/^(TW|ZH(?:-TW|-HANT)?$)/.test(value) || value.startsWith("ZH-HANT")) return "TW";
+    if (value === "CN" || value.startsWith("ZH")) return "CN";
+    return value.split("-")[0].replace(/^UK$/, "UA");
+  }
+  var init_language = __esm({
+    "src/core/language.js"() {
     }
   });
 
   // src/core/store.js
   function createStore(host = globalThis) {
-    let data = defaults(host.Player?.MemberNumber);
+    let data = defaults(host.Player?.MemberNumber, gameLanguage(host));
     let loaded = false;
     const listeners = /* @__PURE__ */ new Set();
     const notify = () => listeners.forEach((fn) => fn(data));
@@ -803,14 +869,14 @@ One of mods you are using is using an old version of SDK. It will work for now b
           data = validateData(JSON.parse(decoded));
           if (data.starterVersion < 1) {
             if (data.personas.length === 1 && data.personas[0].rules.length === 0) {
-              data.personas[0].rules = starterPersona(data.personas[0].name).rules;
+              data.personas[0].rules = starterPersona(data.personas[0].name, host.Player?.MemberNumber, gameLanguage(host)).rules;
               if (Number.isSafeInteger(host.Player?.MemberNumber) && !data.personas[0].blackList.includes(host.Player.MemberNumber)) data.personas[0].blackList.push(host.Player.MemberNumber);
             }
             data.starterVersion = 1;
             host.Player.ExtensionSettings[ID] = host.LZString.compressToBase64(JSON.stringify(data));
             host.ServerPlayerExtensionSettingsSync(ID);
           }
-        } else data = defaults(host.Player?.MemberNumber);
+        } else data = defaults(host.Player?.MemberNumber, gameLanguage(host));
         loaded = true;
         notify();
       },
@@ -840,6 +906,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var init_store = __esm({
     "src/core/store.js"() {
+      init_language();
       init_model();
     }
   });
@@ -926,7 +993,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function matches(rule2, event) {
     const t = rule2.trigger;
     if (!rule2.enabled || t.matchNone || t.kind !== event.kind) return false;
-    if (t.members?.length && !t.members.includes(event.actor)) return false;
+    if (supportsRuleMembers(t) && t.members?.length && !t.members.includes(event.actor)) return false;
     if (t.kind === "activity") {
       if (t.activities?.length && !t.activities.includes(event.activity)) return false;
       if (t.groups?.length && !t.groups.includes(event.group)) return false;
@@ -942,7 +1009,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!persona2 || (persona2.listMode === "whitelist" ? !persona2.whiteList.includes(event.actor) : persona2.blackList.includes(event.actor))) return null;
     const pool = persona2.rules.filter((r) => matches(r, event)).flatMap((r) => r.choices.filter((c) => c.steps.length).map((choice2) => ({ rule: r, choice: choice2 })));
     if (!pool.length) return null;
-    const selected = pool[Math.min(pool.length - 1, Math.floor(random() * pool.length))];
+    const ordinary = pool.filter((x) => !x.choice.always);
+    const draw = ordinary.length ? ordinary : pool;
+    const selected = draw[Math.min(draw.length - 1, Math.floor(random() * draw.length))];
+    const guaranteed = selected.rule.choices.find((c) => c.always && c !== selected.choice);
     const steps = selected.choice.steps.map((s) => ({ ...s }));
     if (event.kind === "activity") {
       const prefixes = persona2.rules.filter((r) => matches(r, { ...event, kind: "spicer" })).flatMap((r) => r.choices.flatMap((c) => c.steps.filter((s) => s.type === "chat")));
@@ -951,7 +1021,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         if (chat) chat.text = prefixes[Math.floor(random() * prefixes.length)].text + " " + chat.text;
       }
     }
-    return { ...selected, steps };
+    return { ...selected, steps, guaranteedSteps: guaranteed?.steps.map((s) => ({ ...s })) ?? [] };
   }
   function createScheduler({ active, execute, valid, now = Date.now, random = Math.random, setTimer = setTimeout, clearTimer = clearTimeout, report = console.warn }) {
     const timers = /* @__PURE__ */ new Set();
@@ -978,14 +1048,24 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const token = generation;
         const run = () => {
           if (token !== generation || !valid(event)) return;
-          for (const step2 of selected.steps) {
-            if (token !== generation || !valid(event)) break;
-            try {
-              execute(step2, event);
-            } catch (error) {
-              report(error);
+          const executeSteps = (steps) => {
+            for (const step2 of steps) {
+              if (token !== generation || !valid(event)) break;
+              try {
+                execute(step2, event);
+              } catch (error) {
+                report(error);
+              }
             }
-          }
+          };
+          if (selected.guaranteedSteps.length) {
+            executeSteps(selected.guaranteedSteps);
+            const timer = setTimer(() => {
+              timers.delete(timer);
+              executeSteps(selected.steps);
+            }, 50);
+            timers.add(timer);
+          } else executeSteps(selected.steps);
         };
         if (selected.rule.delayMs) {
           const timer = setTimer(() => {
@@ -1000,6 +1080,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var init_engine = __esm({
     "src/core/engine.js"() {
+      init_model();
     }
   });
 
@@ -1008,6 +1089,32 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var init_en = __esm({
     "Translation/en.js"() {
       en_default = {
+        loadingActivities: "Loading activities\u2026",
+        mainResponse: "Main response",
+        sameClothing: "Same clothing as A",
+        newSpeech: "Add speech phrase",
+        editSpeech: "Edit speech phrase",
+        "speech": "Speech habit",
+        "speechList": "Speech habit phrases",
+        "speechChannel": "Apply to",
+        "speech_all": "All",
+        "speech_chat": "Chat only",
+        "speech_whisper": "Whispers only",
+        "chance": "Chance",
+        "severity": "Severity",
+        "weak": "Weak",
+        "medium": "Medium",
+        "strong": "Strong",
+        "addicted": "Addicted",
+        "speechHint": "Weak: sentence ending. Medium: ending plus random insertion. Strong: up to three insertions. Addicted: also replaces 1\u20132 characters. Short messages receive fewer changes.",
+        "alwaysHint": "Guaranteed response (one per rule). Runs with another random response, 50 ms apart.",
+        "editAppearance": "Wardrobe",
+        "animationSeconds": "Shared duration (seconds)",
+        "chooseAnimationGroup": "Select at least one group and both states.",
+        "invalidAnimation": "Count must be 1\u2013100 and duration 0.1\u2013120 seconds.",
+        "HairAccessory2": "Ears",
+        "TailStraps": "Tail",
+        "Wings": "Wings",
         "title": "Responsive_Liko",
         "home": "Settings",
         "enabled": "Enable module",
@@ -1183,6 +1290,32 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var init_tw = __esm({
     "Translation/tw.js"() {
       tw_default = {
+        loadingActivities: "\u6B63\u5728\u8F09\u5165\u52D5\u4F5C\u2026\u2026",
+        mainResponse: "\u4E3B\u56DE\u61C9",
+        sameClothing: "\u540C\u670D\u88DD\uFF08\u8207 A \u76F8\u540C\uFF09",
+        newSpeech: "\u65B0\u589E\u8A9E\u7656",
+        editSpeech: "\u7DE8\u8F2F\u8A9E\u7656",
+        "speech": "\u8A9E\u7656",
+        "speechList": "\u8A9E\u7656\u5217\u8868",
+        "speechChannel": "\u5957\u7528\u7BC4\u570D",
+        "speech_all": "\u5168\u90E8",
+        "speech_chat": "\u50C5\u804A\u5929",
+        "speech_whisper": "\u50C5\u6084\u6084\u8A71",
+        "chance": "\u89F8\u767C\u6A5F\u7387",
+        "severity": "\u8A9E\u7656\u56B4\u91CD\u5EA6",
+        "weak": "\u5F31",
+        "medium": "\u4E2D",
+        "strong": "\u5F37",
+        "addicted": "\u4E2D\u6BD2",
+        "speechHint": "\u5F31\uFF1A\u50C5\u53E5\u5C3E\u3002\u4E2D\uFF1A\u53E5\u5C3E\u5FC5\u5B9A\u52A0\u5165\uFF0C\u53E5\u4E2D\u96A8\u6A5F\u63D2\u5165\u3002\u5F37\uFF1A\u96A8\u6A5F\u63D2\u5165\u4E09\u689D\u3002\u4E2D\u6BD2\uFF1A\u53E6\u66FF\u63DB 1\uFF5E2 \u500B\u5B57\u3002\u77ED\u53E5\u6703\u6E1B\u5C11\u63D2\u5165\u91CF\uFF0C\u4E00\u5B57\u77ED\u53E5\u4E2D\u6BD2\u6642\u53EF\u76F4\u63A5\u66FF\u63DB\u3002",
+        "alwaysHint": "\u5FC5\u5B9A\u89F8\u767C\uFF08\u6BCF\u689D\u898F\u5247\u9650\u4E00\u500B\uFF09\uFF0C\u8207\u53E6\u4E00\u500B\u96A8\u6A5F\u56DE\u61C9\u9593\u9694 50 ms \u57F7\u884C\u3002",
+        "editAppearance": "\u66F4\u8863\u5BA4\u8A2D\u5B9A",
+        "animationSeconds": "\u5171\u7528\u52D5\u756B\u79D2\u6578",
+        "chooseAnimationGroup": "\u8ACB\u9078\u64C7\u81F3\u5C11\u4E00\u500B\u90E8\u4F4D\u4E26\u8A2D\u5B9A A\uFF0FB\u3002",
+        "invalidAnimation": "\u6B21\u6578\u9808\u70BA 1\uFF5E100\uFF0C\u79D2\u6578\u9808\u70BA 0.1\uFF5E120\u3002",
+        "HairAccessory2": "\u8033\u6735",
+        "TailStraps": "\u5C3E\u5DF4",
+        "Wings": "\u7FC5\u8180",
         "title": "Responsive_Liko",
         "home": "\u4E3B\u8A2D\u5B9A",
         "enabled": "\u555F\u7528\u6A21\u7D44",
@@ -1217,8 +1350,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
         "leave": "\u96E2\u958B",
         "Any": "\u6240\u6709\u7D50\u679C",
         "Orgasmed": "\u5B8C\u6210",
-        "Ruined": "\u4E2D\u65B7",
-        "Resisted": "\u62B5\u6297",
+        "Ruined": "\u62D2\u7D55",
+        "Resisted": "\u5FCD\u8010",
         "trigger": "\u89F8\u767C\u689D\u4EF6",
         "activities": "\u52D5\u4F5C ID\uFF08\u9017\u865F\u5206\u9694\uFF0C\u7A7A\u767D\u70BA\u5168\u90E8\uFF09",
         "groups": "\u90E8\u4F4D ID\uFF08\u9017\u865F\u5206\u9694\uFF0C\u7A7A\u767D\u70BA\u5168\u90E8\uFF09",
@@ -1358,6 +1491,32 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var init_cn = __esm({
     "Translation/cn.js"() {
       cn_default = {
+        loadingActivities: "\u6B63\u5728\u52A0\u8F7D\u52A8\u4F5C\u2026\u2026",
+        mainResponse: "\u4E3B\u56DE\u5E94",
+        sameClothing: "\u540C\u670D\u88C5\uFF08\u4E0E A \u76F8\u540C\uFF09",
+        newSpeech: "\u65B0\u589E\u8BED\u7656",
+        editSpeech: "\u7F16\u8F91\u8BED\u7656",
+        "speech": "\u8BED\u7656",
+        "speechList": "\u8BED\u7656\u5217\u8868",
+        "speechChannel": "\u5957\u7528\u8303\u56F4",
+        "speech_all": "\u5168\u90E8",
+        "speech_chat": "\u4EC5\u804A\u5929",
+        "speech_whisper": "\u4EC5\u6084\u6084\u8BDD",
+        "chance": "\u89E6\u53D1\u6982\u7387",
+        "severity": "\u8BED\u7656\u4E25\u91CD\u5EA6",
+        "weak": "\u5F31",
+        "medium": "\u4E2D",
+        "strong": "\u5F3A",
+        "addicted": "\u4E2D\u6BD2",
+        "speechHint": "\u5F31\uFF1A\u50C5\u53E5\u5C3E\u3002\u4E2D\uFF1A\u53E5\u5C3E\u5FC5\u5B9A\u52A0\u5165\uFF0C\u53E5\u4E2D\u96A8\u6A5F\u63D2\u5165\u3002\u5F37\uFF1A\u96A8\u6A5F\u63D2\u5165\u4E09\u689D\u3002\u4E2D\u6BD2\uFF1A\u53E6\u66FF\u63DB 1\uFF5E2 \u500B\u5B57\u3002\u77ED\u53E5\u6703\u6E1B\u5C11\u63D2\u5165\u91CF\uFF0C\u4E00\u5B57\u77ED\u53E5\u4E2D\u6BD2\u6642\u53EF\u76F4\u63A5\u66FF\u63DB\u3002",
+        "alwaysHint": "\u5FC5\u5B9A\u89F8\u767C\uFF08\u6BCF\u689D\u898F\u5247\u9650\u4E00\u500B\uFF09\uFF0C\u8207\u53E6\u4E00\u500B\u96A8\u6A5F\u56DE\u61C9\u9593\u9694 50 ms \u57F7\u884C\u3002",
+        "editAppearance": "\u66F4\u8863\u5BA4\u8BBE\u7F6E",
+        "animationSeconds": "\u5171\u7528\u52A8\u753B\u79D2\u6570",
+        "chooseAnimationGroup": "\u8ACB\u9078\u64C7\u81F3\u5C11\u4E00\u500B\u90E8\u4F4D\u4E26\u8A2D\u5B9A A\uFF0FB\u3002",
+        "invalidAnimation": "\u6B21\u6578\u9808\u70BA 1\uFF5E100\uFF0C\u79D2\u6578\u9808\u70BA 0.1\uFF5E120\u3002",
+        "HairAccessory2": "\u8033\u6735",
+        "TailStraps": "\u5C3E\u5DF4",
+        "Wings": "\u7FC5\u8180",
         "title": "Responsive_Liko",
         "home": "\u4E3B\u8BBE\u7F6E",
         "enabled": "\u542F\u7528\u6A21\u5757",
@@ -1392,8 +1551,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
         "leave": "\u79BB\u5F00",
         "Any": "\u6240\u6709\u7ED3\u679C",
         "Orgasmed": "\u5B8C\u6210",
-        "Ruined": "\u4E2D\u65AD",
-        "Resisted": "\u62B5\u6297",
+        "Ruined": "\u62D2\u7EDD",
+        "Resisted": "\u5FCD\u8010",
         "trigger": "\u89E6\u53D1\u6761\u4EF6",
         "activities": "\u52A8\u4F5C ID\uFF08\u9017\u53F7\u5206\u9694\uFF0C\u7A7A\u767D\u4E3A\u5168\u90E8\uFF09",
         "groups": "\u90E8\u4F4D ID\uFF08\u9017\u53F7\u5206\u9694\uFF0C\u7A7A\u767D\u4E3A\u5168\u90E8\uFF09",
@@ -1533,6 +1692,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var init_de = __esm({
     "Translation/de.js"() {
       de_default = {
+        loadingActivities: "Aktivit\xE4ten werden geladen\u2026",
         "title": "Responsive_Liko",
         "home": "Einstellungen",
         "enabled": "Modul aktivieren",
@@ -1708,6 +1868,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var init_fr = __esm({
     "Translation/fr.js"() {
       fr_default = {
+        loadingActivities: "Chargement des activit\xE9s\u2026",
         "title": "Responsive_Liko",
         "home": "Param\xE8tres",
         "enabled": "Activer le module",
@@ -1883,6 +2044,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var init_ru = __esm({
     "Translation/ru.js"() {
       ru_default = {
+        loadingActivities: "\u0417\u0430\u0433\u0440\u0443\u0437\u043A\u0430 \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u0439\u2026",
         "title": "Responsive_Liko",
         "home": "\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438",
         "enabled": "\u0412\u043A\u043B\u044E\u0447\u0438\u0442\u044C \u043C\u043E\u0434\u0443\u043B\u044C",
@@ -2058,6 +2220,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var init_ua = __esm({
     "Translation/ua.js"() {
       ua_default = {
+        loadingActivities: "\u0417\u0430\u0432\u0430\u043D\u0442\u0430\u0436\u0435\u043D\u043D\u044F \u0434\u0456\u0439\u2026",
         "title": "Responsive_Liko",
         "home": "\u041D\u0430\u043B\u0430\u0448\u0442\u0443\u0432\u0430\u043D\u043D\u044F",
         "enabled": "\u0423\u0432\u0456\u043C\u043A\u043D\u0443\u0442\u0438 \u043C\u043E\u0434\u0443\u043B\u044C",
@@ -2284,11 +2447,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
   });
 
   // src/integrations/catalog.js
-  function activityLabel(name, group, host = globalThis, character = host.Player) {
+  function activityLabelKeys(name, group, character) {
     const sexGroup = character?.HasPenis?.() ? { ItemVulva: "ItemPenis", ItemVulvaPiercings: "ItemGlans" }[group] ?? group : group;
     const groups = [...new Set([sexGroup, group, LABEL_GROUP[group]].filter(Boolean))];
-    for (const candidate of groups) for (const direction of ["ChatOther", "ChatSelf"]) {
-      const key = `Label-${direction}-${candidate}-${name}`;
+    return groups.flatMap((candidate) => ["ChatOther", "ChatSelf"].map((direction) => `Label-${direction}-${candidate}-${name}`));
+  }
+  function activityLabel(name, group, host = globalThis, character = host.Player) {
+    for (const key of activityLabelKeys(name, group, character)) {
       let value;
       try {
         value = host.ActivityDictionaryText?.(key);
@@ -2298,10 +2463,81 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const row = host.ActivityDictionary?.find?.((r) => Array.isArray(r) && r[0] === key && !missing(r[1]));
       if (row) return row[1];
     }
-    const indexed = host.BC_Interactive_Index?.Interactive_Index?.find?.((a) => a?.activityName === name && (!group || a.Target_Group === group));
-    if (!missing(indexed?.translatedactivity)) return indexed.translatedactivity;
     if (name.startsWith("XSAct_")) return name.slice(6);
     return name.replace(/^[A-Za-z]{2,12}_/, "");
+  }
+  function gameOriginalLabels(host) {
+    const path = host.ScreenFileGetPath?.("ActivityDictionary.csv", "Character", "Preference") ?? "Screens/Character/Preference/ActivityDictionary.csv";
+    const source = host.CommonCSVCache?.[path];
+    if (!Array.isArray(source)) return /* @__PURE__ */ new Map();
+    let cached = originalLabels.get(source);
+    if (!cached || cached.length !== source.length) {
+      cached = { length: source.length, labels: new Map(source.filter((row) => Array.isArray(row) && !missing(row[1])).map((row) => [row[0], row[1]])) };
+      originalLabels.set(source, cached);
+    }
+    return cached.labels;
+  }
+  function activitySearchLabels(name, group, host = globalThis, character = host.Player, lookup) {
+    const english = gameOriginalLabels(host), labels = /* @__PURE__ */ new Set();
+    for (const key of activityLabelKeys(name, group, character)) {
+      let translated;
+      try {
+        translated = lookup ? lookup(key) : host.ActivityDictionaryText?.(key);
+      } catch {
+      }
+      if (!missing(translated)) labels.add(translated);
+      if (!lookup) {
+        for (const row of host.ActivityDictionary ?? []) if (Array.isArray(row) && row[0] === key && !missing(row[1])) labels.add(row[1]);
+      }
+      if (english.has(key)) labels.add(english.get(key));
+    }
+    return [...labels];
+  }
+  function* catalogRows(host = globalThis) {
+    let activities;
+    try {
+      activities = host.AssetAllActivities?.(host.Player?.AssetFamily ?? "Female3DCG");
+    } catch {
+    }
+    activities ??= host.ActivityFemale3DCG ?? [];
+    const result = /* @__PURE__ */ new Map();
+    const legacy = new Map((host.ActivityDictionary ?? []).filter((row) => Array.isArray(row) && !missing(row[1])).map((row) => [row[0], row[1]]));
+    const resolved = /* @__PURE__ */ new Map();
+    const lookup = (key) => {
+      if (!resolved.has(key)) {
+        let value;
+        try {
+          value = host.ActivityDictionaryText?.(key);
+        } catch {
+        }
+        resolved.set(key, missing(value) ? legacy.get(key) : value);
+      }
+      return resolved.get(key);
+    };
+    for (const a of activities) {
+      const groups = [a.Target, a.TargetSelf === true ? a.Target : a.TargetSelf].flat().filter((g) => typeof g === "string");
+      for (const group of groups) if (typeof a.Name === "string" && !result.has(`${group}|${a.Name}`)) {
+        const label = activityLabelKeys(a.Name, group, host.Player).map(lookup).find((value) => !missing(value)) ?? a.Name.replace(/^[A-Za-z]{2,12}_/, "");
+        const row = { name: a.Name, group, label, searchLabels: activitySearchLabels(a.Name, group, host, host.Player, lookup) };
+        result.set(`${group}|${a.Name}`, row);
+        yield row;
+      }
+    }
+  }
+  async function activityOptionsAsync(host = globalThis, cancelled = () => false) {
+    const rows = [];
+    await new Promise((resolve) => setTimeout(resolve, 16));
+    if (cancelled()) return null;
+    let deadline = performance.now() + 4;
+    for (const row of catalogRows(host)) {
+      if (cancelled()) return null;
+      rows.push(row);
+      if (performance.now() >= deadline) {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        deadline = performance.now() + 4;
+      }
+    }
+    return rows.sort((a, b) => a.label.localeCompare(b.label));
   }
   function allowedActivity(target, name, group, host = globalThis) {
     const old = target.FocusGroup;
@@ -2326,32 +2562,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     return zones;
   }
-  function activitiesForGroup(character, group, host = globalThis) {
-    if (!character || !group) return [];
-    const physicalGroups = group === "ItemHands" ? ["ItemHands", "ItemHandheld"] : [group];
-    const found = /* @__PURE__ */ new Map();
-    for (const physical of physicalGroups) {
-      const old = character.FocusGroup;
-      try {
-        character.FocusGroup = host.AssetGroupGet?.(character.AssetFamily, physical) ?? { Name: physical };
-        for (const item of host.ActivityAllowedForGroup?.(character, physical) ?? []) {
-          const activity = item?.Activity ?? item;
-          if (!activity?.Name) continue;
-          const key = `${physical}|${activity.Name}`;
-          found.set(key, { name: activity.Name, group: physical, label: activityLabel(activity.Name, physical, host, character) });
-        }
-      } catch {
-      } finally {
-        character.FocusGroup = old;
-      }
-    }
-    return [...found.values()].sort((a, b) => a.label.localeCompare(b.label));
-  }
-  var missing, LABEL_GROUP, BODY_GROUPS, GROUP_ALIAS, canonicalGroup;
+  var missing, LABEL_GROUP, originalLabels, BODY_GROUPS, GROUP_ALIAS, canonicalGroup;
   var init_catalog = __esm({
     "src/integrations/catalog.js"() {
       missing = (s) => typeof s !== "string" || !s || /MISSING (?:TEXT|ACTIVITY)|STRING_RETRIEVAL_FAILED/.test(s);
       LABEL_GROUP = { ItemMouth2: "ItemMouth", ItemMouth3: "ItemMouth", ItemNeckAccessories: "ItemNeck", ItemNeckRestraints: "ItemNeck", ItemNipplesPiercings: "ItemNipples", ItemTorso2: "ItemTorso", ItemHandheld: "ItemHands" };
+      originalLabels = /* @__PURE__ */ new WeakMap();
       BODY_GROUPS = [
         "ItemHead",
         "ItemNose",
@@ -2406,6 +2622,63 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
   });
 
+  // src/features/appearance.js
+  function animationState(track, state) {
+    return state === "B" && track.stateB.sameAsset ? { ...track.stateB, asset: track.stateA.asset } : track["state" + state];
+  }
+  function snapshotItem(item) {
+    return item ? { asset: item.Asset.Name, color: clone(item.Color ?? "Default"), property: clone(item.Property ?? {}), craft: clone(item.Craft ?? null) } : null;
+  }
+  function wearState(host, group, state) {
+    if (!state) {
+      host.InventoryRemove?.(host.Player, group, false);
+      return;
+    }
+    const worn = host.InventoryWear(host.Player, state.asset, group, state.color ?? "Default", void 0, void 0, void 0, false);
+    const item = worn ?? host.InventoryGet(host.Player, group);
+    if (item) {
+      if (state.property !== void 0) item.Property = clone(state.property ?? {});
+      if (state.craft) item.Craft = clone(state.craft);
+      else delete item.Craft;
+    }
+  }
+  async function editAppearanceState(host, group, state, done) {
+    if (typeof host.CharacterAppearanceLoadCharacter !== "function") throw Error("Wardrobe unavailable");
+    const screen = host.CommonGetScreen();
+    const preview = host.CharacterLoadSimple("Responsive_Liko_StatePreview");
+    preview.Name = host.Player.Name;
+    preview.AssetFamily = host.Player.AssetFamily;
+    preview.Appearance = host.Player.Appearance.map((item) => ({ ...item, Color: clone(item.Color ?? "Default"), Property: clone(item.Property ?? {}), ...item.Craft ? { Craft: clone(item.Craft) } : {} }));
+    const previewHost = Object.create(host);
+    previewHost.Player = preview;
+    const restore = () => {
+      preview.FocusGroup = null;
+    };
+    try {
+      wearState(previewHost, group, state);
+      host.CharacterRefresh(preview, false);
+      await host.CharacterAppearanceLoadCharacter(preview, async (accepted) => {
+        const saved = accepted ? snapshotItem(host.InventoryGet(preview, group)) : null;
+        restore();
+        await host.CommonSetScreen(...screen);
+        await host.PreferenceSubscreenExtensionsOpen?.(ID);
+        done(saved);
+      });
+    } catch (error) {
+      restore();
+      await host.CommonSetScreen(...screen);
+      await host.PreferenceSubscreenExtensionsOpen?.(ID);
+      throw error;
+    }
+  }
+  var ANIMATION_GROUPS;
+  var init_appearance = __esm({
+    "src/features/appearance.js"() {
+      init_model();
+      ANIMATION_GROUPS = ["HairAccessory2", "TailStraps", "Wings"];
+    }
+  });
+
   // src/features/output.js
   function renderText(text, event, host = globalThis) {
     const me = host.Player;
@@ -2422,6 +2695,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   function createOutput({ store, host = globalThis, owns, report }) {
     const restores = /* @__PURE__ */ new Set();
     const activitySeen = /* @__PURE__ */ new Map();
+    const animations = /* @__PURE__ */ new Map();
     function textMessage(step2, event) {
       const text = renderText(step2.text, event, host).trim();
       if (!text) return;
@@ -2471,6 +2745,41 @@ One of mods you are using is using an old version of SDK. It will work for now b
       restores.add(restore);
     }
     function animation(step2, event) {
+      if (step2.tracks) {
+        const tracks = step2.tracks;
+        for (const track of tracks) animations.get(track.group)?.();
+        const originals = tracks.map((track) => snapshotItem(host.InventoryGet(host.Player, track.group)));
+        const timers2 = [], later2 = host.setTimeout ?? setTimeout;
+        const update = (track, state) => {
+          wearState(host, track.group, state);
+          host.CharacterRefresh(host.Player, false);
+          host.ChatRoomCharacterItemUpdate(host.Player, track.group);
+        };
+        const cleanup = () => {
+          restores.delete(restore2);
+          tracks.forEach((track) => {
+            if (animations.get(track.group) === restore2) animations.delete(track.group);
+          });
+        };
+        const restore2 = () => {
+          timers2.forEach((timer) => (host.clearTimeout ?? clearTimeout)(timer));
+          tracks.forEach((track, i) => update(track, originals[i]));
+          cleanup();
+        };
+        restores.add(restore2);
+        tracks.forEach((track) => animations.set(track.group, restore2));
+        for (let i = 0; i < step2.count; i++) timers2.push(later2(() => tracks.forEach((track) => update(track, animationState(track, i % 2 ? "A" : "B"))), Math.round(i * step2.durationMs / step2.count)));
+        timers2.push(later2(() => {
+          tracks.forEach((track) => update(track, track.stateA));
+          cleanup();
+        }, step2.durationMs));
+        if (step2.text.trim()) {
+          const message = { type: step2.messageType, text: step2.text }, check = checkBCX(message, store.data.settings.bcx, host);
+          if (check.allowed) textMessage(message, event);
+          else report(check.reason);
+        }
+        return;
+      }
       const current = host.InventoryGet(host.Player, step2.group);
       const original = current ? { asset: current.Asset?.Name, color: JSON.parse(JSON.stringify(current.Color ?? "Default")), property: JSON.parse(JSON.stringify(current.Property ?? null)) } : null;
       const timers = [];
@@ -2540,6 +2849,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       init_model();
       init_catalog();
       init_bcx();
+      init_appearance();
     }
   });
 
@@ -2601,6 +2911,57 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var init_mouth = __esm({
     "src/features/mouth.js"() {
+    }
+  });
+
+  // src/features/speech.js
+  function petSpeech(text, phrases, severity, random = Math.random) {
+    phrases = phrases.map((x) => x.trim()).filter(Boolean);
+    if (!phrases.length || !text.trim() || /^[\/!*(@.]/.test(text.trimStart()) || /https?:\/\//i.test(text)) return text;
+    const chars = [...text], letters = chars.map((c, i) => /[\p{L}\p{N}]/u.test(c) ? i : -1).filter((i) => i >= 0);
+    if (!letters.length) return text;
+    const pick = () => phrases[Math.min(phrases.length - 1, Math.floor(random() * phrases.length))];
+    const budget = Math.min(3, Math.max(1, Math.ceil(letters.length / 6)));
+    const edits = /* @__PURE__ */ new Map();
+    if (severity === "addicted") {
+      const candidates = [...letters];
+      const count2 = Math.min(letters.length, letters.length < 6 ? 1 : 1 + Math.floor(random() * 2));
+      for (let i = 0; i < count2; i++) {
+        const [at] = candidates.splice(Math.floor(random() * candidates.length), 1);
+        chars[at] = pick();
+      }
+      if (letters.length < 6) return chars.join("");
+    }
+    const end = letters.at(-1) + 1;
+    if (severity === "weak" || severity === "medium") edits.set(end, pick());
+    const count = severity === "weak" ? 0 : severity === "medium" ? budget > 1 && random() < 0.5 ? 1 : 0 : budget;
+    const positions = letters.slice(0, -1).map((i) => i + 1);
+    if (!positions.length && !edits.size) edits.set(end, pick());
+    for (let i = 0; i < count && positions.length; i++) {
+      const [at] = positions.splice(Math.floor(random() * positions.length), 1);
+      edits.set(at, pick());
+    }
+    return chars.map((c, i) => c + (edits.get(i + 1) ?? "")).join("");
+  }
+  function installSpeech({ sdk, store, enabled, host = globalThis, random = Math.random }) {
+    sdk.hookFunction("ChatRoomSendChat", 9, (args, next) => {
+      if (!enabled() || host.CurrentScreen !== "ChatRoom") return next(args);
+      const original = host.ElementValue("InputChat");
+      const channel = host.ChatRoomTargetMemberNumber >= 0 ? "whisper" : "chat";
+      const rules = store.active.rules.filter((r) => r.enabled && r.trigger.kind === "speech" && !r.trigger.matchNone && (r.trigger.channel === "all" || r.trigger.channel === channel));
+      const rule2 = rules[Math.floor(random() * rules.length)];
+      if (!rule2 || random() * 100 >= rule2.trigger.chance) return next(args);
+      const changed = petSpeech(original, rule2.choices.flatMap((c) => c.steps.filter((s) => s.type === "chat").map((s) => s.text)), rule2.trigger.severity, random);
+      host.ElementValue("InputChat", changed);
+      try {
+        return next(args);
+      } finally {
+        if (host.ElementValue("InputChat") === changed) host.ElementValue("InputChat", original);
+      }
+    });
+  }
+  var init_speech = __esm({
+    "src/features/speech.js"() {
     }
   });
 
@@ -2828,6 +3189,124 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
   });
 
+  // src/integrations/action-variants.json
+  var action_variants_default;
+  var init_action_variants = __esm({
+    "src/integrations/action-variants.json"() {
+      action_variants_default = {
+        \u5167: "\u5185",
+        \u52D5: "\u52A8",
+        \u5674: "\u55B7",
+        \u58D3: "\u538B",
+        \u5C07: "\u5C06",
+        \u5E36: "\u5E26",
+        \u5E79: "\u5E72",
+        \u5F37: "\u5F3A",
+        \u5F48: "\u5F39",
+        \u6493: "\u6320",
+        \u64A5: "\u62E8",
+        \u64AB: "\u629A",
+        \u64CA: "\u51FB",
+        \u64D4: "\u62C5",
+        \u69CD: "\u67AA",
+        \u6E96: "\u51C6",
+        \u6EFE: "\u6EDA",
+        \u6F51: "\u6CFC",
+        \u7051: "\u6D12",
+        \u71B1: "\u70ED",
+        \u727D: "\u7275",
+        \u74B0: "\u73AF",
+        \u756B: "\u753B",
+        \u7662: "\u75D2",
+        \u7D81: "\u7ED1",
+        \u7DB2: "\u7F51",
+        \u7DCA: "\u7D27",
+        \u7DE9: "\u7F13",
+        \u7E5E: "\u7ED5",
+        \u7E69: "\u7EF3",
+        \u7E8F: "\u7F20",
+        \u805E: "\u95FB",
+        \u8123: "\u5507",
+        \u812B: "\u8131",
+        \u8166: "\u8111",
+        \u8173: "\u811A",
+        \u81C9: "\u8138",
+        \u8396: "\u830E",
+        \u8457: "\u7740",
+        \u84CB: "\u76D6",
+        \u8655: "\u5904",
+        \u8932: "\u88E4",
+        \u8960: "\u88C6",
+        \u896A: "\u889C",
+        \u89AA: "\u4EB2",
+        \u89F8: "\u89E6",
+        \u8A9E: "\u8BED",
+        \u8B77: "\u62A4",
+        \u8C93: "\u732B",
+        \u8C9E: "\u8D1E",
+        \u8E2B: "\u78B0",
+        \u8EC0: "\u8EAF",
+        \u8F15: "\u8F7B",
+        \u9032: "\u8FDB",
+        \u908A: "\u8FB9",
+        \u9234: "\u94C3",
+        \u943A: "\u94DB",
+        \u958B: "\u5F00",
+        \u9593: "\u95F4",
+        \u9670: "\u9634",
+        \u96FB: "\u7535",
+        \u9805: "\u9879",
+        \u9806: "\u987A",
+        \u982D: "\u5934",
+        \u9830: "\u988A",
+        \u9838: "\u9888",
+        \u984D: "\u989D",
+        \u98A8: "\u98CE",
+        \u9AD4: "\u4F53",
+        \u9AEE: "\u53D1",
+        \u9B06: "\u677E",
+        \u9B5A: "\u9C7C",
+        \u9BCA: "\u9CA8",
+        \u9EDE: "\u70B9"
+      };
+    }
+  });
+
+  // src/integrations/search.js
+  function matchNormalized(text, query) {
+    if (!query || text.includes(query)) return true;
+    let cursor = 0;
+    for (const char of text) if (char === query[cursor]) cursor++;
+    return cursor === query.length;
+  }
+  async function createActivitySearchAsync(rows, cancelled = () => false) {
+    const indexed = [];
+    let deadline = performance.now() + 4;
+    for (const row of rows) {
+      if (cancelled()) return null;
+      indexed.push({ row, texts: [...new Set([row.label, row.name, ...row.searchLabels ?? []].map(normalizeSearch))] });
+      if (performance.now() >= deadline) {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        deadline = performance.now() + 4;
+      }
+    }
+    return searchIndex(rows, indexed);
+  }
+  function searchIndex(rows, indexed) {
+    return (query) => {
+      const normalized = normalizeSearch(query);
+      return normalized ? indexed.filter((entry) => entry.texts.some((text) => matchNormalized(text, normalized))).map((entry) => entry.row) : rows;
+    };
+  }
+  var fold, normalizeSearch;
+  var init_search = __esm({
+    "src/integrations/search.js"() {
+      init_action_variants();
+      fold = new Map(Object.entries(action_variants_default));
+      normalizeSearch = (text) => [...String(text).normalize("NFKC").toLocaleLowerCase()].map((c) => fold.get(c) ?? c).join("").replace(/[\s_:：·'"()（）-]|\[|\]/g, "");
+    }
+  });
+
   // src/ui/dom-settings.js
   function installSettings({ store, t, host = globalThis }) {
     if (typeof host.document?.querySelector !== "function") {
@@ -2849,7 +3328,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       return { close() {
       } };
     }
-    let root, page = "home", deleteMode = false, ruleDeleteMode = false, selectedRuleId = null, draft = null, sessionBaseline = null, pickerGroup = "ItemHead", pickerScope = "current", pickerSelected = /* @__PURE__ */ new Set(), pickerQuery = "", pickerInput = "", pickerMode = "trigger", responseDelete = false, modal = null, filter = "all", ruleQuery = "", inlineEdit = null, notice = "", ruleScrollTop = 0;
+    let root, page = "home", deleteMode = false, ruleDeleteMode = false, selectedRuleId = null, draft = null, sessionBaseline = null, pickerGroup = "ItemHead", pickerScope = "current", pickerSelected = /* @__PURE__ */ new Set(), pickerQuery = "", pickerInput = "", pickerMode = "trigger", responseDelete = false, primaryMode = false, modal = null, filter = "all", ruleQuery = "", inlineEdit = null, notice = "", ruleScrollTop = 0;
     const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
     const fmt = (key, vars = {}) => Object.entries(vars).reduce((s, [k, v]) => s.replaceAll(`{${k}}`, String(v)), t(key));
     const sw = (on, small = false) => `<button class="rl-switch ${small ? "rl-small-switch" : ""} ${on ? "on" : ""}" aria-label="${esc(t(on ? "on" : "off"))}"></button>`;
@@ -2867,7 +3346,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
       return [...new Set(numbers.map(Number).filter(Number.isSafeInteger))];
     }
     function animationGroups() {
-      return [...new Set((host.Asset ?? []).map((a) => a?.Group?.Name).filter(Boolean))].filter((group) => animationAssets(group).length > 1).sort();
+      return ANIMATION_GROUPS.filter((group) => animationAssets(group).length);
+    }
+    function groupLabel(group) {
+      return host.AssetGroupGet?.(host.Player?.AssetFamily, group)?.Description ?? host.AssetGroup?.find((g) => g.Name === group)?.Description ?? t(group);
+    }
+    let wardrobePending = false;
+    function trackFor(group) {
+      const current = snapshotItem(host.InventoryGet?.(host.Player, group));
+      const assets = animationAssets(group);
+      const state = current ?? { asset: assets[0]?.name, color: "Default" };
+      return { group, stateA: clone(state), stateB: { ...clone(state), sameAsset: true } };
     }
     function animationAssets(group) {
       const found = /* @__PURE__ */ new Map();
@@ -2898,6 +3387,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (selectedRuleId && draft?.id !== selectedRuleId) draft = clone(active().rules.find((r) => r.id === selectedRuleId));
     }
     function triggerHtml(r) {
+      if (r.trigger.kind === "speech") return `<div class="rl-field">${esc(t("speechChannel"))}</div><div class="rl-segments">${["all", "chat", "whisper"].map((v) => `<button data-trigger-value="channel" data-value="${v}" class="${r.trigger.channel === v ? "on" : ""}">${esc(t("speech_" + v))}</button>`).join("")}</div><div class="rl-field"><span>${esc(t("chance"))}</span><output data-chance-value>${r.trigger.chance ?? 100}%</output></div><input class="rl-chance-bar" type="range" min="0" max="100" step="1" aria-label="${esc(t("chance"))}" data-chance value="${r.trigger.chance ?? 100}"><div class="rl-field">${esc(t("severity"))}</div><div class="rl-segments">${["weak", "medium", "strong", "addicted"].map((v) => `<button data-trigger-value="severity" data-value="${v}" class="${r.trigger.severity === v ? "on" : ""}">${esc(t(v))}</button>`).join("")}</div><p class="rl-muted">${esc(t("speechHint"))}</p>`;
       if (r.trigger.kind === "activity") return `<div class="rl-summary"><b>${esc(r.trigger.groups?.join(", ") || t("allGroups"))}</b><br>${esc(r.trigger.activities?.map((a) => activityLabel(a, r.trigger.groups?.[0] || "", host)).join(", ") || t("allActivities"))}</div><button class="primary" style="margin-top:18px" data-act="picker" data-mode="trigger">${esc(t("openActionPicker"))}</button>`;
       if (r.trigger.kind === "orgasm") return `<div class="rl-field"><span>${esc(t("outcome"))}</span></div><div class="rl-segments">${["Any", "Orgasmed", "Ruined", "Resisted"].map((x) => `<button class="${r.trigger.outcome === x ? "on" : ""}" data-trigger-value="outcome" data-value="${x}">${esc(t(x))}</button>`).join("")}</div>`;
       if (r.trigger.kind === "spicer") return `<div class="rl-field"><span>${esc(t("min"))}</span><input class="rl-input rl-number" type="number" min="0" max="100" data-field="min" value="${r.trigger.min ?? 0}"></div><div class="rl-field"><span>${esc(t("max"))}</span><input class="rl-input rl-number" type="number" min="0" max="100" data-field="max" value="${r.trigger.max ?? 100}"></div>`;
@@ -2911,39 +3401,70 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const r = activeRule(), editingRule = r && inlineEdit?.type === "rule" && inlineEdit.id === r.id;
       let editor = `<div class="rl-muted">${esc(t("selectRuleHint"))}</div>`;
       if (r) {
-        const responses = r.choices.map((c, i) => {
+        const responses = r.choices.map((c, i) => ({ c, i })).sort((a, b) => Number(!!b.c.always) - Number(!!a.c.always)).map(({ c, i }) => {
           const s = c.steps[0];
-          return `<div class="rl-response"><b>${esc(t(s.type === "activity" ? "activityStep" : s.type === "animation" ? "animationStep" : s.type))}</b><span>${esc(s.type === "activity" ? `${activityLabel(s.activity, s.group, host)} \xB7 ${s.group}` : s.type === "animation" ? `${s.assetA} \u2194 ${s.assetB} \xB7 ${s.count}\xD7 \xB7 ${s.durationMs}ms` : s.text)}</span><button class="${responseDelete ? "danger" : ""}" data-act="${responseDelete ? "deleteResponse" : "editResponse"}" data-index="${i}">${esc(t(responseDelete ? "delete" : "edit"))}</button></div>`;
+          return `<div class="rl-response ${c.always ? "rl-primary-response" : ""} ${primaryMode ? "rl-primary-pick" : ""}" ${primaryMode && r.trigger.kind !== "speech" ? `data-primary-choice="${i}" role="button" tabindex="0" aria-label="${esc(t("mainResponse"))}"` : ""}>${c.always && r.trigger.kind !== "speech" ? `<span class="rl-crown" aria-label="${esc(t("mainResponse"))}">${ICON.crown}</span>` : ""}<b>${esc(t(r.trigger.kind === "speech" ? "speech" : s.type === "activity" ? "activityStep" : s.type === "animation" ? "animationStep" : s.type))}</b><span>${esc(s.type === "activity" ? `${activityLabel(s.activity, s.group, host)} \xB7 ${s.group}` : s.type === "animation" ? `${(s.tracks ?? [{ group: s.group }]).map((x) => groupLabel(x.group)).join(" + ")} \xB7 ${s.count}\xD7 \xB7 ${s.durationMs / 1e3}s` : s.text)}</span><button class="${responseDelete ? "danger" : ""}" data-act="${responseDelete ? "deleteResponse" : "editResponse"}" data-index="${i}">${esc(t(responseDelete ? "delete" : "edit"))}</button></div>`;
         }).join("");
-        editor = `<div class="rl-head">${editingRule ? `<input class="rl-inline-input" data-inline-edit size="${Math.max(6, r.name.length + 1)}" value="${esc(r.name)}">` : `<h2 class="rl-inline-title">${esc(r.name)}</h2><button class="rl-icon" data-act="editRuleInline">${ICON.edit}</button>`}<span class="rl-grow"></span>${ruleDeleteMode ? `<button data-act="finishRuleDelete">${esc(t("finish"))}</button>` : `<span data-act="toggleRule" data-id="${esc(r.id)}">${sw(r.enabled)}</span><button data-act="deleteRule">${esc(t("delete"))}</button>`}<button class="primary" data-act="saveRule">${esc(t("save"))}</button></div><div class="rl-editor-grid"><div class="rl-box"><h3>${esc(t("trigger"))}</h3><div class="rl-field"><span>${esc(t("type"))}</span></div><div class="rl-segments">${["activity", "orgasm", "spicer", "event"].map((x) => `<button class="${r.trigger.kind === x ? "on" : ""}" data-trigger-kind="${x}">${esc(t(x))}</button>`).join("")}</div>${triggerHtml(r)}<div class="rl-settings-group"><h3>${esc(t("ruleWhitelist"))}</h3><div class="rl-muted">${esc(t("ruleWhitelistHint"))}</div>${relationButtons("rule")}<input class="rl-input" data-field="members" value="${esc(r.trigger.members?.join(", ") || "")}" placeholder="${esc(t("memberNumbersPlaceholder"))}"></div></div><div class="rl-box"><div class="rl-response-head"><h3 class="rl-grow">${esc(t("responses"))}</h3><button data-act="picker" data-mode="response">\uFF0B ${esc(t("activityStep"))}</button><button data-act="newAnimation">\uFF0B ${esc(t("animationStep"))}</button><button data-act="newText">\uFF0B ${esc(t("textStep"))}</button><button data-act="responseDelete">${esc(t(responseDelete ? "finish" : "delete"))}</button></div>${responses}</div></div>`;
+        editor = `<div class="rl-head">${editingRule ? `<input class="rl-inline-input" data-inline-edit size="${Math.max(6, r.name.length + 1)}" value="${esc(r.name)}">` : `<h2 class="rl-inline-title">${esc(r.name)}</h2><button class="rl-icon" data-act="editRuleInline">${ICON.edit}</button>`}<span class="rl-grow"></span>${ruleDeleteMode ? `<button data-act="finishRuleDelete">${esc(t("finish"))}</button>` : `<span data-act="toggleRule" data-id="${esc(r.id)}">${sw(r.enabled)}</span><button data-act="deleteRule">${esc(t("delete"))}</button>`}<button class="primary" data-act="saveRule">${esc(t("save"))}</button></div><div class="rl-editor-grid"><div class="rl-box"><h3>${esc(t("trigger"))}</h3><div class="rl-field"><span>${esc(t("type"))}</span></div><div class="rl-segments">${["activity", "orgasm", "spicer", "event", "speech"].map((x) => `<button class="${r.trigger.kind === x ? "on" : ""}" data-trigger-kind="${x}">${esc(t(x))}</button>`).join("")}</div>${triggerHtml(r)}${!supportsRuleMembers(r.trigger) ? "" : `<div class="rl-settings-group"><h3>${esc(t("ruleWhitelist"))}</h3><div class="rl-muted">${esc(t("ruleWhitelistHint"))}</div>${relationButtons("rule")}<input class="rl-input" data-field="members" value="${esc(r.trigger.members?.join(", ") || "")}" placeholder="${esc(t("memberNumbersPlaceholder"))}"></div>`}</div><div class="rl-box"><div class="rl-response-head"><h3 class="rl-grow">${esc(t(r.trigger.kind === "speech" ? "speechList" : "responses"))}</h3>${r.trigger.kind === "speech" ? "" : `<button data-act="primaryMode" class="${primaryMode ? "primary" : ""}">${esc(t(primaryMode ? "finish" : "mainResponse"))}</button><span class="rl-response-gap"></span>`}<button data-act="newText">\uFF0B ${esc(t(r.trigger.kind === "speech" ? "speech" : "textStep"))}</button>${r.trigger.kind === "speech" ? "" : `<button data-act="picker" data-mode="response">\uFF0B ${esc(t("activityStep"))}</button><button data-act="newAnimation">\uFF0B ${esc(t("animationStep"))}</button>`}<button class="rl-response-delete" data-act="responseDelete">${esc(t(responseDelete ? "finish" : "delete"))}</button></div>${responses}</div></div>`;
       }
-      return `<main class="rl-work"><aside class="rl-panel rl-browser"><div class="rl-head"><button class="primary rl-grow" data-act="newRule">\uFF0B ${esc(t("addRule"))}</button><button data-act="lists">${esc(t("listSettings"))}</button></div><input class="rl-search" data-rule-search value="${esc(ruleQuery)}" placeholder="${esc(t("searchRules"))}"><div class="rl-cats">${[["all", "all"], ["activity", "activity"], ["orgasm", "orgasm"], ["spicer", "spicer"], ["event", "event"]].map(([v, k]) => `<button class="${filter === v ? "on" : ""}" data-filter="${v}">${esc(t(k))}</button>`).join("")}</div><div class="rl-rule-list">${list}</div></aside><section class="rl-panel rl-editor">${editor}</section></main>`;
+      return `<main class="rl-work"><aside class="rl-panel rl-browser"><div class="rl-head"><button class="primary rl-grow" data-act="newRule">\uFF0B ${esc(t("addRule"))}</button><button data-act="lists">${esc(t("listSettings"))}</button></div><input class="rl-search" data-rule-search value="${esc(ruleQuery)}" placeholder="${esc(t("searchRules"))}"><div class="rl-cats">${[["all", "all"], ["activity", "activity"], ["orgasm", "orgasm"], ["spicer", "spicer"], ["event", "event"], ["speech", "speech"]].map(([v, k]) => `<button class="${filter === v ? "on" : ""}" data-filter="${v}">${esc(t(k))}</button>`).join("")}</div><div class="rl-rule-list">${list}</div></aside><section class="rl-panel rl-editor">${editor}</section></main>`;
     }
+    let pickerIndexModal = null, pickerIndexLanguage = null, pickerSearch = null;
     function pickerRows() {
-      let rows;
-      if (pickerScope === "all") {
-        const found = /* @__PURE__ */ new Map();
-        for (const group of new Set(bodyZones(host.Player, host).map((z) => z.group))) for (const a of activitiesForGroup(host.Player, group, host)) found.set(`${a.group}|${a.name}`, a);
-        rows = [...found.values()];
-      } else rows = activitiesForGroup(host.Player, pickerGroup, host);
-      return rows.filter((a) => `${a.label} ${a.name}`.toLocaleLowerCase().includes(pickerQuery.toLocaleLowerCase()));
+      if (pickerIndexModal !== modal || pickerIndexLanguage !== host.TranslationLanguage) {
+        const current = modal, language = host.TranslationLanguage;
+        pickerIndexModal = current;
+        pickerIndexLanguage = language;
+        pickerSearch = null;
+        const cancelled = () => !root || modal !== current || host.TranslationLanguage !== language;
+        activityOptionsAsync(host, cancelled).then(async (rows2) => {
+          if (!rows2 || cancelled()) return;
+          const search = await createActivitySearchAsync(rows2, cancelled);
+          if (!search || cancelled()) return;
+          pickerSearch = search;
+          updatePickerResults();
+          root.querySelectorAll('[data-act="selectAll"],[data-act="confirmPicker"]').forEach((b) => b.disabled = false);
+        }).catch((error) => {
+          if (!cancelled()) {
+            const el = root.querySelector(".rl-actions");
+            if (el) el.textContent = String(error.message || error);
+          }
+        });
+      }
+      if (!pickerSearch) return [];
+      const rows = pickerSearch(pickerQuery);
+      return pickerScope === "all" ? rows : rows.filter((a) => canonicalGroup(a.group) === canonicalGroup(pickerGroup));
+    }
+    function pickerActions(rows) {
+      if (!pickerSearch) return `<div class="rl-muted" role="status">${esc(t("loadingActivities"))}</div>`;
+      return rows.map((a) => {
+        const key = `${a.group}|${a.name}`;
+        return `<button class="rl-action ${pickerSelected.has(key) ? "on" : ""}" data-action="${esc(key)}"><strong>${esc(a.label)}</strong><small>${esc(a.name)}</small></button>`;
+      }).join("") || `<div class="rl-muted">${esc(t("noAvailableActivities"))}</div>`;
+    }
+    function updatePickerResults() {
+      const container = root?.querySelector(".rl-actions");
+      if (!container) return;
+      container.innerHTML = pickerActions(pickerRows());
+      container.scrollTop = 0;
+      container.querySelectorAll("[data-action]").forEach((b) => b.onclick = () => {
+        pickerSelected.has(b.dataset.action) ? pickerSelected.delete(b.dataset.action) : pickerSelected.add(b.dataset.action);
+        b.classList.toggle("on", pickerSelected.has(b.dataset.action));
+        const count = root.querySelector("[data-picker-count]");
+        if (count) count.textContent = fmt("selectedActivityCount", { count: pickerSelected.size });
+      });
     }
     function animationModalBody() {
-      const groups = animationGroups(), assets = animationAssets(modal.group);
-      const options = assets.map((a) => `<option value="${esc(a.name)}">${esc(a.label)}</option>`).join("");
-      return `<div class="rl-animation-grid"><span>${esc(t("animationGroup"))}</span><select class="rl-select" data-animation-field="group">${groups.map((g) => `<option value="${esc(g)}" ${g === modal.group ? "selected" : ""}>${esc(g)}</option>`).join("")}</select><span>${esc(t("animationStateA"))}</span><select class="rl-select" data-animation-field="assetA">${options.replace(`value="${esc(modal.assetA)}"`, `value="${esc(modal.assetA)}" selected`)}</select><span>${esc(t("animationStateB"))}</span><select class="rl-select" data-animation-field="assetB">${options.replace(`value="${esc(modal.assetB)}"`, `value="${esc(modal.assetB)}" selected`)}</select><span>${esc(t("animationCount"))}</span><input class="rl-input rl-number" type="number" min="1" max="100" data-animation-field="count" value="${modal.count}"><span>${esc(t("animationDuration"))}</span><input class="rl-input rl-number" type="number" min="100" max="120000" data-animation-field="durationMs" value="${modal.durationMs}"></div><div class="rl-animation-message"><div class="rl-muted">${esc(t("animationMessageHint"))}</div><div class="rl-choice-row">${["chat", "emote", "action"].map((x) => `<button class="${modal.messageType === x ? "on" : ""}" data-animation-message-type="${x}">${esc(t(x))}</button>`).join("")}</div><textarea class="rl-textarea" data-animation-field="text">${esc(modal.text)}</textarea><div class="rl-tools"><button data-animation-token="{Self}">${esc(t("insertSelfName"))}</button><button data-animation-token="{Other}">${esc(t("insertOtherName"))}</button></div></div>`;
+      return `<div class="rl-segments">${animationGroups().map((g) => `<button data-animation-group="${g}" class="${modal.tracks.some((x) => x.group === g) ? "on" : ""}">${esc(groupLabel(g))}</button>`).join("")}</div><div class="rl-animation-tracks">${modal.tracks.map((track, i) => `<div class="rl-settings-group rl-animation-track"><h3>${esc(groupLabel(track.group))}</h3>${["A", "B"].map((state) => `<div class="rl-field"><span>${esc(t("animationState" + state))}</span><select class="rl-select" data-track="${i}" data-state="${state}">${state === "B" ? `<option value="__same__" ${track.stateB.sameAsset ? "selected" : ""}>${esc(t("sameClothing"))}</option>` : ""}${animationAssets(track.group).map((a) => `<option value="${esc(a.name)}" ${!(state === "B" && track.stateB.sameAsset) && a.name === track["state" + state].asset ? "selected" : ""}>${esc(a.label)}</option>`).join("")}</select><button data-wardrobe="${i}" data-state="${state}">${esc(t("editAppearance"))}</button></div>`).join("")}</div>`).join("")}</div><div class="rl-animation-grid"><span>${esc(t("animationCount"))}</span><input class="rl-input rl-number" type="number" min="1" max="100" data-animation-field="count" value="${modal.count}"><span>${esc(t("animationSeconds"))}</span><input class="rl-input rl-number" type="number" min="0.1" max="120" step="0.1" data-animation-seconds value="${modal.durationMs / 1e3}"></div><div class="rl-animation-message"><div class="rl-muted">${esc(t("animationMessageHint"))}</div><div class="rl-choice-row">${["chat", "emote", "action"].map((x) => `<button class="${modal.messageType === x ? "on" : ""}" data-animation-message-type="${x}">${esc(t(x))}</button>`).join("")}</div><textarea class="rl-textarea" style="height:90px" data-animation-field="text">${esc(modal.text)}</textarea><div class="rl-tools"><button data-animation-token="{Self}">${esc(t("insertSelfName"))}</button><button data-animation-token="{Other}">${esc(t("insertOtherName"))}</button></div></div>`;
     }
     function pickerHtml() {
       const zones = bodyZones(host.Player, host), rows = pickerRows();
       const zoneHtml = zones.map(({ group, zone }) => {
         const [x, y, w, h] = zone;
-        return `<button class="rl-zone ${group === pickerGroup ? "selected" : ""}" data-group="${group}" style="left:${x / 5}%;top:${y / 10}%;width:${w / 5}%;height:${h / 10}%"></button>`;
+        return `<button class="rl-zone ${group === pickerGroup ? "selected" : ""}" data-group="${group}" aria-label="${esc(groupLabel(group))}" title="${esc(groupLabel(group))}" style="left:${x / 5}%;top:${y / 10}%;width:${w / 5}%;height:${h / 10}%"></button>`;
       }).join("");
-      const actions = rows.map((a) => {
-        const key = `${a.group}|${a.name}`;
-        return `<button class="rl-action ${pickerSelected.has(key) ? "on" : ""}" data-action="${esc(key)}"><strong>${esc(a.label)}</strong><small>${esc(a.name)}</small></button>`;
-      }).join("") || `<div class="rl-muted">${esc(t("noAvailableActivities"))}</div>`;
-      return `<div class="rl-overlay"><section class="rl-dialog"><div class="rl-picker-head"><h2>${esc(t("chooseActivity"))}</h2><div class="rl-picker-controls"><select class="rl-select rl-picker-scope" data-picker-scope><option value="current" ${pickerScope === "current" ? "selected" : ""}>${esc(t("currentArea"))}</option><option value="all" ${pickerScope === "all" ? "selected" : ""}>${esc(t("allAreas"))}</option></select><div class="rl-action-search"><input class="rl-input" data-action-search value="${esc(pickerInput)}" placeholder="${esc(t("searchActivities"))}"><button class="rl-clear-search" data-act="clearSearch" title="${esc(t("clearSearch"))}">\xD7</button></div><button data-act="searchActivities">${esc(t("searchButton"))}</button><span class="rl-grow"></span><button data-act="selectAll">${esc(t("selectAll"))}</button><button data-act="clearAll">${esc(t("clearAll"))}</button></div></div><div class="rl-dialog-body rl-picker-body"><div class="rl-body-map">${zoneHtml}</div><div class="rl-actions-wrap"><div class="rl-actions-title">${pickerScope === "all" ? esc(t("allAreaActivities")) : fmt("availableForGroup", { group: esc(pickerGroup) })}</div><div class="rl-actions">${actions}</div></div></div><div class="rl-dialog-foot"><span class="rl-grow rl-muted">${fmt("selectedActivityCount", { count: pickerSelected.size })}</span><button data-act="closeModal">${esc(t("cancel"))}</button><button class="primary" data-act="confirmPicker">${esc(t("confirmAdd"))}</button></div></section></div>`;
+      const actions = pickerActions(rows);
+      return `<div class="rl-overlay"><section class="rl-dialog"><div class="rl-picker-head"><h2>${esc(t("chooseActivity"))}</h2><div class="rl-picker-controls"><select class="rl-select rl-picker-scope" data-picker-scope><option value="current" ${pickerScope === "current" ? "selected" : ""}>${esc(t("currentArea"))}</option><option value="all" ${pickerScope === "all" ? "selected" : ""}>${esc(t("allAreas"))}</option></select><div class="rl-action-search"><input class="rl-input" data-action-search value="${esc(pickerInput)}" placeholder="${esc(t("searchActivities"))}"><button class="rl-clear-search" data-act="clearSearch" title="${esc(t("clearSearch"))}">\xD7</button></div><button data-act="searchActivities">${esc(t("searchButton"))}</button><span class="rl-grow"></span><button data-act="selectAll" ${!pickerSearch ? "disabled" : ""}>${esc(t("selectAll"))}</button><button data-act="clearAll">${esc(t("clearAll"))}</button></div></div><div class="rl-dialog-body rl-picker-body"><div class="rl-body-map">${zoneHtml}</div><div class="rl-actions-wrap"><div class="rl-actions-title">${pickerScope === "all" ? esc(t("allAreaActivities")) : fmt("availableForGroup", { group: esc(groupLabel(pickerGroup)) })}</div><div class="rl-actions">${actions}</div></div></div><div class="rl-dialog-foot"><span class="rl-grow rl-muted" data-picker-count>${fmt("selectedActivityCount", { count: pickerSelected.size })}</span><button data-act="closeModal">${esc(t("cancel"))}</button><button class="primary" data-act="confirmPicker" ${!pickerSearch ? "disabled" : ""}>${esc(t("confirmAdd"))}</button></div></section></div>`;
     }
     function modalHtml() {
       if (!modal) return "";
@@ -2954,13 +3475,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (modal.type === "name") body = `<input class="rl-input" data-modal-value value="${esc(modal.value)}">`;
       if (modal.type === "confirm") body = `<p>${esc(modal.message)}</p>`;
       if (modal.type === "transfer") body = `<textarea class="rl-textarea" data-modal-value ${modal.mode === "export" ? "readonly" : ""}>${esc(modal.value)}</textarea>`;
-      if (modal.type === "text") body = `<div class="rl-choice-row">${["chat", "emote", "action"].map((x) => `<button class="${modal.responseType === x ? "on" : ""}" data-response-type="${x}">${esc(t(x))}</button>`).join("")}</div><textarea class="rl-textarea" style="margin-top:18px" data-modal-value>${esc(modal.value)}</textarea><div class="rl-tools" style="margin-top:12px"><button data-token="{Self}">${esc(t("insertSelfName"))}</button><button data-token="{Other}">${esc(t("insertOtherName"))}</button></div>`;
+      if (modal.type === "text") body = `<div class="rl-choice-row">${(draft?.trigger.kind === "speech" ? ["chat"] : ["chat", "emote", "action"]).map((x) => `<button class="${modal.responseType === x ? "on" : ""}" data-response-type="${x}">${esc(t(x))}</button>`).join("")}</div><textarea class="rl-textarea" style="margin-top:18px" data-modal-value>${esc(modal.value)}</textarea><div class="rl-tools" style="margin-top:12px"><button data-token="{Self}">${esc(t("insertSelfName"))}</button><button data-token="{Other}">${esc(t("insertOtherName"))}</button></div>`;
+      if (modal.type === "text" && draft?.trigger.kind === "speech") {
+        titles.text = t(modal.index == null ? "newSpeech" : "editSpeech");
+        body = `<textarea class="rl-textarea" data-modal-value>${esc(modal.value)}</textarea>`;
+      }
       if (modal.type === "animation") body = animationModalBody();
       if (modal.type === "lists") {
         const key = modal.listMode === "whitelist" ? "white" : "black", value = key === "white" ? modal.white : modal.black;
         body = `<div class="rl-settings-group"><h3>${esc(t("interactionTargets"))}</h3><div class="rl-segments"><button class="${modal.listMode === "whitelist" ? "on" : ""}" data-list-mode="whitelist">${esc(t("onlyWhitelist"))}</button><button class="${modal.listMode === "blacklist" ? "on" : ""}" data-list-mode="blacklist">${esc(t("onlyBlacklist"))}</button></div></div><div class="rl-settings-group"><h3>${esc(t(key === "white" ? "whiteList" : "blackList"))}</h3><div class="rl-muted">${esc(t(key === "white" ? "whiteListHint" : "blackListHint"))}</div>${relationButtons("persona")}<div class="rl-list-entry"><input class="rl-input" data-list="${key}" value="${esc(value)}" placeholder="${esc(t("memberNumbersPlaceholder"))}"><button data-act="normalizeList">\uFF0B</button></div></div>`;
       }
-      return `<div class="rl-overlay"><section class="rl-dialog compact"><div class="rl-dialog-head"><h2 class="rl-grow">${esc(titles[modal.type])}</h2><button data-act="closeModal">${ICON.close}</button></div><div class="rl-dialog-body">${body}</div><div class="rl-dialog-foot"><span class="rl-grow"></span><button data-act="closeModal">${esc(t("cancel"))}</button>${modal.mode === "export" ? "" : `<button class="primary" data-act="confirmModal">${esc(t("save"))}</button>`}</div></section></div>`;
+      return `<div class="rl-overlay"><section class="rl-dialog compact ${modal.type === "animation" ? "rl-animation-dialog" : ""}"><div class="rl-dialog-head"><h2 class="rl-grow">${esc(titles[modal.type])}</h2><button data-act="closeModal">${ICON.close}</button></div><div class="rl-dialog-body">${modal.error ? `<p role="alert">${esc(modal.error)}</p>` : ""}${body}</div><div class="rl-dialog-foot"><span class="rl-grow"></span><button data-act="closeModal">${esc(t("cancel"))}</button>${modal.mode === "export" ? "" : `<button class="primary" data-act="confirmModal">${esc(t("save"))}</button>`}</div></section></div>`;
     }
     function render() {
       if (!root) return;
@@ -2981,6 +3506,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       let pointer = null, startX = 0, startY = 0, left = 0, top = 0, dragging = false;
       element.onpointerdown = (e) => {
         if (e.button !== 0 || e.target.closest("input,textarea,select")) return;
+        const tracks = e.target.closest(".rl-animation-tracks"), trackScroll = tracks && (tracks.scrollWidth > tracks.clientWidth || tracks.scrollHeight > tracks.clientHeight);
+        if (tracks && (element !== tracks && trackScroll || element === tracks && !trackScroll)) return;
         pointer = e.pointerId;
         startX = e.clientX;
         startY = e.clientY;
@@ -3047,7 +3574,84 @@ One of mods you are using is using an old version of SDK. It will work for now b
       return [...new Set(value.split(",").map((x) => Number(x.trim())).filter(Number.isSafeInteger))];
     }
     function bind() {
-      root.querySelectorAll(".rl-box,.rl-rule-list").forEach(bindDragScroll);
+      root.querySelectorAll("[data-animation-field]").forEach((el) => el.oninput = () => {
+        modal[el.dataset.animationField] = el.dataset.animationField === "count" ? Number(el.value) : el.value;
+      });
+      root.querySelectorAll('[data-act="primaryMode"]').forEach((b) => b.onclick = () => {
+        primaryMode = !primaryMode;
+        responseDelete = false;
+        render();
+      });
+      root.querySelectorAll("[data-primary-choice]").forEach((b) => {
+        const choose = () => {
+          const choice2 = draft.choices[Number(b.dataset.primaryChoice)], value = !choice2.always;
+          draft.choices.forEach((c) => delete c.always);
+          if (value) choice2.always = true;
+          primaryMode = false;
+          render();
+        };
+        b.onclick = (e) => {
+          if (!e.target.closest("button")) choose();
+        };
+        b.onkeydown = (e) => {
+          if (e.target === b && ["Enter", " "].includes(e.key)) {
+            e.preventDefault();
+            choose();
+          }
+        };
+      });
+      const chance = root.querySelector("[data-chance]");
+      if (chance) chance.oninput = () => {
+        draft.trigger.chance = Number(chance.value);
+        root.querySelector("[data-chance-value]").textContent = chance.value + "%";
+      };
+      root.querySelectorAll("[data-animation-group]").forEach((b) => b.onclick = () => {
+        const g = b.dataset.animationGroup, i = modal.tracks.findIndex((x) => x.group === g);
+        if (i < 0) modal.tracks.push(trackFor(g));
+        else modal.tracks.splice(i, 1);
+        render();
+      });
+      root.querySelectorAll("[data-track]").forEach((el) => el.onchange = () => {
+        const track = modal.tracks[Number(el.dataset.track)], state = el.dataset.state;
+        if (state === "B" && el.value === "__same__") track.stateB = { ...track.stateB, asset: track.stateA.asset, sameAsset: true };
+        else {
+          track["state" + state] = { asset: el.value, color: "Default" };
+          if (state === "A" && track.stateB.sameAsset) track.stateB.asset = el.value;
+        }
+        render();
+      });
+      const seconds = root.querySelector("[data-animation-seconds]");
+      if (seconds) seconds.oninput = seconds.onchange = () => {
+        modal.durationMs = Number(seconds.value) * 1e3;
+      };
+      root.querySelectorAll("[data-wardrobe]").forEach((b) => b.onclick = async () => {
+        const track = modal.tracks[Number(b.dataset.wardrobe)], state = "state" + b.dataset.state;
+        wardrobePending = true;
+        root.style.display = "none";
+        try {
+          await editAppearanceState(host, track.group, animationState(track, b.dataset.state), (saved) => {
+            if (saved) {
+              const same = state === "stateB" && track.stateB.sameAsset && saved.asset === track.stateA.asset;
+              track[state] = { ...saved, ...same ? { sameAsset: true } : {} };
+              if (state === "stateA" && track.stateB.sameAsset) track.stateB.asset = saved.asset;
+            }
+            wardrobePending = false;
+            if (!root) {
+              root = host.document.createElement("div");
+              root.className = "rl-root";
+              host.document.body.appendChild(root);
+            }
+            root.style.display = "";
+            render();
+          });
+        } catch (error) {
+          wardrobePending = false;
+          if (root) root.style.display = "";
+          modal.error = String(error.message);
+          render();
+        }
+      });
+      root.querySelectorAll(".rl-box,.rl-rule-list,.rl-animation-tracks,.rl-animation-dialog .rl-dialog-body").forEach(bindDragScroll);
       root.querySelectorAll('[data-act="exit"]').forEach((b) => b.onclick = () => {
         if (page === "home") host.PreferenceSubscreenExtensionsClear?.();
         else if (dirty()) {
@@ -3160,6 +3764,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       };
       root.querySelectorAll('[data-act="selectRule"]').forEach((b) => b.onclick = () => {
         if (dirty()) commitDraft();
+        primaryMode = false;
         selectedRuleId = b.closest(".rl-rule").dataset.id;
         draft = null;
         render();
@@ -3208,7 +3813,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
       });
       root.querySelectorAll("[data-trigger-kind]").forEach((b) => b.onclick = () => {
         const v = b.dataset.triggerKind;
-        draft.trigger = { kind: v, members: [], ...v === "activity" ? { activities: [], groups: [], self: false } : v === "orgasm" ? { outcome: "Any" } : v === "spicer" ? { min: 0, max: 100 } : { event: "join", roomMode: "any", roomNames: [] } };
+        primaryMode = false;
+        if (v === "speech") draft.choices = draft.choices.map((c) => ({ id: c.id, steps: c.steps.filter((s) => ["chat", "emote", "action"].includes(s.type)).map((s) => ({ type: "chat", text: s.text })) })).filter((c) => c.steps.length);
+        draft.trigger = { kind: v, members: [], ...v === "activity" ? { activities: [], groups: [], self: false } : v === "orgasm" ? { outcome: "Any" } : v === "spicer" ? { min: 0, max: 100 } : v === "speech" ? { channel: "all", chance: 100, severity: "weak" } : { event: "join", roomMode: "any", roomNames: [] } };
         render();
       });
       root.querySelectorAll("[data-trigger-value]").forEach((b) => b.onclick = () => {
@@ -3218,9 +3825,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
       root.querySelectorAll("[data-field]").forEach((el) => el.onchange = () => {
         const k = el.dataset.field, v = el.value;
         if (k === "kind") {
-          draft.trigger = { kind: v, members: [], ...v === "activity" ? { activities: [], groups: [], self: false } : v === "orgasm" ? { outcome: "Any" } : v === "spicer" ? { min: 0, max: 100 } : { event: "join", roomMode: "any", roomNames: [] } };
-        } else if (["min", "max"].includes(k)) draft.trigger[k] = Number(v);
-        else if (k === "members") draft.trigger.members = parseMembers(v);
+          draft.trigger = { kind: v, members: [], ...v === "activity" ? { activities: [], groups: [], self: false } : v === "orgasm" ? { outcome: "Any" } : v === "spicer" ? { min: 0, max: 100 } : v === "speech" ? { channel: "all", chance: 100, severity: "weak" } : { event: "join", roomMode: "any", roomNames: [] } };
+        } else if (["min", "max", "chance"].includes(k)) {
+          draft.trigger[k] = Math.max(0, Math.min(100, Number(v) || 0));
+          el.value = draft.trigger[k];
+          return;
+        } else if (k === "members") draft.trigger.members = parseMembers(v);
         else if (k === "roomNames") draft.trigger.roomNames = v.split(",").map((x) => x.trim()).filter(Boolean);
         else draft.trigger[k] = v;
         render();
@@ -3237,10 +3847,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const ps = root.querySelector("[data-picker-scope]");
       if (ps) ps.onchange = () => {
         pickerScope = ps.value;
+        pickerQuery = pickerInput;
         render();
       };
       root.querySelectorAll("[data-group]").forEach((b) => b.onclick = () => {
         pickerGroup = b.dataset.group;
+        pickerScope = "current";
+        pickerQuery = pickerInput;
         render();
       });
       root.querySelectorAll("[data-action]").forEach((b) => b.onclick = () => {
@@ -3249,26 +3862,35 @@ One of mods you are using is using an old version of SDK. It will work for now b
       });
       const as = root.querySelector("[data-action-search]");
       if (as) {
-        as.oninput = () => {
+        as.oninput = (e) => {
           pickerInput = as.value;
+          if (e.isComposing) return;
+          pickerQuery = pickerInput;
+          updatePickerResults();
+        };
+        as.oncompositionend = () => {
+          pickerInput = as.value;
+          pickerQuery = pickerInput;
+          updatePickerResults();
         };
         as.onkeydown = (e) => {
           if (e.key === "Enter" && !e.isComposing) {
             pickerInput = as.value;
             pickerQuery = pickerInput;
-            render();
+            updatePickerResults();
           }
         };
       }
       root.querySelectorAll('[data-act="searchActivities"]').forEach((b) => b.onclick = () => {
         pickerInput = as?.value ?? pickerInput;
         pickerQuery = pickerInput;
-        render();
+        updatePickerResults();
       });
       root.querySelectorAll('[data-act="clearSearch"]').forEach((b) => b.onclick = () => {
         pickerInput = "";
         pickerQuery = "";
-        render();
+        if (as) as.value = "";
+        updatePickerResults();
       });
       root.querySelectorAll('[data-act="selectAll"]').forEach((b) => b.onclick = () => {
         pickerRows().forEach((a) => pickerSelected.add(`${a.group}|${a.name}`));
@@ -3288,7 +3910,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           draft.trigger.activities = [...new Set(picked.map((x) => x.activity))];
         } else if (pickerMode === "responseEdit" && modal.responseIndex != null && picked[0]) {
           const old = draft.choices[modal.responseIndex];
-          draft.choices[modal.responseIndex] = { id: old.id, steps: [{ type: "activity", ...picked[0] }] };
+          draft.choices[modal.responseIndex] = { id: old.id, always: old.always ?? false, steps: [{ type: "activity", ...picked[0] }] };
         } else picked.forEach((x) => draft.choices.push({ id: uid(), steps: [{ type: "activity", ...x }] }));
         modal = null;
         render();
@@ -3298,8 +3920,9 @@ One of mods you are using is using an old version of SDK. It will work for now b
         render();
       });
       root.querySelectorAll('[data-act="newAnimation"]').forEach((b) => b.onclick = () => {
-        const groups = animationGroups(), group = groups.includes("HairAccessory2") ? "HairAccessory2" : groups[0], assets = animationAssets(group), current = host.InventoryGet?.(host.Player, group)?.Asset?.Name, assetA = assets.some((a) => a.name === current) ? current : assets[0]?.name;
-        modal = { type: "animation", index: null, group, assetA, assetB: assets.find((a) => a.name !== assetA)?.name ?? assetA, count: 6, durationMs: 1200, messageType: "emote", text: "" };
+        const group = animationGroups()[0];
+        if (!group) return;
+        modal = { type: "animation", index: null, tracks: [trackFor(group)], count: 6, durationMs: 1200, messageType: "emote", text: "" };
         render();
       });
       root.querySelectorAll('[data-act="editResponse"]').forEach((b) => b.onclick = () => {
@@ -3311,6 +3934,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           render();
         } else if (s.type === "animation") {
           modal = { type: "animation", index: i, ...clone(s) };
+          modal.tracks ??= [{ group: s.group, stateA: { asset: s.assetA, color: snapshotItem(host.InventoryGet?.(host.Player, s.group))?.color ?? "Default" }, stateB: { asset: s.assetB, color: snapshotItem(host.InventoryGet?.(host.Player, s.group))?.color ?? "Default" } }];
           render();
         } else {
           modal = { type: "text", index: i, responseType: s.type, value: s.text };
@@ -3319,6 +3943,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       });
       root.querySelectorAll('[data-act="responseDelete"]').forEach((b) => b.onclick = () => {
         responseDelete = !responseDelete;
+        primaryMode = false;
         render();
       });
       root.querySelectorAll('[data-act="deleteResponse"]').forEach((b) => {
@@ -3358,14 +3983,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         modal[el.dataset.animationField] = ["count", "durationMs"].includes(el.dataset.animationField) ? Number(el.value) : el.value;
       });
       root.querySelectorAll("[data-animation-field]").forEach((el) => el.onchange = () => {
-        const previous = modal.group;
         captureAnimation();
-        if (el.dataset.animationField === "group" && modal.group !== previous) {
-          const assets = animationAssets(modal.group);
-          modal.assetA = assets[0]?.name;
-          modal.assetB = assets[1]?.name;
-        }
-        render();
       });
       root.querySelectorAll("[data-animation-message-type]").forEach((b) => b.onclick = () => {
         captureAnimation();
@@ -3375,6 +3993,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       root.querySelectorAll("[data-animation-token]").forEach((b) => b.onclick = () => {
         const el = root.querySelector('[data-animation-field="text"]');
         el.value += b.dataset.animationToken;
+        modal.text = el.value;
       });
       root.querySelectorAll("[data-response-type]").forEach((b) => b.onclick = () => {
         modal.responseType = b.dataset.responseType;
@@ -3439,13 +4058,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
         } else if (m.type === "text") {
           const choice2 = { id: m.index == null ? uid() : draft.choices[m.index].id, steps: [{ type: m.responseType, text: value }] };
           if (m.index == null) draft.choices.push(choice2);
-          else draft.choices[m.index] = choice2;
+          else draft.choices[m.index] = { ...choice2, always: draft.choices[m.index].always ?? false };
         } else if (m.type === "animation") {
+          const seconds = root.querySelector("[data-animation-seconds]");
+          if (seconds) m.durationMs = Number(seconds.value) * 1e3;
           for (const el of root.querySelectorAll("[data-animation-field]")) m[el.dataset.animationField] = ["count", "durationMs"].includes(el.dataset.animationField) ? Number(el.value) : el.value;
-          if (!m.group || !m.assetA || !m.assetB) return;
-          const choice2 = { id: m.index == null ? uid() : draft.choices[m.index].id, steps: [{ type: "animation", group: m.group, assetA: m.assetA, assetB: m.assetB, count: m.count, durationMs: m.durationMs, messageType: m.messageType, text: m.text }] };
+          for (const track of m.tracks) if (track.stateB.sameAsset) track.stateB.asset = track.stateA.asset;
+          if (!m.tracks.length || m.tracks.some((x) => !x.stateA.asset || !x.stateB.asset)) throw Error(t("chooseAnimationGroup"));
+          if (!Number.isInteger(m.count) || m.count < 1 || m.count > 100 || !Number.isFinite(m.durationMs) || m.durationMs < 100 || m.durationMs > 12e4) throw Error(t("invalidAnimation"));
+          const choice2 = { id: m.index == null ? uid() : draft.choices[m.index].id, steps: [{ type: "animation", tracks: clone(m.tracks), count: m.count, durationMs: m.durationMs, messageType: m.messageType, text: m.text }] };
           if (m.index == null) draft.choices.push(choice2);
-          else draft.choices[m.index] = choice2;
+          else draft.choices[m.index] = { ...choice2, always: draft.choices[m.index].always ?? false };
         } else if (m.type === "lists") {
           const input = root.querySelector("[data-list]");
           if (input) m[input.dataset.list] = input.value;
@@ -3472,7 +4095,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       root = host.document.createElement("div");
       root.className = "rl-root";
       host.document.body.appendChild(root);
-      page = "home";
+      if (!wardrobePending) page = "home";
       render();
     }
     function unload() {
@@ -3503,14 +4126,21 @@ One of mods you are using is using an old version of SDK. It will work for now b
       init_exit_icon();
       init_catalog();
       init_canvas();
+      init_search();
+      init_appearance();
       svg = (path) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="${path}"/></svg>`;
-      ICON = { edit: svg("M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"), trash: svg("M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6"), close: svg("M18 6 6 18M6 6l12 12") };
+      ICON = { crown: svg("M3 6l4 4 5-7 5 7 4-4-2 13H5L3 6Zm2 10h14"), edit: svg("M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"), trash: svg("M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6"), close: svg("M18 6 6 18M6 6l12 12") };
       CSS = `
+.rl-chance-bar{width:100%;height:30px;accent-color:#b23a56;cursor:pointer}.rl-response{position:relative;margin:12px 0;padding:12px;border:2px solid transparent!important;border-top-color:#f2e0e4!important;border-radius:14px}.rl-response.rl-primary-response{border-color:#c08a3e!important;background:#fff8e9}.rl-response.rl-primary-pick{cursor:pointer;border-style:dashed!important}.rl-primary-pick:hover{border-color:#b23a56!important}.rl-crown{position:absolute;left:-13px;top:-17px;transform:rotate(-45deg);color:#c08a3e;pointer-events:none;background:#fff8e9;border-radius:50%;padding:3px}.rl-crown svg{width:28px!important;height:28px!important}
+
 .rl-root *{user-select:none;-webkit-user-select:none}.rl-root input,.rl-root textarea{user-select:text;-webkit-user-select:text}.rl-exit img{width:72px;height:72px;pointer-events:none}.rl-box,.rl-rule-list{cursor:grab}.rl-box.rl-dragging,.rl-rule-list.rl-dragging{cursor:grabbing}
 .rl-root{position:fixed;width:2000px;height:1000px;transform-origin:top left;z-index:50;font-family:Arial,"Microsoft JhengHei",sans-serif;color:#3a2430;overflow:hidden;--soft:#8a6b74;--line:#e9cdd4;--card:#fffafb;--paper:#fdf3f5;--rose:#b23a56;--deep:#8c2540;--light:#f7dee4;--lighter:#fcf0f3;--gold:#c08a3e;--danger:#c0392b}.rl-root *{box-sizing:border-box}.rl-root button,.rl-root input,.rl-root select,.rl-root textarea{font:inherit;color:inherit}.rl-root button{border:2px solid var(--line);background:var(--card);height:54px;padding:0 20px;border-radius:28px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:9px;font-size:21px}.rl-root button:hover{border-color:var(--rose);color:var(--deep)}.rl-root button.primary{color:white;border-color:transparent;background:linear-gradient(135deg,var(--rose),var(--deep))}.rl-root button.danger{color:var(--danger);border-color:#e4aaa4;background:#f6dcd9}.rl-root svg{width:26px;height:26px}.rl-screen{width:100%;height:100%;background:radial-gradient(1100px 480px at 92% -10%,#fceef1 0,transparent 62%),linear-gradient(160deg,#fdf2f5,#f3dee6);border:2px solid var(--line)}.rl-top{height:120px;display:flex;align-items:center;padding:0 180px;border-bottom:2px solid #f2e0e4}.rl-brand{display:flex;align-items:center;gap:20px;font:italic 600 42px Georgia,serif}.rl-context{font:500 27px Arial,"Microsoft JhengHei",sans-serif;color:var(--soft)}.rl-icon{width:43px!important;height:43px!important;padding:7px!important;border:0!important;background:transparent!important}.rl-exit{position:absolute!important;left:1815px;top:75px;width:90px!important;height:90px!important;padding:0!important;border-radius:12px!important;transform:translateY(-50%);background:white!important}.rl-main{height:880px;padding:20px 180px 38px;display:grid;grid-template-columns:520px 1fr;gap:28px}.rl-work{height:880px;padding:18px 65px 35px;display:grid;grid-template-columns:470px 1fr;gap:24px}.rl-panel{background:var(--paper);border:2px solid var(--line);border-radius:23px;padding:26px;overflow:auto}.rl-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}.rl-head h2{font-size:31px;margin:0}.rl-grow{flex:1;min-width:0}.rl-muted{font-size:18px;color:var(--soft)}.rl-setting{height:100px;display:flex;align-items:center;border-bottom:2px solid #f2e0e4;font-size:25px}.rl-switch{width:86px!important;height:46px!important;padding:5px!important;border:0!important;background:#cbbdc1!important;justify-content:flex-start!important}.rl-switch:before{content:"";width:36px;height:36px;border-radius:50%;background:white;box-shadow:0 2px 5px #0004}.rl-switch.on{background:linear-gradient(135deg,var(--rose),var(--deep))!important;justify-content:flex-end!important}.rl-small-switch{width:58px!important;height:31px!important;padding:4px!important}.rl-small-switch:before{width:23px;height:23px}.rl-tools{display:flex;gap:9px;flex-wrap:wrap}.rl-tools button{height:46px;font-size:18px;padding:0 15px}.rl-personas{display:flex;flex-direction:column;gap:14px}.rl-card-wrap{position:relative;padding-right:87px}.rl-card{height:140px;background:white;border:2px solid var(--line);border-radius:21px;padding:18px 23px;display:flex;align-items:center;gap:20px}.rl-card.active{border-color:var(--gold);background:linear-gradient(90deg,var(--lighter),white 60%)}.rl-card.delete{margin-left:20px}.rl-card-name{width:220px}.rl-name-row{display:flex;align-items:center;gap:6px;font-size:24px;font-weight:700}.rl-meter{flex:1}.rl-track{height:10px;border-radius:8px;background:#f2e0e4;overflow:hidden;margin-bottom:9px}.rl-fill{height:100%;background:linear-gradient(90deg,var(--rose),var(--gold))}.rl-count{font-size:21px}.rl-count b{font-size:29px;color:var(--deep)}.rl-card-side{position:absolute;right:3px;top:35px;width:70px!important;height:70px!important;padding:0!important}.rl-browser{padding:24px}.rl-search,.rl-input,.rl-select,.rl-textarea{width:100%;border:2px solid var(--line);border-radius:12px;background:white;padding:0 15px;font-size:20px}.rl-search,.rl-input,.rl-select{height:52px}.rl-textarea{height:220px;padding:14px;resize:none}.rl-cats{display:flex;gap:7px;margin:13px 0}.rl-cats button{height:41px;flex:1;padding:0;font-size:17px}.rl-cats .on,.rl-rule.active{background:var(--lighter);border-color:var(--rose)}.rl-rule{height:81px;border:2px solid var(--line);border-radius:13px;margin-bottom:9px;display:flex;align-items:center;padding:8px 9px 8px 14px;background:white}.rl-rule-main{height:61px!important;border:0!important;background:transparent!important;border-radius:8px!important;justify-content:flex-start!important;text-align:left;padding:0!important}.rl-rule-main b{font-size:20px}.rl-rule-main small{display:block;color:var(--soft);margin-top:4px}.rl-editor{padding:23px}.rl-editor-grid{display:grid;grid-template-columns:1fr 1fr;gap:19px}.rl-box{background:white;border:2px solid var(--line);border-radius:17px;padding:22px;height:650px;overflow:auto}.rl-box h3{font-size:24px;color:var(--deep);margin:0 0 18px}.rl-field{display:flex;align-items:center;gap:12px;margin:15px 0;font-size:20px}.rl-field>span{min-width:80px}.rl-summary{border:2px dashed var(--line);border-radius:13px;padding:18px;margin-top:18px;color:var(--soft);font-size:19px}.rl-response-head{display:flex;align-items:center;gap:7px}.rl-response-head button{height:41px;font-size:17px;padding:0 13px}.rl-response{min-height:80px;display:grid;grid-template-columns:100px 1fr 92px;gap:9px;align-items:center;border-top:2px solid #f2e0e4;font-size:19px}.rl-response b{color:var(--deep)}.rl-response button{height:40px;font-size:17px;padding:0 12px}.rl-overlay{position:absolute;inset:0;background:#46203299;display:flex;align-items:center;justify-content:center;padding:52px 105px;backdrop-filter:blur(2px);z-index:9}.rl-dialog{width:100%;height:100%;background:var(--card);border:2px solid var(--line);border-radius:25px;padding:27px;display:flex;flex-direction:column;box-shadow:0 20px 60px #40152655}.rl-dialog.compact{width:900px;height:auto;min-height:420px}.rl-dialog-head{height:68px;display:flex;align-items:center;gap:16px}.rl-dialog-head h2{font-size:30px;margin:0}.rl-dialog-body{flex:1;min-height:0}.rl-dialog-foot{height:75px;display:flex;align-items:flex-end;gap:11px}.rl-picker-body{display:grid;grid-template-columns:400px 1fr;gap:22px}.rl-body-map{position:relative;background:var(--lighter);border:2px solid var(--line);border-radius:17px;overflow:hidden}.rl-zone{position:absolute;border:2px solid #b23a5688;background:#bdeeee88;padding:0!important;border-radius:7px!important;min-width:4px!important;min-height:4px!important;height:auto}.rl-zone.selected{background:#f4e4c4aa!important;border-color:var(--gold)!important}.rl-actions-wrap{min-height:0;display:flex;flex-direction:column}.rl-actions-title{font-size:23px;margin:4px 0 13px}.rl-actions{min-height:0;overflow-y:auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-content:start;padding:3px 11px 3px 3px;scrollbar-color:var(--rose) #f2e0e4}.rl-action{height:80px!important;border-radius:14px!important;display:block!important;text-align:left;padding:11px 14px!important;overflow:hidden}.rl-action strong,.rl-action small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rl-action strong{font-size:19px}.rl-action small{color:var(--soft);font-size:14px;margin-top:4px}.rl-action.on{background:var(--light);border-color:var(--rose)}.rl-choice-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.rl-choice-row button.on{background:var(--light);border-color:var(--rose)}
 .rl-segments{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.rl-segments button{height:45px;font-size:18px;padding:0 17px}.rl-segments button.on{background:var(--light);border-color:var(--rose);color:var(--deep)}.rl-inline-title{margin:0;white-space:nowrap;max-width:620px;overflow:hidden;text-overflow:ellipsis}.rl-inline-input{all:unset!important;box-sizing:border-box!important;width:auto!important;min-width:180px!important;max-width:620px!important;height:48px!important;padding:0 12px!important;border:2px solid var(--rose)!important;border-radius:10px!important;background:#fff!important;color:#3a2430!important;-webkit-text-fill-color:#3a2430!important;font:inherit!important}.rl-root .rl-search,.rl-root .rl-input,.rl-root .rl-select,.rl-root .rl-textarea{appearance:none!important;-webkit-appearance:none!important;background:#fff!important;background-color:#fff!important;color:#3a2430!important;-webkit-text-fill-color:#3a2430!important;border:2px solid var(--line)!important;box-shadow:none!important;filter:none!important;opacity:1!important}.rl-root .rl-search::placeholder,.rl-root .rl-input::placeholder,.rl-root .rl-textarea::placeholder{color:#a58b93!important;-webkit-text-fill-color:#a58b93!important;opacity:1!important}
 .rl-box{height:700px}.rl-number{width:100px!important;flex:none!important}.rl-cats,.rl-segments{border-bottom:1px solid var(--line);gap:5px;padding:0 8px 7px}.rl-cats button,.rl-segments button{position:relative;border-color:transparent!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;color:var(--soft);transition:color .18s,transform .18s}.rl-cats button:after,.rl-segments button:after{content:"";position:absolute;left:50%;right:50%;bottom:-1px;height:3px;background:var(--rose);transition:left .22s,right .22s,box-shadow .22s}.rl-cats button:hover,.rl-segments button:hover{color:var(--rose);transform:translateY(-1px)}.rl-cats button.on,.rl-segments button.on{color:var(--rose)!important}.rl-cats button.on:after,.rl-segments button.on:after{left:8px;right:8px;box-shadow:0 0 8px var(--rose)}.rl-picker-head{display:grid;grid-template-columns:400px 1fr;gap:22px;height:72px;align-items:center}.rl-picker-head h2{text-align:center;font-size:30px;margin:0}.rl-picker-controls{display:flex;align-items:center;gap:10px}.rl-action-search{position:relative;width:500px;flex:none}.rl-action-search .rl-input{width:500px!important;padding-right:48px!important}.rl-clear-search{position:absolute!important;right:5px;top:5px;width:42px!important;height:42px!important;padding:0!important;border:0!important;background:transparent!important}.rl-picker-controls>button{height:48px;font-size:18px;padding:0 14px}.rl-notice{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);padding:13px 28px;border-radius:24px;background:#3a2430;color:#fff;font-size:20px;z-index:12;box-shadow:0 8px 24px #0004}.rl-browser{overflow:hidden;display:flex;flex-direction:column}.rl-rule-list{flex:1;min-height:0;overflow-y:auto;padding-right:8px}.rl-root *{scrollbar-width:thin;scrollbar-color:var(--rose) var(--light)}.rl-root *::-webkit-scrollbar{width:12px;height:12px}.rl-root *::-webkit-scrollbar-track{background:var(--light);border-radius:8px}.rl-root *::-webkit-scrollbar-thumb{background:var(--rose);border:3px solid var(--light);border-radius:8px}.rl-root *::-webkit-scrollbar-thumb:hover{background:var(--deep)}
-.rl-picker-scope{width:180px!important;flex:none}.rl-dialog.compact,.srl-dialog.compact{width:980px;min-height:470px;font-size:22px}.rl-dialog.compact .rl-dialog-head h2,.srl-dialog.compact .rl-dialog-head h2{font-size:34px}.rl-dialog.compact p,.srl-dialog.compact p{font-size:22px;line-height:1.6}.rl-settings-group{background:#fff;border:2px solid var(--line);border-radius:15px;padding:18px;margin:14px 0}.rl-settings-group h3{font-size:23px;margin:0 0 8px}.rl-relation-buttons{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.rl-relation-buttons button{height:39px;padding:0 14px;font-size:17px}.rl-list-entry{display:flex;gap:8px}.rl-list-entry .rl-input{flex:1}.rl-list-entry button{width:55px;height:52px;padding:0}.rl-rule-trash{width:48px!important;height:48px!important;padding:9px!important;margin-right:8px}.rl-rule.delete-active{padding-left:5px}.rl-animation-grid{display:grid;grid-template-columns:180px 1fr;gap:12px 15px;align-items:center}.rl-animation-grid .rl-number{width:160px!important}.rl-animation-message{margin-top:16px}
+.rl-picker-scope{width:180px!important;flex:none}.rl-dialog.compact,.srl-dialog.compact{width:980px;min-height:470px;font-size:22px}.rl-dialog.compact .rl-dialog-head h2,.srl-dialog.compact .rl-dialog-head h2{font-size:34px}.rl-dialog.compact p,.srl-dialog.compact p{font-size:22px;line-height:1.6}.rl-settings-group{background:#fff;border:2px solid var(--line);border-radius:15px;padding:18px;margin:14px 0}.rl-settings-group h3{font-size:23px;margin:0 0 8px}.rl-relation-buttons{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.rl-relation-buttons button{height:39px;padding:0 14px;font-size:17px}.rl-list-entry{display:flex;gap:8px}.rl-list-entry .rl-input{flex:1}.rl-list-entry button{width:55px;height:52px;padding:0}.rl-rule-trash{width:48px!important;height:48px!important;padding:9px!important;margin-right:8px}.rl-rule.delete-active{padding-left:5px}.rl-animation-grid{display:grid;grid-template-columns:180px 1fr;gap:12px 15px;align-items:center}.rl-animation-grid .rl-number{width:160px!important}.rl-animation-message{margin-top:16px}.rl-animation-tracks{max-height:350px;overflow:auto}.rl-dialog.compact{max-height:95%;overflow:auto}.rl-response-head{flex-wrap:wrap}.rl-response-head h3{flex-basis:100%}.rl-response>b>button{padding:0 4px;font-size:23px}.rl-response>b{font-size:16px}
+.rl-dialog.compact .rl-dialog-body{overflow-y:auto;flex:1 1 auto;padding-right:8px}.rl-dialog.compact .rl-dialog-head,.rl-dialog.compact .rl-dialog-foot{flex-shrink:0}.rl-dialog.compact .rl-dialog-foot{height:65px}.rl-animation-tracks .rl-field>button{white-space:nowrap;flex-shrink:0}.rl-animation-tracks .rl-field>span{min-width:90px}
+.rl-dialog.compact.rl-animation-dialog{width:1500px}.rl-animation-dialog .rl-animation-tracks{display:flex;flex-direction:row;gap:18px;overflow:auto;max-height:380px;cursor:grab;padding:4px 3px 12px;touch-action:none}.rl-animation-dialog .rl-animation-track{flex:0 0 450px;min-width:450px}.rl-animation-track .rl-field{flex-wrap:wrap}.rl-animation-track .rl-field>span{flex-basis:100%}.rl-animation-track .rl-field>.rl-select{width:240px;flex:1}.rl-animation-dialog .rl-dialog-body{cursor:grab}.rl-animation-dialog .rl-dragging{cursor:grabbing}
+.rl-animation-dialog .rl-animation-tracks{justify-content:space-between}.rl-animation-dialog .rl-animation-track:only-child{margin-left:auto;margin-right:auto}.rl-response-gap{width:22px;flex:none}.rl-response-head .rl-response-delete{margin-left:auto}
 `;
     }
   });
@@ -3557,6 +4187,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       try {
         store.load();
         account = host.Player.MemberNumber;
+        installSpeech({ sdk, store, host, enabled: () => !stopped && store.loaded && store.data.settings.enabled && host.Player.MemberNumber === account });
         output = createOutput({ store, host, owns: coordination.owns, report });
         mouth = createMouth({ sdk, owns: coordination.owns, host });
         const valid = (event) => !stopped && store.loaded && store.data.settings.enabled && store.data.settings.reactions && host.CurrentScreen === "ChatRoom" && host.Player.MemberNumber === account && event.room === events.roomKey() && !host.Player.GhostList?.includes(event.actor) && (event.event === "leave" || host.ChatRoomCharacter.some((c) => c.MemberNumber === event.actor));
@@ -3616,6 +4247,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       init_i18n();
       init_output();
       init_mouth();
+      init_speech();
       init_events();
       init_dom_settings();
     }

@@ -1,6 +1,7 @@
 import { ID } from '../core/model.js';
 import { allowedActivity } from '../integrations/catalog.js';
 import { checkBCX } from '../integrations/bcx.js';
+import { snapshotItem, wearState, animationState } from './appearance.js';
 export function renderText(text, event, host = globalThis) {
   const me = host.Player;
   const other = host.ChatRoomCharacter?.find(c => c.MemberNumber === event.actor) ?? event.actorCharacter;
@@ -14,7 +15,7 @@ export function renderText(text, event, host = globalThis) {
   return text.replace(/\{(?:me|self|Self|other|Other)\}|%[A-Z_]+%|%name%/g, token => values[token] ?? token);
 }
 export function createOutput({ store, host = globalThis, owns, report }) {
-  const restores = new Set(); const activitySeen = new Map();
+  const restores = new Set(); const activitySeen = new Map(); const animations = new Map();
   function textMessage(step, event) {
     const text = renderText(step.text, event, host).trim(); if (!text) return;
     if (step.type === 'action') {
@@ -52,6 +53,20 @@ export function createOutput({ store, host = globalThis, owns, report }) {
     timer = setTimeout(restore, step.durationMs); restores.add(restore);
   }
   function animation(step, event) {
+    if (step.tracks) {
+      const tracks = step.tracks;
+      for (const track of tracks) animations.get(track.group)?.();
+      const originals = tracks.map(track => snapshotItem(host.InventoryGet(host.Player, track.group)));
+      const timers = [], later = host.setTimeout ?? setTimeout;
+      const update = (track, state) => { wearState(host, track.group, state); host.CharacterRefresh(host.Player, false); host.ChatRoomCharacterItemUpdate(host.Player, track.group); };
+      const cleanup = () => { restores.delete(restore); tracks.forEach(track => { if (animations.get(track.group) === restore) animations.delete(track.group); }); };
+      const restore = () => { timers.forEach(timer => (host.clearTimeout ?? clearTimeout)(timer)); tracks.forEach((track, i) => update(track, originals[i])); cleanup(); };
+      restores.add(restore); tracks.forEach(track => animations.set(track.group, restore));
+      for (let i = 0; i < step.count; i++) timers.push(later(() => tracks.forEach(track => update(track, animationState(track, i % 2 ? 'A' : 'B'))), Math.round(i * step.durationMs / step.count)));
+      timers.push(later(() => { tracks.forEach(track => update(track, track.stateA)); cleanup(); }, step.durationMs));
+      if (step.text.trim()) { const message = { type: step.messageType, text: step.text }, check = checkBCX(message, store.data.settings.bcx, host); if (check.allowed) textMessage(message, event); else report(check.reason); }
+      return;
+    }
     const current = host.InventoryGet(host.Player, step.group);
     const original = current ? { asset: current.Asset?.Name, color: JSON.parse(JSON.stringify(current.Color ?? 'Default')), property: JSON.parse(JSON.stringify(current.Property ?? null)) } : null;
     const timers = [];
