@@ -24,11 +24,12 @@ export default {
   addicted: 'Addicted',
   speechHint:
     'Weak: sentence ending. Medium: ending plus random insertion. Strong: up to three insertions. Addicted: also replaces 1–2 characters. Short messages receive fewer changes.',
-  alwaysHint: 'Guaranteed response (one per rule). Runs with another random response, 50 ms apart.',
+  alwaysHint:
+    'Guaranteed response (one per rule). Runs before a random response, 50 ms apart; no pause when leaving.',
   editAppearance: 'Wardrobe',
-  animationSeconds: 'Shared duration (seconds)',
+  animationSeconds: 'A/B switch interval (seconds)',
   chooseAnimationGroup: 'Select at least one group and both states.',
-  invalidAnimation: 'Count must be 1–100 and duration 0.1–120 seconds.',
+  invalidAnimation: 'Count must be 1–100 and switch interval 0.001–120 seconds.',
   HairAccessory2: 'Ears',
   TailStraps: 'Tail',
   Wings: 'Wings',
@@ -194,7 +195,7 @@ export default {
   animationStateA: 'State A',
   animationStateB: 'State B',
   animationCount: 'Changes',
-  animationDuration: 'Total duration (ms)',
+  animationDuration: 'A/B switch interval (ms)',
   animationMessageHint:
     'Optionally choose a message type and enter text. Leave it blank to play only the animation.',
   mouthState: 'Mouth owner',

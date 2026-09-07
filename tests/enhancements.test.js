@@ -330,7 +330,16 @@ test('three animation tracks use their own colors/properties on the same clock a
     owns: () => true,
     report() {},
   });
+  r.choices = validatePersona(p).rules[0].choices;
+  assert.equal(r.choices[0].steps[0].intervalMs, 500, 'legacy total duration becomes a per-switch interval');
+  assert.equal(r.choices[0].steps[0].durationMs, undefined);
+  r.choices[0].steps[0].count = 4;
   output.execute(r.choices[0].steps[0], {});
+  assert.deepEqual(
+    scheduled.map((timer) => timer.ms),
+    [0, 500, 1000, 1500, 2000],
+    'increasing count preserves the A/B interval',
+  );
   scheduled.find((t) => t.ms === 0).fn();
   assert.equal(refreshes, 1, 'one character rebuild per frame for all three tracks');
   for (const group of groups) {

@@ -235,10 +235,14 @@ export function validatePersona(input) {
             }
           }
           assert(Number.isSafeInteger(s.count) && s.count >= 1 && s.count <= 100, 'Invalid animation count');
+          // Legacy animations stored total duration, not the delay between states.
+          if (s.intervalMs === undefined && Number.isFinite(s.durationMs))
+            s.intervalMs = s.durationMs / s.count;
           assert(
-            Number.isFinite(s.durationMs) && s.durationMs >= 100 && s.durationMs <= 120000,
-            'Invalid animation duration',
+            Number.isFinite(s.intervalMs) && s.intervalMs >= 1 && s.intervalMs <= 120000,
+            'Invalid animation interval',
           );
+          delete s.durationMs;
           assert(
             ['chat', 'emote', 'action'].includes(s.messageType) &&
               typeof s.text === 'string' &&

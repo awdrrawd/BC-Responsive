@@ -1,0 +1,689 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Responsive 架構分支圖</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0d0c12;
+        --side: #121018;
+        --panel: #18151f;
+        --node: #201b2a;
+        --line: #625578;
+        --text: #f5f1fb;
+        --muted: #aaa2b7;
+        --accent: #9864ff;
+        --ui: #45ddc7;
+        --controller: #b991ff;
+        --core: #70a7ff;
+        --hook: #ffb15d;
+        --storage: #e77fba;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font:
+          14px/1.45 system-ui,
+          'Segoe UI',
+          sans-serif;
+      }
+      .app {
+        display: grid;
+        grid-template-columns: 250px minmax(0, 1fr);
+        min-height: 100vh;
+      }
+      .sidebar {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        padding: 22px 14px;
+        border-right: 1px solid #352e42;
+        background: var(--side);
+        overflow: auto;
+      }
+      .brand {
+        padding: 0 8px 18px;
+      }
+      .brand h1 {
+        font-size: 20px;
+        margin: 0 0 5px;
+      }
+      .brand p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .search {
+        width: 100%;
+        margin-bottom: 12px;
+        padding: 10px 11px;
+        border: 1px solid #3b3348;
+        border-radius: 7px;
+        background: #0e0c13;
+        color: var(--text);
+      }
+      .group-label {
+        margin: 17px 8px 7px;
+        color: var(--muted);
+        font-size: 11px;
+        letter-spacing: 0.08em;
+      }
+      .feature-btn {
+        display: block;
+        width: 100%;
+        margin: 3px 0;
+        padding: 10px 11px;
+        border: 0;
+        border-radius: 7px;
+        background: transparent;
+        color: var(--text);
+        text-align: left;
+        cursor: pointer;
+      }
+      .feature-btn:hover {
+        background: #201b2a;
+      }
+      .feature-btn[aria-current='true'] {
+        background: #2b2040;
+        color: #cdb4ff;
+        box-shadow: inset 3px 0 var(--accent);
+      }
+      .main {
+        min-width: 0;
+        padding: 24px 28px 46px;
+      }
+      .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 18px;
+        margin-bottom: 16px;
+      }
+      .top h2 {
+        margin: 0 0 4px;
+        font-size: 22px;
+      }
+      .top p {
+        margin: 0;
+        color: var(--muted);
+      }
+      .legend {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .legend i {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 5px;
+        background: var(--c);
+      }
+      .graph-wrap {
+        position: relative;
+        min-height: 560px;
+        border: 1px solid #332c3e;
+        border-radius: 12px;
+        background: radial-gradient(circle at 20% 20%, #1d1728 0, #121018 48%, #0f0d14 100%);
+        overflow: auto;
+      }
+      .graph {
+        position: relative;
+        width: 1100px;
+        min-width: 1100px;
+        min-height: 560px;
+      }
+      .edges {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+      .edge {
+        fill: none;
+        stroke: var(--line);
+        stroke-width: 2;
+      }
+      .edge.trunk {
+        stroke: var(--accent);
+        stroke-width: 3;
+      }
+      .node {
+        position: absolute;
+        transform: translateY(-50%);
+        width: 190px;
+        min-height: 48px;
+        padding: 9px 11px;
+        border: 1px solid #443952;
+        border-left: 4px solid var(--node-color, var(--accent));
+        border-radius: 7px;
+        background: var(--node);
+        color: var(--text);
+        text-align: left;
+        cursor: pointer;
+        box-shadow: 0 5px 18px #0005;
+      }
+      .node:hover,
+      .node:focus-visible {
+        border-color: var(--node-color);
+        background: #2a2335;
+      }
+      .node.root {
+        width: 165px;
+        background: #342252;
+        border-color: var(--accent);
+        font-weight: 650;
+      }
+      .node .type {
+        display: block;
+        color: var(--node-color);
+        font-size: 10px;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+      }
+      .node .label {
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .detail {
+        display: grid;
+        grid-template-columns: minmax(220px, 0.7fr) 1.3fr;
+        gap: 18px;
+        margin-top: 15px;
+        padding: 15px 17px;
+        border-left: 3px solid var(--detail-color, var(--accent));
+        background: var(--panel);
+      }
+      .detail h3 {
+        margin: 0 0 4px;
+        font-size: 16px;
+      }
+      .detail p {
+        margin: 0;
+        color: var(--muted);
+      }
+      .files {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+      }
+      .files a {
+        padding: 5px 8px;
+        border: 1px solid #443952;
+        border-radius: 5px;
+        color: #d8c9f4;
+        text-decoration: none;
+        font-family: ui-monospace, Consolas, monospace;
+        font-size: 12px;
+      }
+      .files a:hover {
+        border-color: var(--detail-color);
+        color: var(--text);
+      }
+      .mobile-select {
+        display: none;
+        width: 100%;
+        padding: 10px;
+        background: var(--panel);
+        border: 1px solid #443952;
+        color: var(--text);
+        border-radius: 7px;
+      }
+      @media (max-width: 760px) {
+        .app {
+          display: block;
+        }
+        .sidebar {
+          position: static;
+          height: auto;
+          border-right: 0;
+          border-bottom: 1px solid #352e42;
+        }
+        .sidebar nav,
+        .group-label {
+          display: none;
+        }
+        .mobile-select {
+          display: block;
+        }
+        .main {
+          padding: 18px 12px;
+        }
+        .top {
+          display: block;
+        }
+        .legend {
+          margin-top: 10px;
+        }
+        .detail {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand">
+          <h1>Responsive 架構分支圖</h1>
+          <p>2026-09-07 · 選擇功能或資料夾總覽，點節點開啟檔案。</p>
+        </div>
+        <input
+          id="search"
+          class="search"
+          type="search"
+          placeholder="搜尋功能…"
+          aria-label="搜尋功能"
+        /><select id="mobile-select" class="mobile-select" aria-label="選擇功能"></select>
+        <nav id="feature-list" aria-label="功能列表"></nav>
+      </aside>
+      <main class="main">
+        <div class="top">
+          <div>
+            <h2 id="title"></h2>
+            <p id="subtitle"></p>
+          </div>
+          <div class="legend">
+            <span><i style="--c: var(--ui)"></i>UI</span
+            ><span><i style="--c: var(--controller)"></i>Controller</span
+            ><span><i style="--c: var(--core)"></i>Core</span><span><i style="--c: var(--hook)"></i>Hook</span
+            ><span><i style="--c: var(--storage)"></i>Storage</span>
+          </div>
+        </div>
+        <section class="graph-wrap" aria-label="功能依賴束狀圖">
+          <div id="graph" class="graph"><svg id="edges" class="edges" aria-hidden="true"></svg></div>
+        </section>
+        <section id="detail" class="detail" aria-live="polite"></section>
+      </main>
+    </div>
+    <script>
+      const features = [
+        {
+          group: '總覽',
+          id: 'overview',
+          name: '整體架構',
+          desc: '靜態審查：分層清楚，可持續維護；UI 仍偏集中。連線遊戲與第三方插件相容性不能由離線測試保證。',
+          branches: [
+            ['Core', '啟動與組裝', ['src/main.js', 'src/app.js']],
+            ['Core', '規則與資料模型', ['src/core/engine.js', 'src/core/model.js']],
+            ['Storage', '保存與匯入', ['src/core/store.js', 'src/core/import.js']],
+            ['Hook', '遊戲整合', ['src/integrations/events.js', 'src/integrations/bcx.js']],
+            ['UI', '設定介面', ['src/ui/dom-settings.js', 'src/ui/settings.css']],
+            ['Core', '檢查報告', ['docs/architecture-review.md']],
+          ],
+        },
+        {
+          group: '總覽',
+          id: 'folders',
+          name: '資料夾樹狀總覽',
+          desc: '以實際檔案產生；TEMP 為參考原碼，不參與正式建置。dist 為生成檔，修改應回到 src。',
+          branches: [
+            [
+              'Core',
+              'src/core',
+              [
+                'src/core/api.js',
+                'src/core/engine.js',
+                'src/core/i18n.js',
+                'src/core/import.js',
+                'src/core/language.js',
+                'src/core/model.js',
+                'src/core/store.js',
+              ],
+            ],
+            [
+              'Core',
+              'src/features',
+              [
+                'src/features/appearance.js',
+                'src/features/mouth.js',
+                'src/features/output.js',
+                'src/features/speech.js',
+              ],
+            ],
+            [
+              'Core',
+              'src/integrations',
+              [
+                'src/integrations/action-variants.json',
+                'src/integrations/bcx.js',
+                'src/integrations/catalog.js',
+                'src/integrations/events.js',
+                'src/integrations/search.js',
+              ],
+            ],
+            [
+              'UI',
+              'src/ui',
+              [
+                'src/ui/activity-picker.js',
+                'src/ui/canvas.js',
+                'src/ui/dom-settings.js',
+                'src/ui/input-controls.js',
+                'src/ui/settings.css',
+              ],
+            ],
+            [
+              'Storage',
+              'Translation',
+              [
+                'Translation/cn.js',
+                'Translation/de.js',
+                'Translation/en.js',
+                'Translation/fr.js',
+                'Translation/ru.js',
+                'Translation/starters.js',
+                'Translation/tw.js',
+                'Translation/ua.js',
+              ],
+            ],
+            [
+              'Core',
+              'scripts',
+              ['scripts/build-action-variants.ps1', 'scripts/build.mjs', 'scripts/serve.mjs'],
+            ],
+            [
+              'Core',
+              'tests',
+              [
+                'tests/bundle.test.js',
+                'tests/canvas.test.js',
+                'tests/engine.test.js',
+                'tests/enhancements.test.js',
+                'tests/events.test.js',
+                'tests/import.test.js',
+                'tests/initialization.test.js',
+                'tests/loader.test.js',
+                'tests/picker.test.js',
+                'tests/runtime.test.js',
+                'tests/serve.test.js',
+                'tests/translations.test.js',
+              ],
+            ],
+            [
+              'Core',
+              'docs',
+              ['docs/code-health.md', 'docs/architecture-review.md', 'docs/responsive-architecture.html'],
+            ],
+          ],
+        },
+        {
+          group: '基礎系統',
+          id: 'bootstrap',
+          name: '載入與生命週期',
+          desc: 'loader → main 防止重複載入 → app 等待 BC 就緒 → 組裝 store / scheduler / output / UI。stop 清除工作，但不卸載已安裝 hooks。',
+          branches: [
+            ['Core', '載入入口', ['loader.local.user.js', 'loader.user.js', 'src/main.js']],
+            ['Controller', '初始化、帳號與畫面監控', ['src/app.js']],
+            [
+              'Core',
+              '回歸測試',
+              ['tests/loader.test.js', 'tests/initialization.test.js', 'tests/bundle.test.js'],
+            ],
+          ],
+        },
+        {
+          group: '基礎系統',
+          id: 'storage',
+          name: '資料與設定保存',
+          desc: 'UI 修改副本 → validateData → LZString 壓縮 → Player.ExtensionSettings → BC 同步。同步呼叫丟錯時回復舊值；不代表遠端確認成功。',
+          branches: [
+            ['Storage', '資料與驗證', ['src/core/model.js', 'src/core/store.js']],
+            ['Storage', '新舊格式匯入匯出', ['src/core/import.js']],
+            ['Core', '回歸測試', ['tests/import.test.js', 'tests/runtime.test.js']],
+          ],
+        },
+        {
+          group: '基礎系統',
+          id: 'coordination',
+          name: '插件協調與翻譯',
+          desc: 'API 協調嘴型及表情控制權；共享 I18N 服務依 BC 語言選表。語言切換不重新命名已保存的人格與規則。',
+          branches: [
+            ['Core', '控制權協調', ['src/core/api.js']],
+            ['Core', '介面語言', ['src/core/i18n.js', 'src/core/language.js']],
+            [
+              'Storage',
+              '翻譯與預設內容',
+              [
+                'Translation/en.js',
+                'Translation/tw.js',
+                'Translation/cn.js',
+                'Translation/de.js',
+                'Translation/fr.js',
+                'Translation/ru.js',
+                'Translation/ua.js',
+                'Translation/starters.js',
+              ],
+            ],
+            ['Core', '鍵、參數及占位文字檢查', ['tests/translations.test.js']],
+          ],
+        },
+        {
+          group: '回應流程',
+          id: 'events',
+          name: '進房、離房與互動事件',
+          desc: '遊戲 hooks → 標準事件。離房先保存事件上下文，在 ServerSend(ChatRoomLeave) 前提交；不依賴尚未清除的 ChatRoomData。',
+          branches: [
+            ['Hook', '事件建立、房名快取', ['src/integrations/events.js']],
+            ['Controller', '有效性檢查與排程接線', ['src/app.js']],
+            ['Core', '同步送出離房回應', ['src/core/engine.js']],
+            ['Core', '無輸入框的離房發話', ['src/features/output.js']],
+            ['Core', '生命週期與封包順序測試', ['tests/events.test.js', 'tests/bundle.test.js']],
+          ],
+        },
+        {
+          group: '回應流程',
+          id: 'rules',
+          name: '規則抽選與取消',
+          desc: '觸發条件與名單 → 隨機回應＋主回應 → 延遲計時 → 執行前檢查房間及帳號。自己進出房事件不受會員名單過濾。',
+          branches: [
+            ['Core', '比對、抽選、去重、取消', ['src/core/engine.js']],
+            ['Core', '規則結構', ['src/core/model.js']],
+            ['Controller', '執行有效性', ['src/app.js']],
+            ['Core', '回歸測試', ['tests/engine.test.js', 'tests/enhancements.test.js']],
+          ],
+        },
+        {
+          group: '回應流程',
+          id: 'output',
+          name: '發話、互動與動畫',
+          desc: '輸出前 BCX 檢查；一般發話保存及還原輸入草稿。特殊互動按 intervalMs 切換 A/B，多部位共用畫格，取消時還原。',
+          branches: [
+            ['Core', '輸出及動畫排程', ['src/features/output.js']],
+            ['Core', '外觀狀態與衣櫃預覽', ['src/features/appearance.js']],
+            ['Hook', '限制與活動可用性', ['src/integrations/bcx.js', 'src/integrations/catalog.js']],
+            ['Core', '回歸測試', ['tests/runtime.test.js', 'tests/enhancements.test.js']],
+          ],
+        },
+        {
+          group: '回應流程',
+          id: 'speech',
+          name: '語癖與嘴型',
+          desc: '語癖在 ChatRoomSendChat 前修改發話；嘴型只在本地繪製時暫時覆寫表情，繪製後還原 Property。',
+          branches: [
+            ['Hook', '語癖掛接', ['src/features/speech.js']],
+            ['Hook', '嘴型繪製掛接', ['src/features/mouth.js']],
+            ['Core', '功能控制權', ['src/core/api.js']],
+          ],
+        },
+        {
+          group: '設定介面',
+          id: 'editor',
+          name: '人格與規則編輯',
+          desc: 'editingPersonaId 與 activePersona 分離；只有手動選取切換主人格。unload 重設暫存介面狀態；暫時進入衣櫃保留編輯工作。',
+          branches: [
+            ['UI', '人格、規則與對話框', ['src/ui/dom-settings.js']],
+            ['UI', '版面與通用輸入', ['src/ui/settings.css', 'src/ui/input-controls.js', 'src/ui/canvas.js']],
+            ['Storage', '保存邊界', ['src/core/store.js']],
+          ],
+        },
+        {
+          group: '設定介面',
+          id: 'picker',
+          name: '活動搜尋與非同步載入',
+          desc: '部位或全部範圍 → 分批載入 → 搜尋索引 → 卡片篩選。請求序號排除過期結果，重設會清除會話快取。',
+          branches: [
+            ['UI', '選取器生命週期', ['src/ui/activity-picker.js']],
+            ['Hook', '遊戲活動與翻譯', ['src/integrations/catalog.js']],
+            [
+              'Core',
+              '搜尋及繁簡變體',
+              ['src/integrations/search.js', 'src/integrations/action-variants.json'],
+            ],
+            ['Core', '回歸測試', ['tests/picker.test.js']],
+          ],
+        },
+        {
+          group: '維護',
+          id: 'build',
+          name: '建置、預覽與測試',
+          desc: 'esbuild 產生 dist/main.js；本機預覽每次讀最新建置，不自動替换已載入遊戲的腳本。',
+          branches: [
+            ['Core', '命令與依賴', ['package.json', 'scripts/build.mjs', 'scripts/serve.mjs']],
+            ['UI', '離線預覽', ['dev/preview.html', 'dev/preview.js']],
+            ['Core', '服務與回歸測試', ['tests/serve.test.js', 'tests/bundle.test.js']],
+            ['Core', '維護紀錄', ['docs/code-health.md', 'docs/architecture-review.md']],
+          ],
+        },
+      ];
+      const colors = {
+          UI: 'var(--ui)',
+          Controller: 'var(--controller)',
+          Core: 'var(--core)',
+          Hook: 'var(--hook)',
+          Storage: 'var(--storage)',
+        },
+        list = document.getElementById('feature-list'),
+        select = document.getElementById('mobile-select'),
+        search = document.getElementById('search'),
+        graph = document.getElementById('graph'),
+        edges = document.getElementById('edges'),
+        detail = document.getElementById('detail');
+      let active = features[0];
+      function shortPath(path) {
+        const p = path.split('/');
+        return p.length > 2 ? p.slice(-2).join('/') : path;
+      }
+      function renderList(query = '') {
+        list.innerHTML = '';
+        select.innerHTML = '';
+        let last = '',
+          optgroup;
+        for (const feature of features.filter((f) =>
+          (f.name + ' ' + f.desc + ' ' + f.branches.flat(2).join(' '))
+            .toLowerCase()
+            .includes(query.toLowerCase()),
+        )) {
+          if (feature.group !== last) {
+            const label = document.createElement('div');
+            label.className = 'group-label';
+            label.textContent = feature.group;
+            list.append(label);
+            optgroup = document.createElement('optgroup');
+            optgroup.label = feature.group;
+            select.append(optgroup);
+            last = feature.group;
+          }
+          const button = document.createElement('button');
+          button.className = 'feature-btn';
+          button.textContent = feature.name;
+          button.setAttribute('aria-current', String(feature === active));
+          button.onclick = () => choose(feature);
+          list.append(button);
+          const option = document.createElement('option');
+          option.value = feature.id;
+          option.textContent = feature.name;
+          option.selected = feature === active;
+          optgroup.append(option);
+        }
+      }
+      function choose(feature) {
+        active = feature;
+        renderList(search.value);
+        renderGraph();
+        select.value = feature.id;
+      }
+      function addNode(type, label, x, y, files, isRoot = false) {
+        const b = document.createElement('button');
+        b.className = 'node' + (isRoot ? ' root' : '');
+        b.style.left = x + 'px';
+        b.style.top = y + 'px';
+        b.style.setProperty('--node-color', colors[type] || 'var(--accent)');
+        b.innerHTML = '<span class="type">' + type + '</span><span class="label">' + label + '</span>';
+        b.onclick = () => showDetail(type, label, files);
+        graph.append(b);
+      }
+      function addPath(x1, y1, x2, y2, trunk = false) {
+        const mid = x1 + (x2 - x1) * 0.48,
+          p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        p.setAttribute('d', `M${x1},${y1} C${mid},${y1} ${mid},${y2} ${x2},${y2}`);
+        p.setAttribute('class', 'edge' + (trunk ? ' trunk' : ''));
+        edges.append(p);
+      }
+      function renderGraph() {
+        document.getElementById('title').textContent = active.name;
+        document.getElementById('subtitle').textContent = active.desc;
+        graph.querySelectorAll('.node').forEach((n) => n.remove());
+        edges.innerHTML = '';
+        const rows = active.branches.reduce((n, b) => n + Math.max(1, b[2].length), 0),
+          height = Math.max(560, rows * 66 + 70);
+        graph.style.height = height + 'px';
+        edges.setAttribute('viewBox', `0 0 1100 ${height}`);
+        const rootY = height / 2;
+        addNode('功能', active.name, 35, rootY, [active.name], true);
+        let cursor = 45;
+        for (const [type, label, files] of active.branches) {
+          const block = Math.max(1, files.length) * 66,
+            branchY = cursor + block / 2;
+          addNode(type, label, 330, branchY, files);
+          addPath(200, rootY, 330, branchY, true);
+          files.forEach((file, i) => {
+            const y = cursor + 33 + i * 66;
+            addNode(type, shortPath(file), 660, y, [file]);
+            addPath(520, branchY, 660, y);
+          });
+          cursor += block;
+        }
+        showDetail(
+          '功能',
+          active.name,
+          active.branches.flatMap((b) => b[2]),
+        );
+      }
+      function showDetail(type, label, files) {
+        detail.style.setProperty('--detail-color', colors[type] || 'var(--accent)');
+        detail.innerHTML =
+          '<div><h3>' +
+          label +
+          '</h3><p>' +
+          type +
+          ' · ' +
+          files.length +
+          ' 個相關檔案</p></div><div class="files">' +
+          files
+            .map((file) => (file.includes('.') ? `<a href="../${file}">${file}</a>` : `<span>${file}</span>`))
+            .join('') +
+          '</div>';
+      }
+      search.addEventListener('input', () => renderList(search.value));
+      select.addEventListener('change', () => {
+        const feature = features.find((f) => f.id === select.value);
+        if (feature) choose(feature);
+      });
+      renderList();
+      renderGraph();
+    </script>
+  </body>
+</html>

@@ -179,7 +179,7 @@ export function createOutput({ store, host = globalThis, owns, report }) {
       timers.push(
         later(
           () => frame(tracks.map((track) => animationState(track, i % 2 ? 'A' : 'B'))),
-          Math.round((i * step.durationMs) / step.count),
+          Math.round(i * (step.intervalMs ?? step.durationMs / step.count)),
         ),
       );
     timers.push(
@@ -189,7 +189,7 @@ export function createOutput({ store, host = globalThis, owns, report }) {
             tracks.map((track) => track.stateA),
             true,
           ),
-        step.durationMs,
+        Math.round(step.count * (step.intervalMs ?? step.durationMs / step.count)),
       ),
     );
     if (step.text.trim()) {

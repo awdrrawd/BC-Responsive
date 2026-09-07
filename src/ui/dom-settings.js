@@ -176,7 +176,7 @@ export function installSettings({ store, t, host = globalThis }) {
         .sort((a, b) => Number(!!b.c.always) - Number(!!a.c.always))
         .map(({ c, i }) => {
           const s = c.steps[0];
-          return `<div class="rl-response ${c.always ? 'rl-primary-response' : ''} ${primaryMode ? 'rl-primary-pick' : ''}" ${primaryMode && r.trigger.kind !== 'speech' ? `data-primary-choice="${i}" role="button" tabindex="0" aria-label="${esc(t('mainResponse'))}"` : ''}>${c.always && r.trigger.kind !== 'speech' ? `<span class="rl-crown" aria-label="${esc(t('mainResponse'))}">${ICON.crown}</span>` : ''}<b>${esc(t(r.trigger.kind === 'speech' ? 'speech' : s.type === 'activity' ? 'activityStep' : s.type === 'animation' ? 'animationStep' : s.type))}</b><span>${esc(s.type === 'activity' ? `${activityLabel(s.activity, s.group, host)} · ${s.group}` : s.type === 'animation' ? `${(s.tracks ?? [{ group: s.group }]).map((x) => groupLabel(x.group)).join(' + ')} · ${s.count}× · ${s.durationMs / 1000}s` : s.text)}</span><button class="${responseDelete ? 'danger' : ''}" data-act="${responseDelete ? 'deleteResponse' : 'editResponse'}" data-index="${i}">${esc(t(responseDelete ? 'delete' : 'edit'))}</button></div>`;
+          return `<div class="rl-response ${c.always ? 'rl-primary-response' : ''} ${primaryMode ? 'rl-primary-pick' : ''}" ${primaryMode && r.trigger.kind !== 'speech' ? `data-primary-choice="${i}" role="button" tabindex="0" aria-label="${esc(t('mainResponse'))}"` : ''}>${c.always && r.trigger.kind !== 'speech' ? `<span class="rl-crown" aria-label="${esc(t('mainResponse'))}">${ICON.crown}</span>` : ''}<b>${esc(t(r.trigger.kind === 'speech' ? 'speech' : s.type === 'activity' ? 'activityStep' : s.type === 'animation' ? 'animationStep' : s.type))}</b><span>${esc(s.type === 'activity' ? `${activityLabel(s.activity, s.group, host)} · ${s.group}` : s.type === 'animation' ? `${(s.tracks ?? [{ group: s.group }]).map((x) => groupLabel(x.group)).join(' + ')} · ${s.count}× · ${s.intervalMs / 1000}s` : s.text)}</span><button class="${responseDelete ? 'danger' : ''}" data-act="${responseDelete ? 'deleteResponse' : 'editResponse'}" data-index="${i}">${esc(t(responseDelete ? 'delete' : 'edit'))}</button></div>`;
         })
         .join('');
       editor = `<div class="rl-head">${editableName(r.name, editingRule, 'rl-inline-title', 'editRuleInline')}<span class="rl-grow"></span>${ruleDeleteMode ? `<button data-act="finishRuleDelete">${esc(t('finish'))}</button>` : `<span data-act="toggleRule" data-id="${esc(r.id)}">${sw(r.enabled)}</span><button data-act="deleteRule">${esc(t('delete'))}</button>`}<button class="primary" data-act="saveRule">${esc(t('save'))}</button></div><div class="rl-editor-grid"><div class="rl-box"><h3>${esc(t('trigger'))}</h3><div class="rl-field"><span>${esc(t('type'))}</span></div><div class="rl-segments">${['activity', 'orgasm', 'spicer', 'event', 'speech'].map((x) => `<button class="${r.trigger.kind === x ? 'on' : ''}" data-trigger-kind="${x}">${esc(t(x))}</button>`).join('')}</div>${triggerHtml(r)}${!supportsRuleMembers(r.trigger) ? '' : `<div class="rl-settings-group"><h3>${esc(t('ruleWhitelist'))}</h3><div class="rl-muted">${esc(t('ruleWhitelistHint'))}</div>${relationButtons('rule')}<input class="rl-input" data-field="members" value="${esc(r.trigger.members?.join(', ') || '')}" placeholder="${esc(t('memberNumbersPlaceholder'))}"></div>`}</div><div class="rl-box"><div class="rl-response-head"><h3 class="rl-grow">${esc(t(r.trigger.kind === 'speech' ? 'speechList' : 'responses'))}</h3>${r.trigger.kind === 'speech' ? '' : `<button data-act="primaryMode" class="${primaryMode ? 'primary' : ''}">${esc(t(primaryMode ? 'finish' : 'mainResponse'))}</button><span class="rl-response-gap"></span>`}<button data-act="newText">＋ ${esc(t(r.trigger.kind === 'speech' ? 'speech' : 'textStep'))}</button>${r.trigger.kind === 'speech' ? '' : `<button data-act="picker" data-mode="response">＋ ${esc(t('activityStep'))}</button><button data-act="newAnimation">＋ ${esc(t('animationStep'))}</button>`}<button class="rl-response-delete" data-act="responseDelete">${esc(t(responseDelete ? 'finish' : 'delete'))}</button></div>${responses}</div></div>`;
@@ -289,7 +289,7 @@ export function installSettings({ store, t, host = globalThis }) {
       )
       .join(
         '',
-      )}</div><div class="rl-animation-grid"><span>${esc(t('animationCount'))}</span><input class="rl-input rl-number" type="number" min="1" max="100" data-animation-field="count" value="${modal.count}"><span>${esc(t('animationSeconds'))}</span><input class="rl-input rl-number" type="number" min="0.1" max="120" step="0.1" data-animation-seconds value="${modal.durationMs / 1000}"></div><div class="rl-animation-message"><div class="rl-muted">${esc(t('animationMessageHint'))}</div><div class="rl-choice-row">${['chat', 'emote', 'action'].map((x) => `<button class="${modal.messageType === x ? 'on' : ''}" data-animation-message-type="${x}">${esc(t(x))}</button>`).join('')}</div><textarea class="rl-textarea" style="height:90px" data-animation-field="text">${esc(modal.text)}</textarea><div class="rl-tools"><button data-animation-token="{Self}">${esc(t('insertSelfName'))}</button><button data-animation-token="{Other}">${esc(t('insertOtherName'))}</button></div></div>`;
+      )}</div><div class="rl-animation-grid"><span>${esc(t('animationCount'))}</span><input class="rl-input rl-number" type="number" min="1" max="100" data-animation-field="count" value="${modal.count}"><span>${esc(t('animationSeconds'))}</span><input class="rl-input rl-number" type="number" min="0.001" max="120" step="0.001" data-animation-seconds value="${modal.intervalMs / 1000}"></div><div class="rl-animation-message"><div class="rl-muted">${esc(t('animationMessageHint'))}</div><div class="rl-choice-row">${['chat', 'emote', 'action'].map((x) => `<button class="${modal.messageType === x ? 'on' : ''}" data-animation-message-type="${x}">${esc(t(x))}</button>`).join('')}</div><textarea class="rl-textarea" style="height:90px" data-animation-field="text">${esc(modal.text)}</textarea><div class="rl-tools"><button data-animation-token="{Self}">${esc(t('insertSelfName'))}</button><button data-animation-token="{Other}">${esc(t('insertOtherName'))}</button></div></div>`;
   }
   function pickerHtml() {
     const zones = bodyZones(host.Player, host),
@@ -537,7 +537,7 @@ export function installSettings({ store, t, host = globalThis }) {
     const seconds = root.querySelector('[data-animation-seconds]');
     if (seconds)
       seconds.oninput = seconds.onchange = () => {
-        modal.durationMs = Number(seconds.value) * 1000;
+        modal.intervalMs = Number(seconds.value) * 1000;
       };
     root.querySelectorAll('[data-wardrobe]').forEach(
       (b) =>
@@ -997,7 +997,7 @@ export function installSettings({ store, t, host = globalThis }) {
             index: null,
             tracks: [trackFor(group)],
             count: 6,
-            durationMs: 1200,
+            intervalMs: 200,
             messageType: 'emote',
             text: '',
           };
@@ -1097,7 +1097,7 @@ export function installSettings({ store, t, host = globalThis }) {
     );
     const captureAnimation = () =>
       root.querySelectorAll('[data-animation-field]').forEach((el) => {
-        modal[el.dataset.animationField] = ['count', 'durationMs'].includes(el.dataset.animationField)
+        modal[el.dataset.animationField] = ['count', 'intervalMs'].includes(el.dataset.animationField)
           ? Number(el.value)
           : el.value;
       });
@@ -1235,9 +1235,9 @@ export function installSettings({ store, t, host = globalThis }) {
         else draft.choices[m.index] = { ...choice, always: draft.choices[m.index].always ?? false };
       } else if (m.type === 'animation') {
         const seconds = root.querySelector('[data-animation-seconds]');
-        if (seconds) m.durationMs = Number(seconds.value) * 1000;
+        if (seconds) m.intervalMs = Number(seconds.value) * 1000;
         for (const el of root.querySelectorAll('[data-animation-field]'))
-          m[el.dataset.animationField] = ['count', 'durationMs'].includes(el.dataset.animationField)
+          m[el.dataset.animationField] = ['count', 'intervalMs'].includes(el.dataset.animationField)
             ? Number(el.value)
             : el.value;
         for (const track of m.tracks) if (track.stateB.sameAsset) track.stateB.asset = track.stateA.asset;
@@ -1247,9 +1247,9 @@ export function installSettings({ store, t, host = globalThis }) {
           !Number.isInteger(m.count) ||
           m.count < 1 ||
           m.count > 100 ||
-          !Number.isFinite(m.durationMs) ||
-          m.durationMs < 100 ||
-          m.durationMs > 120000
+          !Number.isFinite(m.intervalMs) ||
+          m.intervalMs < 1 ||
+          m.intervalMs > 120000
         )
           throw Error(t('invalidAnimation'));
         const choice = {
@@ -1259,7 +1259,7 @@ export function installSettings({ store, t, host = globalThis }) {
               type: 'animation',
               tracks: clone(m.tracks),
               count: m.count,
-              durationMs: m.durationMs,
+              intervalMs: m.intervalMs,
               messageType: m.messageType,
               text: m.text,
             },

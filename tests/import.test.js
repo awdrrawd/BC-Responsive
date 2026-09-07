@@ -51,7 +51,7 @@ test('own Base64 export round trip retains grouped and animation steps with fres
       assetA: 'EarA',
       assetB: 'EarB',
       count: 6,
-      durationMs: 1200,
+      intervalMs: 200,
       messageType: 'emote',
       text: '',
     },
