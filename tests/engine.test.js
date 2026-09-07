@@ -32,6 +32,21 @@ test('one random choice can execute multiple steps in order', () => {
   assert.equal(scheduler.submit(event(2)), true);
   assert.deepEqual(calls, ['chat', 'activity']);
 });
+
+test('own room lifecycle bypasses member lists while visitor filters remain active', () => {
+  const { p, r } = fixture();
+  for (const mode of ['blacklist', 'whitelist']) {
+    p.listMode = mode;
+    p.blackList = [1, 2];
+    p.whiteList = [3];
+    for (const name of ['join', 'leave', 'slowLeave']) {
+      r.trigger = { kind: 'event', event: name };
+      assert.ok(selectResponse(p, { ...event(1), event: name }));
+    }
+    r.trigger = { kind: 'event', event: 'visitor' };
+    assert.equal(selectResponse(p, { ...event(2), event: 'visitor' }), null);
+  }
+});
 test('dedupe is per person/rule, and delayed responses cancel on disable', () => {
   const { p } = fixture();
   const timers = new Map();

@@ -8,6 +8,7 @@ import { defaults, ID, rule } from '../src/core/model.js';
 test('bundled plugin registers with ModSDK and handles a visitor through actual hooks', async () => {
   const data = defaults();
   data.settings.enabled = true;
+  data.personas[0].blackList = [1];
   const r = rule();
   r.trigger = { kind: 'event', event: 'visitor' };
   r.delayMs = 0;
@@ -16,7 +17,19 @@ test('bundled plugin registers with ModSDK and handles a visitor through actual 
     { type: 'activity', activity: 'Hug', group: 'ItemArms' },
   ];
   data.personas[0].rules = [r];
+  for (const name of ['join', 'leave']) {
+    const lifecycle = rule();
+    lifecycle.trigger = { kind: 'event', event: name, roomMode: 'named', roomNames: ['Test'] };
+    lifecycle.delayMs = 30;
+    lifecycle.choices = [
+      { always: true, steps: [{ type: 'chat', text: `${name} primary` }] },
+      { steps: [{ type: 'chat', text: `${name} response` }] },
+    ];
+    data.personas[0].rules.push(lifecycle);
+  }
   const calls = [];
+  const packets = [];
+  let inputPresent = true;
   const intervals = new Set();
   let draft = 'draft';
   let setting;
@@ -63,7 +76,18 @@ test('bundled plugin registers with ModSDK and handles a visitor through actual 
     ChatRoomRegisterMessageHandler(config) {
       handler = config;
     },
-    ChatRoomSync() {},
+    ChatRoomSync() {
+      sandbox.CurrentScreen = 'ChatRoom';
+      sandbox.ChatRoomData = { Name: 'Test' };
+      sandbox.ChatRoomCharacter = [sandbox.Player];
+    },
+    ChatRoomLeave() {
+      sandbox.ChatRoomData = null;
+      sandbox.ChatRoomCharacter = [];
+      inputPresent = false;
+      sandbox.ServerSend('ChatRoomLeave', '');
+      sandbox.CurrentScreen = 'ChatSearch';
+    },
     ChatRoomAddCharacterToChatRoom(c) {
       sandbox.ChatRoomCharacter.push(c);
     },
@@ -77,7 +101,17 @@ test('bundled plugin registers with ModSDK and handles a visitor through actual 
     InventoryGet() {
       return null;
     },
-    ElementValue: (_, value) => (value === undefined ? draft : (draft = value)),
+    ElementValue: (_, value) => {
+      assert.ok(inputPresent, 'leave messages must not access the removed input');
+      return value === undefined ? draft : (draft = value);
+    },
+    ChatRoomSendChatMessage(text) {
+      sandbox.ServerSend('ChatRoomChat', { Type: 'Chat', Content: text });
+    },
+    ServerSend(name, data) {
+      packets.push(name);
+      if (name === 'ChatRoomChat') calls.push(data.Content);
+    },
     ChatRoomSetTarget(value) {
       sandbox.ChatRoomTargetMemberNumber = value;
     },
@@ -136,6 +170,24 @@ test('bundled plugin registers with ModSDK and handles a visitor through actual 
   setting.click();
   setting.run();
   setting.unload();
+  sandbox.CurrentScreen = 'ChatSearch';
+  for (const callback of intervals) callback();
+  sandbox.ChatRoomSync({ Name: 'Test' });
+  for (const callback of intervals) callback();
+  await new Promise((resolve) => setTimeout(resolve, 120));
+  assert.deepEqual(calls, ['join primary', 'join response']);
+  // Reproduce the real trace: room data is already absent on entry to the hook.
+  sandbox.ChatRoomData = null;
+  sandbox.ChatRoomLeave();
+  assert.deepEqual(calls.slice(2), ['leave primary', 'leave response']);
+  assert.deepEqual(packets, ['ChatRoomChat', 'ChatRoomChat', 'ChatRoomLeave']);
+  assert.equal(sandbox.CurrentScreen, 'ChatSearch');
+  // Restore the fixture without emitting another join.
+  sandbox.CurrentScreen = 'ChatRoom';
+  inputPresent = true;
+  sandbox.ChatRoomData = { Name: 'Test' };
+  sandbox.ChatRoomCharacter = [sandbox.Player];
+  calls.length = 0;
   sandbox.ChatRoomAddCharacterToChatRoom({ MemberNumber: 2, Name: 'Friend' });
   assert.deepEqual(calls, ['Hello Friend', 'Hug Friend']);
   assert.equal(draft, 'draft');

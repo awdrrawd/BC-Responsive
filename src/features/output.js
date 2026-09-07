@@ -57,6 +57,14 @@ export function createOutput({ store, host = globalThis, owns, report }) {
       report('Command-like chat skipped; use Emote/Action for narration.');
       return;
     }
+    // BC clears InputChat before sending its leave packet. Keep native speech
+    // restrictions/transforms, but do not depend on that deleted DOM element.
+    if (event.kind === 'event' && event.event === 'leave') {
+      if (step.type === 'chat' && typeof host.ChatRoomSendChatMessage === 'function')
+        return host.ChatRoomSendChatMessage(text);
+      if (step.type === 'emote' && typeof host.ChatRoomSendEmote === 'function')
+        return host.ChatRoomSendEmote('*' + text);
+    }
     const draft = host.ElementValue('InputChat');
     const target = host.ChatRoomTargetMemberNumber;
     const canInterrupt =

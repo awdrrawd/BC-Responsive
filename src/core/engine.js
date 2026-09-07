@@ -23,11 +23,16 @@ export function matches(rule, event) {
   return true;
 }
 export function selectResponse(persona, event, random = Math.random) {
+  const ownRoomEvent =
+    event.kind === 'event' &&
+    event.actor === event.self &&
+    ['join', 'leave', 'slowLeave'].includes(event.event);
   if (
     !persona ||
-    (persona.listMode === 'whitelist'
-      ? !persona.whiteList.includes(event.actor)
-      : persona.blackList.includes(event.actor))
+    (!ownRoomEvent &&
+      (persona.listMode === 'whitelist'
+        ? !persona.whiteList.includes(event.actor)
+        : persona.blackList.includes(event.actor)))
   )
     return null;
   const pool = persona.rules
@@ -80,6 +85,8 @@ export function createScheduler({
       const eligible = { ...p, rules: p.rules.filter((r) => !seen.has(keyFor(r, event))) };
       const selected = selectResponse(eligible, event, random);
       if (!selected) return false;
+      // The room and chat input disappear as soon as the leave hook returns.
+      const leaving = event.kind === 'event' && event.event === 'leave';
       const key = keyFor(selected.rule, event);
       seen.set(key, time + selected.rule.delayMs + selected.rule.dedupeMs);
       const token = generation;
@@ -97,6 +104,10 @@ export function createScheduler({
         };
         if (selected.guaranteedSteps.length) {
           executeSteps(selected.guaranteedSteps);
+          if (leaving) {
+            executeSteps(selected.steps);
+            return;
+          }
           const timer = setTimer(() => {
             timers.delete(timer);
             executeSteps(selected.steps);
@@ -104,7 +115,7 @@ export function createScheduler({
           timers.add(timer);
         } else executeSteps(selected.steps);
       };
-      if (selected.rule.delayMs) {
+      if (selected.rule.delayMs && !leaving) {
         const timer = setTimer(() => {
           timers.delete(timer);
           run();

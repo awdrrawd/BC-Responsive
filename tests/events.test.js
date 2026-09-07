@@ -18,6 +18,7 @@ test('room lifecycle maps join, visitor, slow leave and leave to distinct events
     ChatRoomSyncMemberLeave() {},
     ChatRoomAttemptLeave() {},
     ChatRoomLeave() {},
+    ServerSend() {},
   };
   const sdk = {
     hookFunction(name, _priority, callback) {
@@ -31,7 +32,10 @@ test('room lifecycle maps join, visitor, slow leave and leave to distinct events
   host.ChatRoomCharacter.pop();
   assert.equal(hooks.has('ChatRoomSyncMemberLeave'), false, 'visitor departure needs no hook');
   hooks.get('ChatRoomAttemptLeave')([], () => {});
-  hooks.get('ChatRoomLeave')([], () => {});
+  hooks.get('ChatRoomLeave')([], () => {
+    host.ChatRoomData = null;
+    hooks.get('ServerSend')(['ChatRoomLeave', ''], () => {});
+  });
   assert.deepEqual(
     submitted.map((event) => event.event),
     ['join', 'visitor', 'slowLeave', 'leave'],

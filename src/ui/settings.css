@@ -296,9 +296,18 @@
     transition: none;
   }
 }
+.rl-transfer-field {
+  position: relative;
+}
+.rl-transfer-field .rl-textarea {
+  padding-bottom: 65px;
+}
 .rl-transfer-tools {
-  margin-top: 12px;
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
   align-items: center;
+  flex-direction: row-reverse;
 }
 .rl-card.active {
   border-color: var(--gold);

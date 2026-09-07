@@ -20,6 +20,8 @@ const ICON = {
   crown: svg('M3 6l4 4 5-7 5 7 4-4-2 13H5L3 6Zm2 10h14'),
   edit: svg('M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z'),
   trash: svg('M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6'),
+  copy: svg('M8 8h12v13H8zM16 8V3H3v13h5'),
+  paste: svg('M9 4H5v17h14V4h-4M9 2h6v5H9z'),
   close: svg('M18 6 6 18M6 6l12 12'),
 };
 
@@ -28,6 +30,7 @@ export function installSettings({ store, t, host = globalThis }) {
     page = 'home',
     deleteMode = false,
     ruleDeleteMode = false,
+    editingPersonaId = null,
     selectedRuleId = null,
     draft = null,
     sessionBaseline = null,
@@ -94,7 +97,7 @@ export function installSettings({ store, t, host = globalThis }) {
         found.set(a.Name, { name: a.Name, label: a.Description || a.Name });
     return [...found.values()].sort((a, b) => a.label.localeCompare(b.label));
   }
-  const active = () => store.active;
+  const active = () => store.data.personas.find((p) => p.id === editingPersonaId) ?? store.active;
   const activeRule = () =>
     draft?.id === selectedRuleId ? draft : active().rules.find((r) => r.id === selectedRuleId);
   function editableName(name, editing, className, action) {
@@ -105,7 +108,7 @@ export function installSettings({ store, t, host = globalThis }) {
     } </div>`;
   }
   function titleBar(name = '') {
-    const editing = name && inlineEdit?.type === 'persona' && inlineEdit.id === store.data.activePersona;
+    const editing = name && inlineEdit?.type === 'persona' && inlineEdit.id === active().id;
     const context = name ? editableName(name, editing, 'rl-context', 'editPersonaInline') : '';
     return `<header class="rl-top ${page === 'rules' ? 'rl-top-rules' : ''}"><div class="rl-brand"><img class="rl-brand-icon" src="${esc(preferenceIcon)}" alt="">Responsive_Liko${context}</div></header><button class="rl-exit" data-act="exit"><img src="${esc(exitIcon)}" alt="${esc(t('back'))}"></button>`;
   }
@@ -120,7 +123,8 @@ export function installSettings({ store, t, host = globalThis }) {
           `<div class="rl-setting"><div class="rl-grow"><b>${esc(t(k))}</b>${k === 'enabled' ? `<div class="rl-muted">${esc(t('masterHint'))}</div>` : ''}</div><span data-setting="${k}">${sw(s[k])}</span></div>`,
       )
       .join('');
-    const cards = store.data.personas
+    const cards = [...store.data.personas]
+      .sort((a, b) => Number(b.id === store.data.activePersona) - Number(a.id === store.data.activePersona))
       .map((p) => {
         const on = p.rules.filter((r) => r.enabled).length,
           activeP = p.id === store.data.activePersona,
@@ -160,7 +164,7 @@ export function installSettings({ store, t, host = globalThis }) {
       shown
         .map(
           (r) =>
-            `<div class="rl-rule ${r.id === selectedRuleId ? 'active' : ''} ${ruleDeleteMode && r.id === selectedRuleId ? 'delete-active' : ''}" data-id="${esc(r.id)}">${ruleDeleteMode && r.id === selectedRuleId ? `<button class="danger rl-rule-trash" data-act="deleteSelectedRule">${ICON.trash}</button>` : ''}<button class="rl-rule-main rl-grow" data-act="selectRule"><span><b>${esc(r.name)}</b><small>${esc(t(r.trigger.kind))} · ${r.choices.length} ${esc(t('responseCount'))}</small></span></button><span data-act="toggleRule">${sw(r.enabled, true)}</span></div>`,
+            `<div class="rl-rule ${r.id === selectedRuleId ? 'active' : ''} ${ruleDeleteMode ? 'delete-active' : ''}" data-id="${esc(r.id)}">${ruleDeleteMode ? `<button class="danger rl-rule-trash" data-act="deleteRuleRow">${ICON.trash}</button>` : ''}<button class="rl-rule-main rl-grow" data-act="selectRule"><span><b>${esc(r.name)}</b><small>${esc(t(r.trigger.kind))} · ${r.choices.length} ${esc(t('responseCount'))}</small></span></button><span data-act="toggleRule">${sw(r.enabled, true)}</span></div>`,
         )
         .join('') || `<div class="rl-muted">${esc(t('empty'))}</div>`;
     const r = activeRule(),
@@ -297,13 +301,13 @@ export function installSettings({ store, t, host = globalThis }) {
       })
       .join('');
     const actions = pickerSearch ? '' : pickerActions(rows);
-    return `<div class="rl-overlay"><section class="rl-dialog"><div class="rl-picker-head"><h2>${esc(t('chooseActivity'))}</h2><div class="rl-picker-controls"><select class="rl-select rl-picker-scope" data-picker-scope><option value="current" ${pickerScope === 'current' ? 'selected' : ''}>${esc(t('currentArea'))}</option><option value="all" ${pickerScope === 'all' ? 'selected' : ''}>${esc(t('allAreas'))}</option></select><div class="rl-action-search"><input class="rl-input" data-action-search value="${esc(pickerInput)}" placeholder="${esc(t('searchActivities'))}"></div><button data-act="searchActivities">${esc(t('searchButton'))}</button><span class="rl-grow"></span><button data-act="selectAll" ${!pickerSearch ? 'disabled' : ''}>${esc(t('selectAll'))}</button><button data-act="clearAll">${esc(t('clearAll'))}</button></div></div><div class="rl-dialog-body rl-picker-body"><div class="rl-body-map">${zoneHtml}</div><div class="rl-actions-wrap"><div class="rl-actions-title">${pickerScope === 'all' ? esc(t('allAreaActivities')) : fmt('availableForGroup', { group: esc(groupLabel(pickerGroup)) })}</div><div class="rl-actions">${actions}</div></div></div><div class="rl-dialog-foot"><span class="rl-grow rl-muted" data-picker-count>${fmt('selectedActivityCount', { count: pickerSelected.size })}</span><button data-act="closeModal">${esc(t('cancel'))}</button><button class="primary" data-act="confirmPicker" ${!pickerSearch ? 'disabled' : ''}>${esc(t('confirmAdd'))}</button></div></section></div>`;
+    return `<div class="rl-overlay"><section class="rl-dialog"><div class="rl-picker-head"><h2>${esc(t('chooseActivity'))}</h2><div class="rl-picker-controls"><select class="rl-select rl-picker-scope" data-picker-scope><option value="current" ${pickerScope === 'current' ? 'selected' : ''}>${esc(t('currentArea'))}</option><option value="all" ${pickerScope === 'all' ? 'selected' : ''}>${esc(t('allAreas'))}</option></select><div class="rl-action-search"><input class="rl-input" data-action-search value="${esc(pickerInput)}" placeholder="${esc(t('searchActivities'))}"></div><button data-act="searchActivities">${esc(t('searchButton'))}</button><span class="rl-grow"></span><button data-act="selectAll" ${!pickerSearch ? 'disabled' : ''}>${esc(t('selectAll'))}</button><button data-act="clearAll">${esc(t('clearAll'))}</button></div></div><div class="rl-dialog-body rl-picker-body"><div class="rl-body-map">${zoneHtml}</div><div class="rl-actions-wrap"><div class="rl-actions-title">${pickerScope === 'all' ? esc(t('allAreaActivities')) : fmt('availableForGroup', { group: esc(groupLabel(pickerGroup)) })}</div><div class="rl-actions">${actions}</div></div></div><div class="rl-dialog-foot"><span class="rl-grow rl-muted" data-picker-count>${fmt('selectedActivityCount', { count: pickerSelected.size })}</span><button class="primary" data-act="confirmPicker" ${!pickerSearch ? 'disabled' : ''}>${esc(t('confirmAdd'))}</button><button data-act="closeModal">${esc(t('cancel'))}</button></div></section></div>`;
   }
   function modalHtml() {
     if (!modal) return '';
     if (modal.type === 'picker') return pickerHtml();
     if (modal.type === 'unsaved')
-      return `<div class="rl-overlay"><section class="rl-dialog compact"><div class="rl-dialog-head"><h2>${esc(t('unsavedTitle'))}</h2></div><div class="rl-dialog-body"><p>${esc(t('unsavedMessage'))}</p></div><div class="rl-dialog-foot"><span class="rl-grow"></span><button data-act="closeModal">${esc(t('cancel'))}</button><button data-act="discardExit">${esc(t('discardExit'))}</button><button class="primary" data-act="saveExit">${esc(t('saveExit'))}</button></div></section></div>`;
+      return `<div class="rl-overlay"><section class="rl-dialog compact"><div class="rl-dialog-head"><h2>${esc(t('unsavedTitle'))}</h2></div><div class="rl-dialog-body"><p>${esc(t('unsavedMessage'))}</p></div><div class="rl-dialog-foot"><span class="rl-grow"></span><button class="primary" data-act="saveExit">${esc(t('saveExit'))}</button><button data-act="discardExit">${esc(t('discardExit'))}</button><button data-act="closeModal">${esc(t('cancel'))}</button></div></section></div>`;
     const titles = {
       name: modal.mode === 'new' ? t('addPersona') : modal.mode === 'rule' ? t('renameRule') : t('rename'),
       confirm: t('confirmDelete'),
@@ -316,7 +320,7 @@ export function installSettings({ store, t, host = globalThis }) {
     if (modal.type === 'name') body = `<input class="rl-input" data-modal-value value="${esc(modal.value)}">`;
     if (modal.type === 'confirm') body = `<p>${esc(modal.message)}</p>`;
     if (modal.type === 'transfer')
-      body = `<textarea class="rl-textarea" data-modal-value ${modal.mode === 'export' ? 'readonly' : ''}>${esc(modal.value)}</textarea><div class="rl-tools rl-transfer-tools"><button data-clipboard="${modal.mode}">${esc(t(modal.mode === 'export' ? 'copyText' : 'pasteText'))}</button><span class="rl-muted" data-clipboard-status role="status"></span></div>`;
+      body = `<div class="rl-transfer-field"><textarea class="rl-textarea" data-modal-value ${modal.mode === 'export' ? 'readonly' : ''}>${esc(modal.value)}</textarea><div class="rl-tools rl-transfer-tools"><button data-clipboard="${modal.mode}">${ICON[modal.mode === 'export' ? 'copy' : 'paste']}${esc(t(modal.mode === 'export' ? 'copyText' : 'pasteText'))}</button><span class="rl-muted" data-clipboard-status role="status"></span></div></div>`;
     if (modal.type === 'text')
       body = `<div class="rl-choice-row">${(draft?.trigger.kind === 'speech' ? ['chat'] : ['chat', 'emote', 'action']).map((x) => `<button class="${modal.responseType === x ? 'on' : ''}" data-response-type="${x}">${esc(t(x))}</button>`).join('')}</div><textarea class="rl-textarea" style="margin-top:18px" data-modal-value>${esc(modal.value)}</textarea><div class="rl-tools" style="margin-top:12px"><button data-token="{Self}">${esc(t('insertSelfName'))}</button><button data-token="{Other}">${esc(t('insertOtherName'))}</button></div>`;
     if (modal.type === 'text' && draft?.trigger.kind === 'speech') {
@@ -329,7 +333,7 @@ export function installSettings({ store, t, host = globalThis }) {
         value = key === 'white' ? modal.white : modal.black;
       body = `<div class="rl-settings-group"><h3>${esc(t('interactionTargets'))}</h3><div class="rl-segments"><button class="${modal.listMode === 'whitelist' ? 'on' : ''}" data-list-mode="whitelist">${esc(t('onlyWhitelist'))}</button><button class="${modal.listMode === 'blacklist' ? 'on' : ''}" data-list-mode="blacklist">${esc(t('onlyBlacklist'))}</button></div></div><div class="rl-settings-group"><h3>${esc(t(key === 'white' ? 'whiteList' : 'blackList'))}</h3><div class="rl-muted">${esc(t(key === 'white' ? 'whiteListHint' : 'blackListHint'))}</div>${relationButtons('persona')}<div class="rl-list-entry"><input class="rl-input" data-list="${key}" value="${esc(value)}" placeholder="${esc(t('memberNumbersPlaceholder'))}"><button data-act="normalizeList">＋</button></div></div>`;
     }
-    return `<div class="rl-overlay"><section class="rl-dialog compact ${modal.type === 'animation' ? 'rl-animation-dialog' : ''}"><div class="rl-dialog-head"><h2 class="rl-grow">${esc(titles[modal.type])}</h2><button data-act="closeModal">${ICON.close}</button></div><div class="rl-dialog-body">${modal.error ? `<p role="alert">${esc(modal.error)}</p>` : ''}${body}</div><div class="rl-dialog-foot"><span class="rl-grow"></span><button data-act="closeModal">${esc(t('cancel'))}</button>${modal.mode === 'export' ? '' : `<button class="primary" data-act="confirmModal">${esc(t('save'))}</button>`}</div></section></div>`;
+    return `<div class="rl-overlay"><section class="rl-dialog compact ${modal.type === 'animation' ? 'rl-animation-dialog' : ''}"><div class="rl-dialog-head"><h2 class="rl-grow">${esc(titles[modal.type])}</h2><button data-act="closeModal">${ICON.close}</button></div><div class="rl-dialog-body">${modal.error ? `<p role="alert">${esc(modal.error)}</p>` : ''}${body}</div><div class="rl-dialog-foot"><span class="rl-grow"></span>${modal.mode === 'export' ? '' : `<button class="primary" data-act="confirmModal">${esc(t('save'))}</button>`}<button data-act="closeModal">${esc(t('cancel'))}</button></div></section></div>`;
   }
   function render() {
     if (!root) return;
@@ -427,7 +431,7 @@ export function installSettings({ store, t, host = globalThis }) {
   function commitDraft() {
     if (!draft) return;
     store.update((d) => {
-      const p = d.personas.find((x) => x.id === d.activePersona),
+      const p = d.personas.find((x) => x.id === active().id),
         i = p.rules.findIndex((x) => x.id === draft.id);
       p.rules[i] = clone(draft);
     });
@@ -613,7 +617,7 @@ export function installSettings({ store, t, host = globalThis }) {
       (b) =>
         (b.onclick = () => {
           const id = b.closest('.rl-card-wrap').dataset.id;
-          if (id !== store.data.activePersona) store.update((d) => (d.activePersona = id));
+          editingPersonaId = id;
           selectedRuleId = null;
           draft = null;
           sessionBaseline = clone(contentOf(active(), null));
@@ -631,7 +635,7 @@ export function installSettings({ store, t, host = globalThis }) {
     root.querySelectorAll('[data-act="editPersonaInline"]').forEach(
       (b) =>
         (b.onclick = () => {
-          inlineEdit = { type: 'persona', id: store.data.activePersona };
+          inlineEdit = { type: 'persona', id: active().id };
           render();
         }),
     );
@@ -678,7 +682,7 @@ export function installSettings({ store, t, host = globalThis }) {
     root.querySelectorAll('[data-act="renamePersona"]').forEach(
       (b) =>
         (b.onclick = () => {
-          modal = { type: 'name', mode: 'persona', id: store.data.activePersona, value: active().name };
+          modal = { type: 'name', mode: 'persona', id: active().id, value: active().name };
           render();
         }),
     );
@@ -747,7 +751,7 @@ export function installSettings({ store, t, host = globalThis }) {
           const id = w.dataset.id || w.closest('.rl-rule').dataset.id;
           if (draft?.id === id) draft.enabled = !draft.enabled;
           store.update((d) => {
-            const r = d.personas.find((p) => p.id === d.activePersona).rules.find((x) => x.id === id);
+            const r = d.personas.find((p) => p.id === active().id).rules.find((x) => x.id === id);
             r.enabled = !r.enabled;
           });
           draft = null;
@@ -760,7 +764,7 @@ export function installSettings({ store, t, host = globalThis }) {
           if (dirty()) commitDraft();
           const r = rule();
           r.name = t('newRule');
-          store.update((d) => d.personas.find((p) => p.id === d.activePersona).rules.push(r));
+          store.update((d) => d.personas.find((p) => p.id === active().id).rules.push(r));
           selectedRuleId = r.id;
           draft = null;
           render();
@@ -780,11 +784,16 @@ export function installSettings({ store, t, host = globalThis }) {
           render();
         }),
     );
-    root.querySelectorAll('[data-act="deleteSelectedRule"]').forEach(
+    root.querySelectorAll('[data-act="deleteRuleRow"]').forEach(
       (b) =>
         (b.onclick = (e) => {
           e.stopPropagation();
-          modal = { type: 'confirm', mode: 'rule', id: selectedRuleId, message: t('removeConfirm') };
+          modal = {
+            type: 'confirm',
+            mode: 'rule',
+            id: b.closest('.rl-rule').dataset.id,
+            message: t('removeConfirm'),
+          };
           render();
         }),
     );
@@ -1171,7 +1180,7 @@ export function installSettings({ store, t, host = globalThis }) {
           draft = null;
           if (restore)
             store.update((d) => {
-              const p = d.personas.find((x) => x.id === d.activePersona);
+              const p = d.personas.find((x) => x.id === active().id);
               p.name = restore.name;
               p.rules = clone(restore.rules);
             });
@@ -1204,11 +1213,11 @@ export function installSettings({ store, t, host = globalThis }) {
       } else if (m.type === 'confirm' && m.mode === 'rule') {
         if (draft?.id === m.id) draft = null;
         store.update((d) => {
-          const p = d.personas.find((x) => x.id === d.activePersona);
+          const p = d.personas.find((x) => x.id === active().id);
           p.rules = p.rules.filter((r) => r.id !== m.id);
         });
-        selectedRuleId = active().rules[0]?.id ?? null;
-        ruleDeleteMode = false;
+        if (selectedRuleId === m.id) selectedRuleId = active().rules[0]?.id ?? null;
+        if (!active().rules.length) ruleDeleteMode = false;
       } else if (m.type === 'confirm') {
         store.update((d) => {
           d.personas = d.personas.filter((p) => p.id !== m.id);
@@ -1262,7 +1271,7 @@ export function installSettings({ store, t, host = globalThis }) {
         const input = root.querySelector('[data-list]');
         if (input) m[input.dataset.list] = input.value;
         store.update((d) => {
-          const p = d.personas.find((x) => x.id === d.activePersona);
+          const p = d.personas.find((x) => x.id === active().id);
           p.listMode = m.listMode;
           p.whiteList = parseMembers(m.white);
           p.blackList = parseMembers(m.black);
@@ -1284,16 +1293,41 @@ export function installSettings({ store, t, host = globalThis }) {
       transform: `scale(${b.width / 2000},${b.height / 1000})`,
     });
   }
+  function resetView() {
+    page = 'home';
+    editingPersonaId = null;
+    selectedRuleId = null;
+    draft = null;
+    sessionBaseline = null;
+    modal = null;
+    inlineEdit = null;
+    deleteMode = false;
+    ruleDeleteMode = false;
+    responseDelete = false;
+    primaryMode = false;
+    filter = 'all';
+    ruleQuery = '';
+    ruleScrollTop = 0;
+    pickerGroup = 'ItemHead';
+    pickerScope = 'current';
+    pickerSelected = new Set();
+    pickerQuery = '';
+    pickerInput = '';
+    pickerMode = 'trigger';
+    notice = '';
+  }
   function load() {
     root?.remove();
     root = host.document.createElement('div');
     root.className = 'rl-root';
     host.document.body.appendChild(root);
-    if (!wardrobePending) page = 'home';
+    if (!wardrobePending) resetView();
     render();
   }
   function unload() {
     clearTimeout(noticeTimer);
+    notice = '';
+    if (!wardrobePending) resetView();
     picker.reset();
     root?.remove();
     root = null;

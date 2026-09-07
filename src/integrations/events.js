@@ -1,11 +1,15 @@
 export function installEvents({ sdk, submit, mouth, reset, host = globalThis }) {
   let syncing = 0,
     roomEpoch = 0;
-  const roomKey = () => `${host.ChatRoomData?.Name ?? ''}:${roomEpoch}`;
+  let leavingEvent;
+  let sendingLeave = false;
+  let lastRoomName = host.ChatRoomData?.Name ?? '';
+  const roomName = () => host.ChatRoomData?.Name ?? lastRoomName;
+  const roomKey = () => (sendingLeave ? leavingEvent.room : `${roomName()}:${roomEpoch}`);
   const event = (kind, actorCharacter, fields = {}) => ({
     kind,
     room: roomKey(),
-    roomName: host.ChatRoomData?.Name ?? '',
+    roomName: roomName(),
     self: host.Player.MemberNumber,
     actor: actorCharacter?.MemberNumber,
     actorCharacter,
@@ -49,6 +53,7 @@ export function installEvents({ sdk, submit, mouth, reset, host = globalThis }) 
   };
   host.ChatRoomRegisterMessageHandler(handler);
   sdk.hookFunction('ChatRoomSync', 0, (args, next) => {
+    lastRoomName = args[0]?.Name ?? host.ChatRoomData?.Name ?? '';
     syncing++;
     roomEpoch++;
     reset();
@@ -98,8 +103,35 @@ export function installEvents({ sdk, submit, mouth, reset, host = globalThis }) 
     });
   if (typeof host.ChatRoomLeave === 'function')
     sdk.hookFunction('ChatRoomLeave', 0, (args, next) => {
-      if (host.CurrentScreen === 'ChatRoom' && host.ChatRoomData)
-        submit(event('event', host.Player, { event: 'leave' }));
+      if (host.CurrentScreen === 'ChatRoom' && host.Player) {
+        leavingEvent = event('event', host.Player, { event: 'leave' });
+      }
+      try {
+        return next(args);
+      } finally {
+        leavingEvent = undefined;
+      }
+    });
+  if (typeof host.ServerSend === 'function')
+    sdk.hookFunction('ServerSend', 1, (args, next) => {
+      if (args[0] === 'ChatRoomLeave' && !sendingLeave) {
+        const captured = leavingEvent;
+        leavingEvent ??=
+          host.CurrentScreen === 'ChatRoom' && host.Player
+            ? event('event', host.Player, { event: 'leave' })
+            : undefined;
+        if (leavingEvent) {
+          sendingLeave = true;
+          try {
+            submit(leavingEvent);
+          } catch (error) {
+            console.warn('Responsive_Liko leave event', error);
+          } finally {
+            sendingLeave = false;
+            leavingEvent = captured;
+          }
+        }
+      }
       return next(args);
     });
   return { roomKey };

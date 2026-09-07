@@ -85,7 +85,17 @@ export function start(namespace, host = globalThis) {
         !host.Player.GhostList?.includes(event.actor) &&
         (event.event === 'leave' || host.ChatRoomCharacter.some((c) => c.MemberNumber === event.actor));
       scheduler = createScheduler({ active: () => store.active, valid, execute: output.execute, report });
-      events = installEvents({ sdk, submit: (e) => scheduler.submit(e), mouth, reset, host });
+      events = installEvents({
+        sdk,
+        submit: (e) => {
+          // ChatRoomSync already reset the old room's work before emitting join.
+          if (e.kind === 'event' && e.event === 'join') lastScreen = host.CurrentScreen;
+          return scheduler.submit(e);
+        },
+        mouth,
+        reset,
+        host,
+      });
       ui = installSettings({ store, t, host });
       lastScreen = host.CurrentScreen;
       unsubscribe = store.subscribe(() => {

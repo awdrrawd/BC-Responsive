@@ -776,7 +776,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     "package.json"() {
       package_default = {
         name: "responsive-liko",
-        version: "0.1.1",
+        version: "0.1.2",
         private: true,
         type: "module",
         repository: {
@@ -1279,7 +1279,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return true;
   }
   function selectResponse(persona2, event, random = Math.random) {
-    if (!persona2 || (persona2.listMode === "whitelist" ? !persona2.whiteList.includes(event.actor) : persona2.blackList.includes(event.actor)))
+    const ownRoomEvent = event.kind === "event" && event.actor === event.self && ["join", "leave", "slowLeave"].includes(event.event);
+    if (!persona2 || !ownRoomEvent && (persona2.listMode === "whitelist" ? !persona2.whiteList.includes(event.actor) : persona2.blackList.includes(event.actor)))
       return null;
     const pool = persona2.rules.filter((r) => matches(r, event)).flatMap((r) => r.choices.filter((c) => c.steps.length).map((choice2) => ({ rule: r, choice: choice2 })));
     if (!pool.length) return null;
@@ -1326,6 +1327,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const eligible = { ...p, rules: p.rules.filter((r) => !seen.has(keyFor(r, event))) };
         const selected = selectResponse(eligible, event, random);
         if (!selected) return false;
+        const leaving = event.kind === "event" && event.event === "leave";
         const key = keyFor(selected.rule, event);
         seen.set(key, time + selected.rule.delayMs + selected.rule.dedupeMs);
         const token = generation;
@@ -1343,6 +1345,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
           };
           if (selected.guaranteedSteps.length) {
             executeSteps(selected.guaranteedSteps);
+            if (leaving) {
+              executeSteps(selected.steps);
+              return;
+            }
             const timer = setTimer(() => {
               timers.delete(timer);
               executeSteps(selected.steps);
@@ -1350,7 +1356,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             timers.add(timer);
           } else executeSteps(selected.steps);
         };
-        if (selected.rule.delayMs) {
+        if (selected.rule.delayMs && !leaving) {
           const timer = setTimer(() => {
             timers.delete(timer);
             run();
@@ -3113,6 +3119,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
         report("Command-like chat skipped; use Emote/Action for narration.");
         return;
       }
+      if (event.kind === "event" && event.event === "leave") {
+        if (step2.type === "chat" && typeof host.ChatRoomSendChatMessage === "function")
+          return host.ChatRoomSendChatMessage(text);
+        if (step2.type === "emote" && typeof host.ChatRoomSendEmote === "function")
+          return host.ChatRoomSendEmote("*" + text);
+      }
       const draft = host.ElementValue("InputChat");
       const target = host.ChatRoomTargetMemberNumber;
       const canInterrupt = step2.type === "chat" && store.data.settings.interruption && target < 0 && draft.trim() && !/^[\/!*(@.]|^https?:/i.test(draft.trimStart());
@@ -3407,11 +3419,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
   // src/integrations/events.js
   function installEvents({ sdk, submit, mouth, reset, host = globalThis }) {
     let syncing = 0, roomEpoch = 0;
-    const roomKey = () => `${host.ChatRoomData?.Name ?? ""}:${roomEpoch}`;
+    let leavingEvent;
+    let sendingLeave = false;
+    let lastRoomName = host.ChatRoomData?.Name ?? "";
+    const roomName = () => host.ChatRoomData?.Name ?? lastRoomName;
+    const roomKey = () => sendingLeave ? leavingEvent.room : `${roomName()}:${roomEpoch}`;
     const event = (kind, actorCharacter, fields = {}) => ({
       kind,
       room: roomKey(),
-      roomName: host.ChatRoomData?.Name ?? "",
+      roomName: roomName(),
       self: host.Player.MemberNumber,
       actor: actorCharacter?.MemberNumber,
       actorCharacter,
@@ -3443,6 +3459,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     };
     host.ChatRoomRegisterMessageHandler(handler);
     sdk.hookFunction("ChatRoomSync", 0, (args, next) => {
+      lastRoomName = args[0]?.Name ?? host.ChatRoomData?.Name ?? "";
       syncing++;
       roomEpoch++;
       reset();
@@ -3486,8 +3503,32 @@ One of mods you are using is using an old version of SDK. It will work for now b
       });
     if (typeof host.ChatRoomLeave === "function")
       sdk.hookFunction("ChatRoomLeave", 0, (args, next) => {
-        if (host.CurrentScreen === "ChatRoom" && host.ChatRoomData)
-          submit(event("event", host.Player, { event: "leave" }));
+        if (host.CurrentScreen === "ChatRoom" && host.Player) {
+          leavingEvent = event("event", host.Player, { event: "leave" });
+        }
+        try {
+          return next(args);
+        } finally {
+          leavingEvent = void 0;
+        }
+      });
+    if (typeof host.ServerSend === "function")
+      sdk.hookFunction("ServerSend", 1, (args, next) => {
+        if (args[0] === "ChatRoomLeave" && !sendingLeave) {
+          const captured = leavingEvent;
+          leavingEvent ??= host.CurrentScreen === "ChatRoom" && host.Player ? event("event", host.Player, { event: "leave" }) : void 0;
+          if (leavingEvent) {
+            sendingLeave = true;
+            try {
+              submit(leavingEvent);
+            } catch (error) {
+              console.warn("Responsive_Liko leave event", error);
+            } finally {
+              sendingLeave = false;
+              leavingEvent = captured;
+            }
+          }
+        }
         return next(args);
       });
     return { roomKey };
@@ -3530,7 +3571,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var settings_default;
   var init_settings = __esm({
     "src/ui/settings.css"() {
-      settings_default = ".rl-chance-bar {\n  width: 100%;\n  height: 30px;\n  accent-color: #b23a56;\n  cursor: pointer;\n}\n.rl-response {\n  position: relative;\n  margin: 12px 0;\n  padding: 12px;\n  border: 2px solid transparent !important;\n  border-top-color: #f2e0e4 !important;\n  border-radius: 14px;\n}\n.rl-response.rl-primary-response {\n  border-color: #c08a3e !important;\n  background: #fff8e9;\n}\n.rl-response.rl-primary-pick {\n  cursor: pointer;\n  border-style: dashed !important;\n}\n.rl-primary-pick:hover {\n  border-color: #b23a56 !important;\n}\n.rl-crown {\n  position: absolute;\n  left: -13px;\n  top: -17px;\n  transform: rotate(-45deg);\n  color: #c08a3e;\n  pointer-events: none;\n  background: #fff8e9;\n  border-radius: 50%;\n  padding: 3px;\n}\n.rl-crown svg {\n  width: 28px !important;\n  height: 28px !important;\n}\n\n.rl-root * {\n  user-select: none;\n  -webkit-user-select: none;\n}\n.rl-root input,\n.rl-root textarea {\n  user-select: text;\n  -webkit-user-select: text;\n}\n.rl-exit img {\n  width: 72px;\n  height: 72px;\n  pointer-events: none;\n}\n.rl-box,\n.rl-rule-list {\n  cursor: grab;\n}\n.rl-box.rl-dragging,\n.rl-rule-list.rl-dragging {\n  cursor: grabbing;\n}\n.rl-root {\n  position: fixed;\n  width: 2000px;\n  height: 1000px;\n  transform-origin: top left;\n  z-index: 50;\n  font-family: Arial, 'Microsoft JhengHei', sans-serif;\n  color: #3a2430;\n  overflow: hidden;\n  --soft: #8a6b74;\n  --line: #e9cdd4;\n  --card: #fffafb;\n  --paper: #fdf3f5;\n  --rose: #b23a56;\n  --deep: #8c2540;\n  --light: #f7dee4;\n  --lighter: #fcf0f3;\n  --gold: #c08a3e;\n  --danger: #c0392b;\n}\n.rl-root * {\n  box-sizing: border-box;\n}\n.rl-root button,\n.rl-root input,\n.rl-root select,\n.rl-root textarea {\n  font: inherit;\n  color: inherit;\n}\n.rl-root button {\n  border: 2px solid var(--line);\n  background: var(--card);\n  height: 54px;\n  padding: 0 20px;\n  border-radius: 28px;\n  cursor: pointer;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  gap: 9px;\n  font-size: 21px;\n}\n.rl-root button:hover {\n  border-color: var(--rose);\n  color: var(--deep);\n}\n.rl-root button.primary {\n  color: white;\n  border-color: transparent;\n  background: linear-gradient(135deg, var(--rose), var(--deep));\n}\n.rl-root button.danger {\n  color: var(--danger);\n  border-color: #e4aaa4;\n  background: #f6dcd9;\n}\n.rl-root svg {\n  width: 26px;\n  height: 26px;\n}\n.rl-screen {\n  width: 100%;\n  height: 100%;\n  background:\n    radial-gradient(1100px 480px at 92% -10%, #fceef1 0, transparent 62%),\n    linear-gradient(160deg, #fdf2f5, #f3dee6);\n  border: 2px solid var(--line);\n}\n.rl-top {\n  height: 120px;\n  display: flex;\n  align-items: center;\n  padding: 0 180px;\n  border-bottom: 2px solid #f2e0e4;\n}\n.rl-top-rules {\n  padding-left: 65px;\n}\n.rl-brand {\n  display: flex;\n  align-items: center;\n  gap: 20px;\n  font:\n    italic 600 42px Georgia,\n    serif;\n}\n\n.rl-icon {\n  width: 43px !important;\n  height: 43px !important;\n  padding: 7px !important;\n  border: 0 !important;\n  background: transparent !important;\n}\n.rl-exit {\n  position: absolute !important;\n  left: 1815px;\n  top: 75px;\n  width: 90px !important;\n  height: 90px !important;\n  padding: 0 !important;\n  border-radius: 12px !important;\n  transform: translateY(-50%);\n  background: white !important;\n}\n.rl-main {\n  height: 880px;\n  padding: 20px 180px 38px;\n  display: grid;\n  grid-template-columns: 520px 1fr;\n  gap: 28px;\n}\n.rl-work {\n  height: 880px;\n  padding: 18px 65px 35px;\n  display: grid;\n  grid-template-columns: 470px 1fr;\n  gap: 24px;\n}\n.rl-panel {\n  background: var(--paper);\n  border: 2px solid var(--line);\n  border-radius: 23px;\n  padding: 26px;\n  overflow: auto;\n}\n.rl-head {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  margin-bottom: 16px;\n}\n.rl-head h2 {\n  font-size: 31px;\n  margin: 0;\n}\n.rl-grow {\n  flex: 1;\n  min-width: 0;\n}\n.rl-muted {\n  font-size: 18px;\n  color: var(--soft);\n}\n.rl-setting {\n  height: 100px;\n  display: flex;\n  align-items: center;\n  border-bottom: 2px solid #f2e0e4;\n  font-size: 25px;\n}\n.rl-switch {\n  width: 86px !important;\n  height: 46px !important;\n  padding: 5px !important;\n  border: 0 !important;\n  background: #cbbdc1 !important;\n  justify-content: flex-start !important;\n}\n.rl-switch:before {\n  content: '';\n  width: 36px;\n  height: 36px;\n  border-radius: 50%;\n  background: white;\n  box-shadow: 0 2px 5px #0004;\n}\n.rl-switch.on {\n  background: linear-gradient(135deg, var(--rose), var(--deep)) !important;\n  justify-content: flex-end !important;\n}\n.rl-small-switch {\n  width: 58px !important;\n  height: 31px !important;\n  padding: 4px !important;\n}\n.rl-small-switch:before {\n  width: 23px;\n  height: 23px;\n}\n.rl-tools {\n  display: flex;\n  gap: 9px;\n  flex-wrap: wrap;\n}\n.rl-tools button {\n  height: 46px;\n  font-size: 18px;\n  padding: 0 15px;\n}\n.rl-personas {\n  display: flex;\n  flex-direction: column;\n  gap: 14px;\n}\n.rl-card-wrap {\n  position: relative;\n  padding-right: 87px;\n}\n.rl-card {\n  position: relative;\n  height: 140px;\n  background: white;\n  border: 2px solid var(--line);\n  border-radius: 21px;\n  padding: 18px 23px;\n  display: flex;\n  align-items: center;\n  gap: 20px;\n}\n.rl-card,\n.rl-rule,\n.rl-response {\n  --hover-glow: #b23a5640;\n  transition: box-shadow 160ms ease;\n}\n.rl-card.active,\n.rl-response.rl-primary-response {\n  --hover-glow: #c08a3e66;\n}\n.rl-card-wrap:hover > .rl-card,\n.rl-rule:hover,\n.rl-response:hover {\n  box-shadow:\n    inset 0 0 16px var(--hover-glow),\n    0 0 9px var(--hover-glow);\n}\n@media (prefers-reduced-motion: reduce) {\n  .rl-card,\n  .rl-rule,\n  .rl-response {\n    transition: none;\n  }\n}\n.rl-transfer-tools {\n  margin-top: 12px;\n  align-items: center;\n}\n.rl-card.active {\n  border-color: var(--gold);\n  background: linear-gradient(90deg, var(--lighter), white 60%);\n}\n.rl-card.delete {\n  margin-left: 20px;\n}\n.rl-card-name {\n  width: 220px;\n}\n\n.rl-meter {\n  flex: 1;\n}\n.rl-track {\n  height: 10px;\n  border-radius: 8px;\n  background: #f2e0e4;\n  overflow: hidden;\n  margin-bottom: 9px;\n}\n.rl-fill {\n  height: 100%;\n  background: linear-gradient(90deg, var(--rose), var(--gold));\n}\n.rl-count {\n  font-size: 21px;\n}\n.rl-count b {\n  font-size: 29px;\n  color: var(--deep);\n}\n.rl-card-side {\n  position: absolute;\n  right: 3px;\n  top: 35px;\n  width: 70px !important;\n  height: 70px !important;\n  padding: 0 !important;\n}\n.rl-browser {\n  padding: 24px;\n}\n.rl-search,\n.rl-input,\n.rl-select,\n.rl-textarea {\n  width: 100%;\n  border: 2px solid var(--line);\n  border-radius: 12px;\n  background: white;\n  padding: 0 15px;\n  font-size: 20px;\n}\n.rl-search,\n.rl-input,\n.rl-select {\n  height: 52px;\n}\n.rl-textarea {\n  height: 220px;\n  padding: 14px;\n  resize: none;\n}\n.rl-cats {\n  display: flex;\n  gap: 7px;\n  margin: 13px 0;\n}\n.rl-cats button {\n  height: 41px;\n  flex: 1;\n  padding: 0;\n  font-size: 17px;\n}\n.rl-cats .on,\n.rl-rule.active {\n  background: var(--lighter);\n  border-color: var(--rose);\n}\n.rl-rule {\n  height: 81px;\n  border: 2px solid var(--line);\n  border-radius: 13px;\n  margin-bottom: 9px;\n  display: flex;\n  align-items: center;\n  padding: 8px 9px 8px 14px;\n  background: white;\n}\n.rl-rule-main {\n  height: 61px !important;\n  border: 0 !important;\n  background: transparent !important;\n  border-radius: 8px !important;\n  justify-content: flex-start !important;\n  text-align: left;\n  padding: 0 !important;\n}\n.rl-rule-main b {\n  font-size: 20px;\n}\n.rl-rule-main small {\n  display: block;\n  color: var(--soft);\n  margin-top: 4px;\n}\n.rl-editor {\n  padding: 23px;\n}\n.rl-editor-grid {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 19px;\n}\n.rl-box {\n  background: white;\n  border: 2px solid var(--line);\n  border-radius: 17px;\n  padding: 22px;\n  height: 650px;\n  overflow: auto;\n}\n.rl-box h3 {\n  font-size: 24px;\n  color: var(--deep);\n  margin: 0 0 18px;\n}\n.rl-field {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  margin: 15px 0;\n  font-size: 20px;\n}\n.rl-field > span {\n  min-width: 80px;\n}\n.rl-summary {\n  border: 2px dashed var(--line);\n  border-radius: 13px;\n  padding: 18px;\n  margin-top: 18px;\n  color: var(--soft);\n  font-size: 19px;\n}\n.rl-response-head {\n  display: flex;\n  align-items: center;\n  gap: 7px;\n}\n.rl-response-head button {\n  height: 41px;\n  font-size: 17px;\n  padding: 0 13px;\n}\n.rl-response {\n  min-height: 80px;\n  display: grid;\n  grid-template-columns: 100px 1fr 92px;\n  gap: 9px;\n  align-items: center;\n  border-top: 2px solid #f2e0e4;\n  font-size: 19px;\n}\n.rl-response b {\n  color: var(--deep);\n}\n.rl-response button {\n  height: 40px;\n  font-size: 17px;\n  padding: 0 12px;\n}\n.rl-overlay {\n  position: absolute;\n  inset: 0;\n  background: #46203299;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  padding: 52px 105px;\n  backdrop-filter: blur(2px);\n  z-index: 9;\n}\n.rl-dialog {\n  width: 100%;\n  height: 100%;\n  background: var(--card);\n  border: 2px solid var(--line);\n  border-radius: 25px;\n  padding: 27px;\n  display: flex;\n  flex-direction: column;\n  box-shadow: 0 20px 60px #40152655;\n}\n.rl-dialog.compact {\n  width: 900px;\n  height: auto;\n  min-height: 420px;\n}\n.rl-dialog-head {\n  height: 68px;\n  display: flex;\n  align-items: center;\n  gap: 16px;\n}\n.rl-dialog-head h2 {\n  font-size: 30px;\n  margin: 0;\n}\n.rl-dialog-body {\n  flex: 1;\n  min-height: 0;\n}\n.rl-dialog-foot {\n  height: 75px;\n  display: flex;\n  align-items: flex-end;\n  gap: 11px;\n}\n.rl-picker-body {\n  display: grid;\n  grid-template-columns: 400px 1fr;\n  gap: 22px;\n}\n.rl-body-map {\n  position: relative;\n  background: var(--lighter);\n  border: 2px solid var(--line);\n  border-radius: 17px;\n  overflow: hidden;\n}\n.rl-zone {\n  position: absolute;\n  border: 2px solid #b23a5688;\n  background: #bdeeee88;\n  padding: 0 !important;\n  border-radius: 7px !important;\n  min-width: 4px !important;\n  min-height: 4px !important;\n  height: auto;\n}\n.rl-zone.selected {\n  background: #f4e4c4aa !important;\n  border-color: var(--gold) !important;\n}\n.rl-actions-wrap {\n  min-height: 0;\n  display: flex;\n  flex-direction: column;\n}\n.rl-actions-title {\n  font-size: 23px;\n  margin: 4px 0 13px;\n}\n.rl-actions {\n  min-height: 0;\n  overflow-y: auto;\n  display: grid;\n  grid-template-columns: repeat(4, minmax(0, 1fr));\n  gap: 12px;\n  align-content: start;\n  padding: 3px 11px 3px 3px;\n  scrollbar-color: var(--rose) #f2e0e4;\n}\n.rl-root .rl-action {\n  height: 80px !important;\n  border-radius: 14px !important;\n  display: block;\n  text-align: left;\n  padding: 11px 14px !important;\n  overflow: hidden;\n}\n.rl-action strong,\n.rl-action small {\n  display: block;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.rl-action strong {\n  font-size: 19px;\n}\n.rl-action small {\n  color: var(--soft);\n  font-size: 14px;\n  margin-top: 4px;\n}\n.rl-action.on {\n  background: var(--light);\n  border-color: var(--rose);\n}\n.rl-choice-row {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  gap: 10px;\n}\n.rl-choice-row button.on {\n  background: var(--light);\n  border-color: var(--rose);\n}\n.rl-segments {\n  display: flex;\n  gap: 8px;\n  flex-wrap: wrap;\n  margin: 12px 0;\n}\n.rl-segments button {\n  height: 45px;\n  font-size: 18px;\n  padding: 0 17px;\n}\n.rl-segments button.on {\n  background: var(--light);\n  border-color: var(--rose);\n  color: var(--deep);\n}\n\n.rl-root .rl-search,\n.rl-root .rl-input,\n.rl-root .rl-select,\n.rl-root .rl-textarea {\n  appearance: none !important;\n  -webkit-appearance: none !important;\n  background: #fff !important;\n  background-color: #fff !important;\n  color: #3a2430 !important;\n  -webkit-text-fill-color: #3a2430 !important;\n  border: 2px solid var(--line) !important;\n  box-shadow: none !important;\n  filter: none !important;\n  opacity: 1 !important;\n}\n.rl-root .rl-search::placeholder,\n.rl-root .rl-input::placeholder,\n.rl-root .rl-textarea::placeholder {\n  color: #a58b93 !important;\n  -webkit-text-fill-color: #a58b93 !important;\n  opacity: 1 !important;\n}\n.rl-box {\n  height: 700px;\n}\n.rl-number {\n  width: 100px !important;\n  flex: none !important;\n}\n.rl-cats,\n.rl-segments {\n  border-bottom: 1px solid var(--line);\n  gap: 5px;\n  padding: 0 8px 7px;\n}\n.rl-cats button,\n.rl-segments button {\n  position: relative;\n  border-color: transparent !important;\n  border-radius: 0 !important;\n  background: transparent !important;\n  box-shadow: none !important;\n  color: var(--soft);\n  transition:\n    color 0.18s,\n    transform 0.18s;\n}\n.rl-cats button:after,\n.rl-segments button:after {\n  content: '';\n  position: absolute;\n  left: 50%;\n  right: 50%;\n  bottom: -1px;\n  height: 3px;\n  background: var(--rose);\n  transition:\n    left 0.22s,\n    right 0.22s,\n    box-shadow 0.22s;\n}\n.rl-cats button:hover,\n.rl-segments button:hover {\n  color: var(--rose);\n  transform: translateY(-1px);\n}\n.rl-cats button.on,\n.rl-segments button.on {\n  color: var(--rose) !important;\n}\n.rl-cats button.on:after,\n.rl-segments button.on:after {\n  left: 8px;\n  right: 8px;\n  box-shadow: 0 0 8px var(--rose);\n}\n.rl-picker-head {\n  display: grid;\n  grid-template-columns: 400px 1fr;\n  gap: 22px;\n  height: 72px;\n  align-items: center;\n}\n.rl-picker-head h2 {\n  text-align: center;\n  font-size: 30px;\n  margin: 0;\n}\n.rl-picker-controls {\n  display: flex;\n  align-items: center;\n  gap: 10px;\n}\n.rl-action-search {\n  position: relative;\n  width: 500px;\n  flex: none;\n}\n.rl-action-search .rl-input {\n  width: 500px !important;\n  padding-right: 48px !important;\n}\n\n.rl-picker-controls > button {\n  height: 48px;\n  font-size: 18px;\n  padding: 0 14px;\n}\n.rl-notice {\n  position: absolute;\n  left: 50%;\n  bottom: 28px;\n  transform: translateX(-50%);\n  padding: 13px 28px;\n  border-radius: 24px;\n  background: #3a2430;\n  color: #fff;\n  font-size: 20px;\n  z-index: 12;\n  box-shadow: 0 8px 24px #0004;\n}\n.rl-browser {\n  overflow: hidden;\n  display: flex;\n  flex-direction: column;\n}\n.rl-rule-list {\n  flex: 1;\n  min-height: 0;\n  overflow-y: auto;\n  padding-right: 8px;\n}\n.rl-root * {\n  scrollbar-width: thin;\n  scrollbar-color: var(--rose) var(--light);\n}\n.rl-root *::-webkit-scrollbar {\n  width: 12px;\n  height: 12px;\n}\n.rl-root *::-webkit-scrollbar-track {\n  background: var(--light);\n  border-radius: 8px;\n}\n.rl-root *::-webkit-scrollbar-thumb {\n  background: var(--rose);\n  border: 3px solid var(--light);\n  border-radius: 8px;\n}\n.rl-root *::-webkit-scrollbar-thumb:hover {\n  background: var(--deep);\n}\n.rl-picker-scope {\n  width: 180px !important;\n  flex: none;\n}\n.rl-dialog.compact,\n.srl-dialog.compact {\n  width: 980px;\n  min-height: 470px;\n  font-size: 22px;\n}\n.rl-dialog.compact .rl-dialog-head h2,\n.srl-dialog.compact .rl-dialog-head h2 {\n  font-size: 34px;\n}\n.rl-dialog.compact p,\n.srl-dialog.compact p {\n  font-size: 22px;\n  line-height: 1.6;\n}\n.rl-settings-group {\n  background: #fff;\n  border: 2px solid var(--line);\n  border-radius: 15px;\n  padding: 18px;\n  margin: 14px 0;\n}\n.rl-settings-group h3 {\n  font-size: 23px;\n  margin: 0 0 8px;\n}\n.rl-relation-buttons {\n  display: flex;\n  gap: 8px;\n  flex-wrap: wrap;\n  margin: 10px 0;\n}\n.rl-relation-buttons button {\n  height: 39px;\n  padding: 0 14px;\n  font-size: 17px;\n}\n.rl-list-entry {\n  display: flex;\n  gap: 8px;\n}\n.rl-list-entry .rl-input {\n  flex: 1;\n}\n.rl-list-entry button {\n  width: 55px;\n  height: 52px;\n  padding: 0;\n}\n.rl-rule-trash {\n  width: 48px !important;\n  height: 48px !important;\n  padding: 9px !important;\n  margin-right: 8px;\n}\n.rl-rule.delete-active {\n  padding-left: 5px;\n}\n.rl-animation-grid {\n  display: grid;\n  grid-template-columns: 180px 1fr;\n  gap: 12px 15px;\n  align-items: center;\n}\n.rl-animation-grid .rl-number {\n  width: 160px !important;\n}\n.rl-animation-message {\n  margin-top: 16px;\n}\n.rl-animation-tracks {\n  max-height: 350px;\n  overflow: auto;\n}\n.rl-dialog.compact {\n  max-height: 95%;\n  overflow: auto;\n}\n.rl-response-head {\n  flex-wrap: wrap;\n}\n.rl-response-head h3 {\n  flex-basis: 100%;\n}\n.rl-response > b > button {\n  padding: 0 4px;\n  font-size: 23px;\n}\n.rl-response > b {\n  font-size: 16px;\n}\n.rl-dialog.compact .rl-dialog-body {\n  overflow-y: auto;\n  flex: 1 1 auto;\n  padding-right: 8px;\n}\n.rl-dialog.compact .rl-dialog-head,\n.rl-dialog.compact .rl-dialog-foot {\n  flex-shrink: 0;\n}\n.rl-dialog.compact .rl-dialog-foot {\n  height: 65px;\n}\n.rl-animation-tracks .rl-field > button {\n  white-space: nowrap;\n  flex-shrink: 0;\n}\n.rl-animation-tracks .rl-field > span {\n  min-width: 90px;\n}\n.rl-dialog.compact.rl-animation-dialog {\n  width: 1500px;\n}\n.rl-animation-dialog .rl-animation-tracks {\n  display: flex;\n  flex-direction: row;\n  gap: 18px;\n  overflow: auto;\n  max-height: 380px;\n  cursor: grab;\n  padding: 4px 3px 12px;\n  touch-action: none;\n}\n.rl-animation-dialog .rl-animation-track {\n  flex: 0 0 450px;\n  min-width: 450px;\n}\n.rl-animation-track .rl-field {\n  flex-wrap: wrap;\n}\n.rl-animation-track .rl-field > span {\n  flex-basis: 100%;\n}\n.rl-animation-track .rl-field > .rl-select {\n  width: 240px;\n  flex: 1;\n}\n.rl-animation-dialog .rl-dialog-body {\n  cursor: grab;\n}\n.rl-animation-dialog .rl-dragging {\n  cursor: grabbing;\n}\n.rl-animation-dialog .rl-animation-tracks {\n  justify-content: space-between;\n}\n.rl-animation-dialog .rl-animation-track:only-child {\n  margin-left: auto;\n  margin-right: auto;\n}\n.rl-response-gap {\n  width: 22px;\n  flex: none;\n}\n.rl-response-head .rl-response-delete {\n  margin-left: auto;\n}\n\n.rl-root .rl-action[hidden] {\n  display: none;\n}\n\n.rl-editable-name {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n  min-width: 0;\n  max-width: 620px;\n  color: rgb(58, 36, 48);\n  font-family: Arial, 'Microsoft JhengHei', sans-serif;\n  font-style: normal;\n  font-weight: 600;\n  line-height: 1.3;\n}\n.rl-inline-title {\n  font-size: 31px;\n}\n.rl-context {\n  font-size: 42px;\n}\n.rl-context::before {\n  content: '\u2726';\n  flex: none;\n  margin-right: 8px;\n}\n.rl-name-row {\n  font-size: 24px;\n}\n.rl-brand-icon {\n  width: 58px;\n  height: 58px;\n  flex: none;\n  object-fit: contain;\n}\n.rl-name-text {\n  min-width: 0;\n  overflow: hidden;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n}\n.rl-editable-name > .rl-icon {\n  flex: none;\n}\n.rl-root .rl-inline-input {\n  box-sizing: border-box;\n  width: auto;\n  min-width: 0;\n  max-width: 100%;\n  height: 48px;\n  padding: 0 10px;\n  border: 2px solid var(--rose);\n  border-radius: 10px;\n  background: white;\n  color: inherit;\n  font: inherit;\n}\n.rl-clearable {\n  position: relative;\n  width: 100%;\n  min-width: 0;\n}\n.rl-clearable-number {\n  width: 100px;\n}\n.rl-root .rl-clearable > input {\n  padding-right: 40px;\n}\n.rl-root .rl-clearable > .rl-input-clear {\n  position: absolute;\n  right: 4px;\n  top: 50%;\n  transform: translateY(-50%);\n  width: 32px;\n  height: 36px;\n  padding: 0;\n  border: 0;\n  background: transparent;\n  border-radius: 8px;\n  font-size: 24px;\n}\n.rl-list-entry > .rl-clearable {\n  flex: 1;\n}\n";
+      settings_default = ".rl-chance-bar {\n  width: 100%;\n  height: 30px;\n  accent-color: #b23a56;\n  cursor: pointer;\n}\n.rl-response {\n  position: relative;\n  margin: 12px 0;\n  padding: 12px;\n  border: 2px solid transparent !important;\n  border-top-color: #f2e0e4 !important;\n  border-radius: 14px;\n}\n.rl-response.rl-primary-response {\n  border-color: #c08a3e !important;\n  background: #fff8e9;\n}\n.rl-response.rl-primary-pick {\n  cursor: pointer;\n  border-style: dashed !important;\n}\n.rl-primary-pick:hover {\n  border-color: #b23a56 !important;\n}\n.rl-crown {\n  position: absolute;\n  left: -13px;\n  top: -17px;\n  transform: rotate(-45deg);\n  color: #c08a3e;\n  pointer-events: none;\n  background: #fff8e9;\n  border-radius: 50%;\n  padding: 3px;\n}\n.rl-crown svg {\n  width: 28px !important;\n  height: 28px !important;\n}\n\n.rl-root * {\n  user-select: none;\n  -webkit-user-select: none;\n}\n.rl-root input,\n.rl-root textarea {\n  user-select: text;\n  -webkit-user-select: text;\n}\n.rl-exit img {\n  width: 72px;\n  height: 72px;\n  pointer-events: none;\n}\n.rl-box,\n.rl-rule-list {\n  cursor: grab;\n}\n.rl-box.rl-dragging,\n.rl-rule-list.rl-dragging {\n  cursor: grabbing;\n}\n.rl-root {\n  position: fixed;\n  width: 2000px;\n  height: 1000px;\n  transform-origin: top left;\n  z-index: 50;\n  font-family: Arial, 'Microsoft JhengHei', sans-serif;\n  color: #3a2430;\n  overflow: hidden;\n  --soft: #8a6b74;\n  --line: #e9cdd4;\n  --card: #fffafb;\n  --paper: #fdf3f5;\n  --rose: #b23a56;\n  --deep: #8c2540;\n  --light: #f7dee4;\n  --lighter: #fcf0f3;\n  --gold: #c08a3e;\n  --danger: #c0392b;\n}\n.rl-root * {\n  box-sizing: border-box;\n}\n.rl-root button,\n.rl-root input,\n.rl-root select,\n.rl-root textarea {\n  font: inherit;\n  color: inherit;\n}\n.rl-root button {\n  border: 2px solid var(--line);\n  background: var(--card);\n  height: 54px;\n  padding: 0 20px;\n  border-radius: 28px;\n  cursor: pointer;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  gap: 9px;\n  font-size: 21px;\n}\n.rl-root button:hover {\n  border-color: var(--rose);\n  color: var(--deep);\n}\n.rl-root button.primary {\n  color: white;\n  border-color: transparent;\n  background: linear-gradient(135deg, var(--rose), var(--deep));\n}\n.rl-root button.danger {\n  color: var(--danger);\n  border-color: #e4aaa4;\n  background: #f6dcd9;\n}\n.rl-root svg {\n  width: 26px;\n  height: 26px;\n}\n.rl-screen {\n  width: 100%;\n  height: 100%;\n  background:\n    radial-gradient(1100px 480px at 92% -10%, #fceef1 0, transparent 62%),\n    linear-gradient(160deg, #fdf2f5, #f3dee6);\n  border: 2px solid var(--line);\n}\n.rl-top {\n  height: 120px;\n  display: flex;\n  align-items: center;\n  padding: 0 180px;\n  border-bottom: 2px solid #f2e0e4;\n}\n.rl-top-rules {\n  padding-left: 65px;\n}\n.rl-brand {\n  display: flex;\n  align-items: center;\n  gap: 20px;\n  font:\n    italic 600 42px Georgia,\n    serif;\n}\n\n.rl-icon {\n  width: 43px !important;\n  height: 43px !important;\n  padding: 7px !important;\n  border: 0 !important;\n  background: transparent !important;\n}\n.rl-exit {\n  position: absolute !important;\n  left: 1815px;\n  top: 75px;\n  width: 90px !important;\n  height: 90px !important;\n  padding: 0 !important;\n  border-radius: 12px !important;\n  transform: translateY(-50%);\n  background: white !important;\n}\n.rl-main {\n  height: 880px;\n  padding: 20px 180px 38px;\n  display: grid;\n  grid-template-columns: 520px 1fr;\n  gap: 28px;\n}\n.rl-work {\n  height: 880px;\n  padding: 18px 65px 35px;\n  display: grid;\n  grid-template-columns: 470px 1fr;\n  gap: 24px;\n}\n.rl-panel {\n  background: var(--paper);\n  border: 2px solid var(--line);\n  border-radius: 23px;\n  padding: 26px;\n  overflow: auto;\n}\n.rl-head {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  margin-bottom: 16px;\n}\n.rl-head h2 {\n  font-size: 31px;\n  margin: 0;\n}\n.rl-grow {\n  flex: 1;\n  min-width: 0;\n}\n.rl-muted {\n  font-size: 18px;\n  color: var(--soft);\n}\n.rl-setting {\n  height: 100px;\n  display: flex;\n  align-items: center;\n  border-bottom: 2px solid #f2e0e4;\n  font-size: 25px;\n}\n.rl-switch {\n  width: 86px !important;\n  height: 46px !important;\n  padding: 5px !important;\n  border: 0 !important;\n  background: #cbbdc1 !important;\n  justify-content: flex-start !important;\n}\n.rl-switch:before {\n  content: '';\n  width: 36px;\n  height: 36px;\n  border-radius: 50%;\n  background: white;\n  box-shadow: 0 2px 5px #0004;\n}\n.rl-switch.on {\n  background: linear-gradient(135deg, var(--rose), var(--deep)) !important;\n  justify-content: flex-end !important;\n}\n.rl-small-switch {\n  width: 58px !important;\n  height: 31px !important;\n  padding: 4px !important;\n}\n.rl-small-switch:before {\n  width: 23px;\n  height: 23px;\n}\n.rl-tools {\n  display: flex;\n  gap: 9px;\n  flex-wrap: wrap;\n}\n.rl-tools button {\n  height: 46px;\n  font-size: 18px;\n  padding: 0 15px;\n}\n.rl-personas {\n  display: flex;\n  flex-direction: column;\n  gap: 14px;\n}\n.rl-card-wrap {\n  position: relative;\n  padding-right: 87px;\n}\n.rl-card {\n  position: relative;\n  height: 140px;\n  background: white;\n  border: 2px solid var(--line);\n  border-radius: 21px;\n  padding: 18px 23px;\n  display: flex;\n  align-items: center;\n  gap: 20px;\n}\n.rl-card,\n.rl-rule,\n.rl-response {\n  --hover-glow: #b23a5640;\n  transition: box-shadow 160ms ease;\n}\n.rl-card.active,\n.rl-response.rl-primary-response {\n  --hover-glow: #c08a3e66;\n}\n.rl-card-wrap:hover > .rl-card,\n.rl-rule:hover,\n.rl-response:hover {\n  box-shadow:\n    inset 0 0 16px var(--hover-glow),\n    0 0 9px var(--hover-glow);\n}\n@media (prefers-reduced-motion: reduce) {\n  .rl-card,\n  .rl-rule,\n  .rl-response {\n    transition: none;\n  }\n}\n.rl-transfer-field {\n  position: relative;\n}\n.rl-transfer-field .rl-textarea {\n  padding-bottom: 65px;\n}\n.rl-transfer-tools {\n  position: absolute;\n  right: 12px;\n  bottom: 12px;\n  align-items: center;\n  flex-direction: row-reverse;\n}\n.rl-card.active {\n  border-color: var(--gold);\n  background: linear-gradient(90deg, var(--lighter), white 60%);\n}\n.rl-card.delete {\n  margin-left: 20px;\n}\n.rl-card-name {\n  width: 220px;\n}\n\n.rl-meter {\n  flex: 1;\n}\n.rl-track {\n  height: 10px;\n  border-radius: 8px;\n  background: #f2e0e4;\n  overflow: hidden;\n  margin-bottom: 9px;\n}\n.rl-fill {\n  height: 100%;\n  background: linear-gradient(90deg, var(--rose), var(--gold));\n}\n.rl-count {\n  font-size: 21px;\n}\n.rl-count b {\n  font-size: 29px;\n  color: var(--deep);\n}\n.rl-card-side {\n  position: absolute;\n  right: 3px;\n  top: 35px;\n  width: 70px !important;\n  height: 70px !important;\n  padding: 0 !important;\n}\n.rl-browser {\n  padding: 24px;\n}\n.rl-search,\n.rl-input,\n.rl-select,\n.rl-textarea {\n  width: 100%;\n  border: 2px solid var(--line);\n  border-radius: 12px;\n  background: white;\n  padding: 0 15px;\n  font-size: 20px;\n}\n.rl-search,\n.rl-input,\n.rl-select {\n  height: 52px;\n}\n.rl-textarea {\n  height: 220px;\n  padding: 14px;\n  resize: none;\n}\n.rl-cats {\n  display: flex;\n  gap: 7px;\n  margin: 13px 0;\n}\n.rl-cats button {\n  height: 41px;\n  flex: 1;\n  padding: 0;\n  font-size: 17px;\n}\n.rl-cats .on,\n.rl-rule.active {\n  background: var(--lighter);\n  border-color: var(--rose);\n}\n.rl-rule {\n  height: 81px;\n  border: 2px solid var(--line);\n  border-radius: 13px;\n  margin-bottom: 9px;\n  display: flex;\n  align-items: center;\n  padding: 8px 9px 8px 14px;\n  background: white;\n}\n.rl-rule-main {\n  height: 61px !important;\n  border: 0 !important;\n  background: transparent !important;\n  border-radius: 8px !important;\n  justify-content: flex-start !important;\n  text-align: left;\n  padding: 0 !important;\n}\n.rl-rule-main b {\n  font-size: 20px;\n}\n.rl-rule-main small {\n  display: block;\n  color: var(--soft);\n  margin-top: 4px;\n}\n.rl-editor {\n  padding: 23px;\n}\n.rl-editor-grid {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 19px;\n}\n.rl-box {\n  background: white;\n  border: 2px solid var(--line);\n  border-radius: 17px;\n  padding: 22px;\n  height: 650px;\n  overflow: auto;\n}\n.rl-box h3 {\n  font-size: 24px;\n  color: var(--deep);\n  margin: 0 0 18px;\n}\n.rl-field {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  margin: 15px 0;\n  font-size: 20px;\n}\n.rl-field > span {\n  min-width: 80px;\n}\n.rl-summary {\n  border: 2px dashed var(--line);\n  border-radius: 13px;\n  padding: 18px;\n  margin-top: 18px;\n  color: var(--soft);\n  font-size: 19px;\n}\n.rl-response-head {\n  display: flex;\n  align-items: center;\n  gap: 7px;\n}\n.rl-response-head button {\n  height: 41px;\n  font-size: 17px;\n  padding: 0 13px;\n}\n.rl-response {\n  min-height: 80px;\n  display: grid;\n  grid-template-columns: 100px 1fr 92px;\n  gap: 9px;\n  align-items: center;\n  border-top: 2px solid #f2e0e4;\n  font-size: 19px;\n}\n.rl-response b {\n  color: var(--deep);\n}\n.rl-response button {\n  height: 40px;\n  font-size: 17px;\n  padding: 0 12px;\n}\n.rl-overlay {\n  position: absolute;\n  inset: 0;\n  background: #46203299;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  padding: 52px 105px;\n  backdrop-filter: blur(2px);\n  z-index: 9;\n}\n.rl-dialog {\n  width: 100%;\n  height: 100%;\n  background: var(--card);\n  border: 2px solid var(--line);\n  border-radius: 25px;\n  padding: 27px;\n  display: flex;\n  flex-direction: column;\n  box-shadow: 0 20px 60px #40152655;\n}\n.rl-dialog.compact {\n  width: 900px;\n  height: auto;\n  min-height: 420px;\n}\n.rl-dialog-head {\n  height: 68px;\n  display: flex;\n  align-items: center;\n  gap: 16px;\n}\n.rl-dialog-head h2 {\n  font-size: 30px;\n  margin: 0;\n}\n.rl-dialog-body {\n  flex: 1;\n  min-height: 0;\n}\n.rl-dialog-foot {\n  height: 75px;\n  display: flex;\n  align-items: flex-end;\n  gap: 11px;\n}\n.rl-picker-body {\n  display: grid;\n  grid-template-columns: 400px 1fr;\n  gap: 22px;\n}\n.rl-body-map {\n  position: relative;\n  background: var(--lighter);\n  border: 2px solid var(--line);\n  border-radius: 17px;\n  overflow: hidden;\n}\n.rl-zone {\n  position: absolute;\n  border: 2px solid #b23a5688;\n  background: #bdeeee88;\n  padding: 0 !important;\n  border-radius: 7px !important;\n  min-width: 4px !important;\n  min-height: 4px !important;\n  height: auto;\n}\n.rl-zone.selected {\n  background: #f4e4c4aa !important;\n  border-color: var(--gold) !important;\n}\n.rl-actions-wrap {\n  min-height: 0;\n  display: flex;\n  flex-direction: column;\n}\n.rl-actions-title {\n  font-size: 23px;\n  margin: 4px 0 13px;\n}\n.rl-actions {\n  min-height: 0;\n  overflow-y: auto;\n  display: grid;\n  grid-template-columns: repeat(4, minmax(0, 1fr));\n  gap: 12px;\n  align-content: start;\n  padding: 3px 11px 3px 3px;\n  scrollbar-color: var(--rose) #f2e0e4;\n}\n.rl-root .rl-action {\n  height: 80px !important;\n  border-radius: 14px !important;\n  display: block;\n  text-align: left;\n  padding: 11px 14px !important;\n  overflow: hidden;\n}\n.rl-action strong,\n.rl-action small {\n  display: block;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.rl-action strong {\n  font-size: 19px;\n}\n.rl-action small {\n  color: var(--soft);\n  font-size: 14px;\n  margin-top: 4px;\n}\n.rl-action.on {\n  background: var(--light);\n  border-color: var(--rose);\n}\n.rl-choice-row {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  gap: 10px;\n}\n.rl-choice-row button.on {\n  background: var(--light);\n  border-color: var(--rose);\n}\n.rl-segments {\n  display: flex;\n  gap: 8px;\n  flex-wrap: wrap;\n  margin: 12px 0;\n}\n.rl-segments button {\n  height: 45px;\n  font-size: 18px;\n  padding: 0 17px;\n}\n.rl-segments button.on {\n  background: var(--light);\n  border-color: var(--rose);\n  color: var(--deep);\n}\n\n.rl-root .rl-search,\n.rl-root .rl-input,\n.rl-root .rl-select,\n.rl-root .rl-textarea {\n  appearance: none !important;\n  -webkit-appearance: none !important;\n  background: #fff !important;\n  background-color: #fff !important;\n  color: #3a2430 !important;\n  -webkit-text-fill-color: #3a2430 !important;\n  border: 2px solid var(--line) !important;\n  box-shadow: none !important;\n  filter: none !important;\n  opacity: 1 !important;\n}\n.rl-root .rl-search::placeholder,\n.rl-root .rl-input::placeholder,\n.rl-root .rl-textarea::placeholder {\n  color: #a58b93 !important;\n  -webkit-text-fill-color: #a58b93 !important;\n  opacity: 1 !important;\n}\n.rl-box {\n  height: 700px;\n}\n.rl-number {\n  width: 100px !important;\n  flex: none !important;\n}\n.rl-cats,\n.rl-segments {\n  border-bottom: 1px solid var(--line);\n  gap: 5px;\n  padding: 0 8px 7px;\n}\n.rl-cats button,\n.rl-segments button {\n  position: relative;\n  border-color: transparent !important;\n  border-radius: 0 !important;\n  background: transparent !important;\n  box-shadow: none !important;\n  color: var(--soft);\n  transition:\n    color 0.18s,\n    transform 0.18s;\n}\n.rl-cats button:after,\n.rl-segments button:after {\n  content: '';\n  position: absolute;\n  left: 50%;\n  right: 50%;\n  bottom: -1px;\n  height: 3px;\n  background: var(--rose);\n  transition:\n    left 0.22s,\n    right 0.22s,\n    box-shadow 0.22s;\n}\n.rl-cats button:hover,\n.rl-segments button:hover {\n  color: var(--rose);\n  transform: translateY(-1px);\n}\n.rl-cats button.on,\n.rl-segments button.on {\n  color: var(--rose) !important;\n}\n.rl-cats button.on:after,\n.rl-segments button.on:after {\n  left: 8px;\n  right: 8px;\n  box-shadow: 0 0 8px var(--rose);\n}\n.rl-picker-head {\n  display: grid;\n  grid-template-columns: 400px 1fr;\n  gap: 22px;\n  height: 72px;\n  align-items: center;\n}\n.rl-picker-head h2 {\n  text-align: center;\n  font-size: 30px;\n  margin: 0;\n}\n.rl-picker-controls {\n  display: flex;\n  align-items: center;\n  gap: 10px;\n}\n.rl-action-search {\n  position: relative;\n  width: 500px;\n  flex: none;\n}\n.rl-action-search .rl-input {\n  width: 500px !important;\n  padding-right: 48px !important;\n}\n\n.rl-picker-controls > button {\n  height: 48px;\n  font-size: 18px;\n  padding: 0 14px;\n}\n.rl-notice {\n  position: absolute;\n  left: 50%;\n  bottom: 28px;\n  transform: translateX(-50%);\n  padding: 13px 28px;\n  border-radius: 24px;\n  background: #3a2430;\n  color: #fff;\n  font-size: 20px;\n  z-index: 12;\n  box-shadow: 0 8px 24px #0004;\n}\n.rl-browser {\n  overflow: hidden;\n  display: flex;\n  flex-direction: column;\n}\n.rl-rule-list {\n  flex: 1;\n  min-height: 0;\n  overflow-y: auto;\n  padding-right: 8px;\n}\n.rl-root * {\n  scrollbar-width: thin;\n  scrollbar-color: var(--rose) var(--light);\n}\n.rl-root *::-webkit-scrollbar {\n  width: 12px;\n  height: 12px;\n}\n.rl-root *::-webkit-scrollbar-track {\n  background: var(--light);\n  border-radius: 8px;\n}\n.rl-root *::-webkit-scrollbar-thumb {\n  background: var(--rose);\n  border: 3px solid var(--light);\n  border-radius: 8px;\n}\n.rl-root *::-webkit-scrollbar-thumb:hover {\n  background: var(--deep);\n}\n.rl-picker-scope {\n  width: 180px !important;\n  flex: none;\n}\n.rl-dialog.compact,\n.srl-dialog.compact {\n  width: 980px;\n  min-height: 470px;\n  font-size: 22px;\n}\n.rl-dialog.compact .rl-dialog-head h2,\n.srl-dialog.compact .rl-dialog-head h2 {\n  font-size: 34px;\n}\n.rl-dialog.compact p,\n.srl-dialog.compact p {\n  font-size: 22px;\n  line-height: 1.6;\n}\n.rl-settings-group {\n  background: #fff;\n  border: 2px solid var(--line);\n  border-radius: 15px;\n  padding: 18px;\n  margin: 14px 0;\n}\n.rl-settings-group h3 {\n  font-size: 23px;\n  margin: 0 0 8px;\n}\n.rl-relation-buttons {\n  display: flex;\n  gap: 8px;\n  flex-wrap: wrap;\n  margin: 10px 0;\n}\n.rl-relation-buttons button {\n  height: 39px;\n  padding: 0 14px;\n  font-size: 17px;\n}\n.rl-list-entry {\n  display: flex;\n  gap: 8px;\n}\n.rl-list-entry .rl-input {\n  flex: 1;\n}\n.rl-list-entry button {\n  width: 55px;\n  height: 52px;\n  padding: 0;\n}\n.rl-rule-trash {\n  width: 48px !important;\n  height: 48px !important;\n  padding: 9px !important;\n  margin-right: 8px;\n}\n.rl-rule.delete-active {\n  padding-left: 5px;\n}\n.rl-animation-grid {\n  display: grid;\n  grid-template-columns: 180px 1fr;\n  gap: 12px 15px;\n  align-items: center;\n}\n.rl-animation-grid .rl-number {\n  width: 160px !important;\n}\n.rl-animation-message {\n  margin-top: 16px;\n}\n.rl-animation-tracks {\n  max-height: 350px;\n  overflow: auto;\n}\n.rl-dialog.compact {\n  max-height: 95%;\n  overflow: auto;\n}\n.rl-response-head {\n  flex-wrap: wrap;\n}\n.rl-response-head h3 {\n  flex-basis: 100%;\n}\n.rl-response > b > button {\n  padding: 0 4px;\n  font-size: 23px;\n}\n.rl-response > b {\n  font-size: 16px;\n}\n.rl-dialog.compact .rl-dialog-body {\n  overflow-y: auto;\n  flex: 1 1 auto;\n  padding-right: 8px;\n}\n.rl-dialog.compact .rl-dialog-head,\n.rl-dialog.compact .rl-dialog-foot {\n  flex-shrink: 0;\n}\n.rl-dialog.compact .rl-dialog-foot {\n  height: 65px;\n}\n.rl-animation-tracks .rl-field > button {\n  white-space: nowrap;\n  flex-shrink: 0;\n}\n.rl-animation-tracks .rl-field > span {\n  min-width: 90px;\n}\n.rl-dialog.compact.rl-animation-dialog {\n  width: 1500px;\n}\n.rl-animation-dialog .rl-animation-tracks {\n  display: flex;\n  flex-direction: row;\n  gap: 18px;\n  overflow: auto;\n  max-height: 380px;\n  cursor: grab;\n  padding: 4px 3px 12px;\n  touch-action: none;\n}\n.rl-animation-dialog .rl-animation-track {\n  flex: 0 0 450px;\n  min-width: 450px;\n}\n.rl-animation-track .rl-field {\n  flex-wrap: wrap;\n}\n.rl-animation-track .rl-field > span {\n  flex-basis: 100%;\n}\n.rl-animation-track .rl-field > .rl-select {\n  width: 240px;\n  flex: 1;\n}\n.rl-animation-dialog .rl-dialog-body {\n  cursor: grab;\n}\n.rl-animation-dialog .rl-dragging {\n  cursor: grabbing;\n}\n.rl-animation-dialog .rl-animation-tracks {\n  justify-content: space-between;\n}\n.rl-animation-dialog .rl-animation-track:only-child {\n  margin-left: auto;\n  margin-right: auto;\n}\n.rl-response-gap {\n  width: 22px;\n  flex: none;\n}\n.rl-response-head .rl-response-delete {\n  margin-left: auto;\n}\n\n.rl-root .rl-action[hidden] {\n  display: none;\n}\n\n.rl-editable-name {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n  min-width: 0;\n  max-width: 620px;\n  color: rgb(58, 36, 48);\n  font-family: Arial, 'Microsoft JhengHei', sans-serif;\n  font-style: normal;\n  font-weight: 600;\n  line-height: 1.3;\n}\n.rl-inline-title {\n  font-size: 31px;\n}\n.rl-context {\n  font-size: 42px;\n}\n.rl-context::before {\n  content: '\u2726';\n  flex: none;\n  margin-right: 8px;\n}\n.rl-name-row {\n  font-size: 24px;\n}\n.rl-brand-icon {\n  width: 58px;\n  height: 58px;\n  flex: none;\n  object-fit: contain;\n}\n.rl-name-text {\n  min-width: 0;\n  overflow: hidden;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n}\n.rl-editable-name > .rl-icon {\n  flex: none;\n}\n.rl-root .rl-inline-input {\n  box-sizing: border-box;\n  width: auto;\n  min-width: 0;\n  max-width: 100%;\n  height: 48px;\n  padding: 0 10px;\n  border: 2px solid var(--rose);\n  border-radius: 10px;\n  background: white;\n  color: inherit;\n  font: inherit;\n}\n.rl-clearable {\n  position: relative;\n  width: 100%;\n  min-width: 0;\n}\n.rl-clearable-number {\n  width: 100px;\n}\n.rl-root .rl-clearable > input {\n  padding-right: 40px;\n}\n.rl-root .rl-clearable > .rl-input-clear {\n  position: absolute;\n  right: 4px;\n  top: 50%;\n  transform: translateY(-50%);\n  width: 32px;\n  height: 36px;\n  padding: 0;\n  border: 0;\n  background: transparent;\n  border-radius: 8px;\n  font-size: 24px;\n}\n.rl-list-entry > .rl-clearable {\n  flex: 1;\n}\n";
     }
   });
 
@@ -3868,7 +3909,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
 
   // src/ui/dom-settings.js
   function installSettings({ store, t, host = globalThis }) {
-    let root, page = "home", deleteMode = false, ruleDeleteMode = false, selectedRuleId = null, draft = null, sessionBaseline = null, pickerGroup = "ItemHead", pickerScope = "current", pickerSelected = /* @__PURE__ */ new Set(), pickerQuery = "", pickerInput = "", pickerMode = "trigger", responseDelete = false, primaryMode = false, modal = null, filter = "all", ruleQuery = "", inlineEdit = null, notice = "", ruleScrollTop = 0;
+    let root, page = "home", deleteMode = false, ruleDeleteMode = false, editingPersonaId = null, selectedRuleId = null, draft = null, sessionBaseline = null, pickerGroup = "ItemHead", pickerScope = "current", pickerSelected = /* @__PURE__ */ new Set(), pickerQuery = "", pickerInput = "", pickerMode = "trigger", responseDelete = false, primaryMode = false, modal = null, filter = "all", ruleQuery = "", inlineEdit = null, notice = "", ruleScrollTop = 0;
     const esc = (v) => String(v ?? "").replace(
       /[&<>"']/g,
       (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]
@@ -3909,13 +3950,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
           found.set(a.Name, { name: a.Name, label: a.Description || a.Name });
       return [...found.values()].sort((a, b) => a.label.localeCompare(b.label));
     }
-    const active = () => store.active;
+    const active = () => store.data.personas.find((p) => p.id === editingPersonaId) ?? store.active;
     const activeRule = () => draft?.id === selectedRuleId ? draft : active().rules.find((r) => r.id === selectedRuleId);
     function editableName(name, editing, className, action) {
       return `<div class="rl-editable-name ${className}">${editing ? `<input class="rl-inline-input" data-inline-edit maxlength="100" aria-label="${esc(t("rename"))}" size="${Math.max(6, name.length + 1)}" value="${esc(name)}">` : `<span class="rl-name-text" title="${esc(name)}">${esc(name)}</span><button class="rl-icon" data-act="${action}" aria-label="${esc(t("rename"))}" title="${esc(t("rename"))}">${ICON.edit}</button>`} </div>`;
     }
     function titleBar(name = "") {
-      const editing = name && inlineEdit?.type === "persona" && inlineEdit.id === store.data.activePersona;
+      const editing = name && inlineEdit?.type === "persona" && inlineEdit.id === active().id;
       const context = name ? editableName(name, editing, "rl-context", "editPersonaInline") : "";
       return `<header class="rl-top ${page === "rules" ? "rl-top-rules" : ""}"><div class="rl-brand"><img class="rl-brand-icon" src="${esc(preference_icon_default)}" alt="">Responsive_Liko${context}</div></header><button class="rl-exit" data-act="exit"><img src="${esc(exit_icon_default)}" alt="${esc(t("back"))}"></button>`;
     }
@@ -3927,7 +3968,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       const settings = ["enabled", "reactions", "mouth", "interruption", "bcx"].map(
         (k) => `<div class="rl-setting"><div class="rl-grow"><b>${esc(t(k))}</b>${k === "enabled" ? `<div class="rl-muted">${esc(t("masterHint"))}</div>` : ""}</div><span data-setting="${k}">${sw(s[k])}</span></div>`
       ).join("");
-      const cards = store.data.personas.map((p) => {
+      const cards = [...store.data.personas].sort((a, b) => Number(b.id === store.data.activePersona) - Number(a.id === store.data.activePersona)).map((p) => {
         const on = p.rules.filter((r) => r.enabled).length, activeP = p.id === store.data.activePersona, rate = p.rules.length ? 100 * on / p.rules.length : 0, editing = inlineEdit?.type === "persona" && inlineEdit.id === p.id;
         return `<div class="rl-card-wrap" data-id="${esc(p.id)}"><article class="rl-card ${activeP ? "active" : ""} ${deleteMode ? "delete" : ""}">${activeP ? `<span class="rl-crown" aria-label="${esc(t("activePersona"))}">${ICON.crown}</span>` : ""}<div class="rl-card-name">${editableName(p.name, editing, "rl-name-row", "editCardInline")}<div class="rl-muted">${esc(t(activeP ? "activePersona" : "sparePersona"))}</div></div><div class="rl-meter"><div class="rl-track"><div class="rl-fill" style="width:${rate}%"></div></div><div class="rl-muted">${fmt("enabledRuleCount", { enabled: on, disabled: p.rules.length - on })}</div></div><div class="rl-count"><b>${p.rules.length}</b> ${esc(t("ruleCount"))}</div><button class="primary" data-act="openPersona">${esc(t("personaResponses"))}</button></article><button class="rl-card-side ${deleteMode ? "danger" : ""}" data-act="${deleteMode ? "deletePersona" : "selectPersona"}">${deleteMode ? ICON.trash : activeP ? "\u2713" : ""}</button></div>`;
       }).join("");
@@ -3957,7 +3998,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         (r2) => (filter === "all" || r2.trigger.kind === filter) && r2.name.toLowerCase().includes(ruleQuery.toLowerCase())
       );
       const list = shown.map(
-        (r2) => `<div class="rl-rule ${r2.id === selectedRuleId ? "active" : ""} ${ruleDeleteMode && r2.id === selectedRuleId ? "delete-active" : ""}" data-id="${esc(r2.id)}">${ruleDeleteMode && r2.id === selectedRuleId ? `<button class="danger rl-rule-trash" data-act="deleteSelectedRule">${ICON.trash}</button>` : ""}<button class="rl-rule-main rl-grow" data-act="selectRule"><span><b>${esc(r2.name)}</b><small>${esc(t(r2.trigger.kind))} \xB7 ${r2.choices.length} ${esc(t("responseCount"))}</small></span></button><span data-act="toggleRule">${sw(r2.enabled, true)}</span></div>`
+        (r2) => `<div class="rl-rule ${r2.id === selectedRuleId ? "active" : ""} ${ruleDeleteMode ? "delete-active" : ""}" data-id="${esc(r2.id)}">${ruleDeleteMode ? `<button class="danger rl-rule-trash" data-act="deleteRuleRow">${ICON.trash}</button>` : ""}<button class="rl-rule-main rl-grow" data-act="selectRule"><span><b>${esc(r2.name)}</b><small>${esc(t(r2.trigger.kind))} \xB7 ${r2.choices.length} ${esc(t("responseCount"))}</small></span></button><span data-act="toggleRule">${sw(r2.enabled, true)}</span></div>`
       ).join("") || `<div class="rl-muted">${esc(t("empty"))}</div>`;
       const r = activeRule(), editingRule = r && inlineEdit?.type === "rule" && inlineEdit.id === r.id;
       let editor = `<div class="rl-muted">${esc(t("selectRuleHint"))}</div>`;
@@ -4055,13 +4096,13 @@ One of mods you are using is using an old version of SDK. It will work for now b
         return `<button class="rl-zone ${group === pickerGroup ? "selected" : ""}" data-group="${group}" aria-label="${esc(groupLabel(group))}" title="${esc(groupLabel(group))}" style="left:${x / 5}%;top:${y / 10}%;width:${w / 5}%;height:${h / 10}%"></button>`;
       }).join("");
       const actions = pickerSearch ? "" : pickerActions(rows);
-      return `<div class="rl-overlay"><section class="rl-dialog"><div class="rl-picker-head"><h2>${esc(t("chooseActivity"))}</h2><div class="rl-picker-controls"><select class="rl-select rl-picker-scope" data-picker-scope><option value="current" ${pickerScope === "current" ? "selected" : ""}>${esc(t("currentArea"))}</option><option value="all" ${pickerScope === "all" ? "selected" : ""}>${esc(t("allAreas"))}</option></select><div class="rl-action-search"><input class="rl-input" data-action-search value="${esc(pickerInput)}" placeholder="${esc(t("searchActivities"))}"></div><button data-act="searchActivities">${esc(t("searchButton"))}</button><span class="rl-grow"></span><button data-act="selectAll" ${!pickerSearch ? "disabled" : ""}>${esc(t("selectAll"))}</button><button data-act="clearAll">${esc(t("clearAll"))}</button></div></div><div class="rl-dialog-body rl-picker-body"><div class="rl-body-map">${zoneHtml}</div><div class="rl-actions-wrap"><div class="rl-actions-title">${pickerScope === "all" ? esc(t("allAreaActivities")) : fmt("availableForGroup", { group: esc(groupLabel(pickerGroup)) })}</div><div class="rl-actions">${actions}</div></div></div><div class="rl-dialog-foot"><span class="rl-grow rl-muted" data-picker-count>${fmt("selectedActivityCount", { count: pickerSelected.size })}</span><button data-act="closeModal">${esc(t("cancel"))}</button><button class="primary" data-act="confirmPicker" ${!pickerSearch ? "disabled" : ""}>${esc(t("confirmAdd"))}</button></div></section></div>`;
+      return `<div class="rl-overlay"><section class="rl-dialog"><div class="rl-picker-head"><h2>${esc(t("chooseActivity"))}</h2><div class="rl-picker-controls"><select class="rl-select rl-picker-scope" data-picker-scope><option value="current" ${pickerScope === "current" ? "selected" : ""}>${esc(t("currentArea"))}</option><option value="all" ${pickerScope === "all" ? "selected" : ""}>${esc(t("allAreas"))}</option></select><div class="rl-action-search"><input class="rl-input" data-action-search value="${esc(pickerInput)}" placeholder="${esc(t("searchActivities"))}"></div><button data-act="searchActivities">${esc(t("searchButton"))}</button><span class="rl-grow"></span><button data-act="selectAll" ${!pickerSearch ? "disabled" : ""}>${esc(t("selectAll"))}</button><button data-act="clearAll">${esc(t("clearAll"))}</button></div></div><div class="rl-dialog-body rl-picker-body"><div class="rl-body-map">${zoneHtml}</div><div class="rl-actions-wrap"><div class="rl-actions-title">${pickerScope === "all" ? esc(t("allAreaActivities")) : fmt("availableForGroup", { group: esc(groupLabel(pickerGroup)) })}</div><div class="rl-actions">${actions}</div></div></div><div class="rl-dialog-foot"><span class="rl-grow rl-muted" data-picker-count>${fmt("selectedActivityCount", { count: pickerSelected.size })}</span><button class="primary" data-act="confirmPicker" ${!pickerSearch ? "disabled" : ""}>${esc(t("confirmAdd"))}</button><button data-act="closeModal">${esc(t("cancel"))}</button></div></section></div>`;
     }
     function modalHtml() {
       if (!modal) return "";
       if (modal.type === "picker") return pickerHtml();
       if (modal.type === "unsaved")
-        return `<div class="rl-overlay"><section class="rl-dialog compact"><div class="rl-dialog-head"><h2>${esc(t("unsavedTitle"))}</h2></div><div class="rl-dialog-body"><p>${esc(t("unsavedMessage"))}</p></div><div class="rl-dialog-foot"><span class="rl-grow"></span><button data-act="closeModal">${esc(t("cancel"))}</button><button data-act="discardExit">${esc(t("discardExit"))}</button><button class="primary" data-act="saveExit">${esc(t("saveExit"))}</button></div></section></div>`;
+        return `<div class="rl-overlay"><section class="rl-dialog compact"><div class="rl-dialog-head"><h2>${esc(t("unsavedTitle"))}</h2></div><div class="rl-dialog-body"><p>${esc(t("unsavedMessage"))}</p></div><div class="rl-dialog-foot"><span class="rl-grow"></span><button class="primary" data-act="saveExit">${esc(t("saveExit"))}</button><button data-act="discardExit">${esc(t("discardExit"))}</button><button data-act="closeModal">${esc(t("cancel"))}</button></div></section></div>`;
       const titles = {
         name: modal.mode === "new" ? t("addPersona") : modal.mode === "rule" ? t("renameRule") : t("rename"),
         confirm: t("confirmDelete"),
@@ -4074,7 +4115,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (modal.type === "name") body = `<input class="rl-input" data-modal-value value="${esc(modal.value)}">`;
       if (modal.type === "confirm") body = `<p>${esc(modal.message)}</p>`;
       if (modal.type === "transfer")
-        body = `<textarea class="rl-textarea" data-modal-value ${modal.mode === "export" ? "readonly" : ""}>${esc(modal.value)}</textarea><div class="rl-tools rl-transfer-tools"><button data-clipboard="${modal.mode}">${esc(t(modal.mode === "export" ? "copyText" : "pasteText"))}</button><span class="rl-muted" data-clipboard-status role="status"></span></div>`;
+        body = `<div class="rl-transfer-field"><textarea class="rl-textarea" data-modal-value ${modal.mode === "export" ? "readonly" : ""}>${esc(modal.value)}</textarea><div class="rl-tools rl-transfer-tools"><button data-clipboard="${modal.mode}">${ICON[modal.mode === "export" ? "copy" : "paste"]}${esc(t(modal.mode === "export" ? "copyText" : "pasteText"))}</button><span class="rl-muted" data-clipboard-status role="status"></span></div></div>`;
       if (modal.type === "text")
         body = `<div class="rl-choice-row">${(draft?.trigger.kind === "speech" ? ["chat"] : ["chat", "emote", "action"]).map((x) => `<button class="${modal.responseType === x ? "on" : ""}" data-response-type="${x}">${esc(t(x))}</button>`).join("")}</div><textarea class="rl-textarea" style="margin-top:18px" data-modal-value>${esc(modal.value)}</textarea><div class="rl-tools" style="margin-top:12px"><button data-token="{Self}">${esc(t("insertSelfName"))}</button><button data-token="{Other}">${esc(t("insertOtherName"))}</button></div>`;
       if (modal.type === "text" && draft?.trigger.kind === "speech") {
@@ -4086,7 +4127,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const key = modal.listMode === "whitelist" ? "white" : "black", value = key === "white" ? modal.white : modal.black;
         body = `<div class="rl-settings-group"><h3>${esc(t("interactionTargets"))}</h3><div class="rl-segments"><button class="${modal.listMode === "whitelist" ? "on" : ""}" data-list-mode="whitelist">${esc(t("onlyWhitelist"))}</button><button class="${modal.listMode === "blacklist" ? "on" : ""}" data-list-mode="blacklist">${esc(t("onlyBlacklist"))}</button></div></div><div class="rl-settings-group"><h3>${esc(t(key === "white" ? "whiteList" : "blackList"))}</h3><div class="rl-muted">${esc(t(key === "white" ? "whiteListHint" : "blackListHint"))}</div>${relationButtons("persona")}<div class="rl-list-entry"><input class="rl-input" data-list="${key}" value="${esc(value)}" placeholder="${esc(t("memberNumbersPlaceholder"))}"><button data-act="normalizeList">\uFF0B</button></div></div>`;
       }
-      return `<div class="rl-overlay"><section class="rl-dialog compact ${modal.type === "animation" ? "rl-animation-dialog" : ""}"><div class="rl-dialog-head"><h2 class="rl-grow">${esc(titles[modal.type])}</h2><button data-act="closeModal">${ICON.close}</button></div><div class="rl-dialog-body">${modal.error ? `<p role="alert">${esc(modal.error)}</p>` : ""}${body}</div><div class="rl-dialog-foot"><span class="rl-grow"></span><button data-act="closeModal">${esc(t("cancel"))}</button>${modal.mode === "export" ? "" : `<button class="primary" data-act="confirmModal">${esc(t("save"))}</button>`}</div></section></div>`;
+      return `<div class="rl-overlay"><section class="rl-dialog compact ${modal.type === "animation" ? "rl-animation-dialog" : ""}"><div class="rl-dialog-head"><h2 class="rl-grow">${esc(titles[modal.type])}</h2><button data-act="closeModal">${ICON.close}</button></div><div class="rl-dialog-body">${modal.error ? `<p role="alert">${esc(modal.error)}</p>` : ""}${body}</div><div class="rl-dialog-foot"><span class="rl-grow"></span>${modal.mode === "export" ? "" : `<button class="primary" data-act="confirmModal">${esc(t("save"))}</button>`}<button data-act="closeModal">${esc(t("cancel"))}</button></div></section></div>`;
     }
     function render() {
       if (!root) return;
@@ -4176,7 +4217,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     function commitDraft() {
       if (!draft) return;
       store.update((d) => {
-        const p = d.personas.find((x) => x.id === d.activePersona), i = p.rules.findIndex((x) => x.id === draft.id);
+        const p = d.personas.find((x) => x.id === active().id), i = p.rules.findIndex((x) => x.id === draft.id);
         p.rules[i] = clone(draft);
       });
       draft = clone(active().rules.find((r) => r.id === selectedRuleId));
@@ -4337,7 +4378,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       root.querySelectorAll('[data-act="openPersona"]').forEach(
         (b) => b.onclick = () => {
           const id = b.closest(".rl-card-wrap").dataset.id;
-          if (id !== store.data.activePersona) store.update((d) => d.activePersona = id);
+          editingPersonaId = id;
           selectedRuleId = null;
           draft = null;
           sessionBaseline = clone(contentOf(active(), null));
@@ -4353,7 +4394,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       );
       root.querySelectorAll('[data-act="editPersonaInline"]').forEach(
         (b) => b.onclick = () => {
-          inlineEdit = { type: "persona", id: store.data.activePersona };
+          inlineEdit = { type: "persona", id: active().id };
           render();
         }
       );
@@ -4397,7 +4438,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       });
       root.querySelectorAll('[data-act="renamePersona"]').forEach(
         (b) => b.onclick = () => {
-          modal = { type: "name", mode: "persona", id: store.data.activePersona, value: active().name };
+          modal = { type: "name", mode: "persona", id: active().id, value: active().name };
           render();
         }
       );
@@ -4460,7 +4501,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           const id = w.dataset.id || w.closest(".rl-rule").dataset.id;
           if (draft?.id === id) draft.enabled = !draft.enabled;
           store.update((d) => {
-            const r = d.personas.find((p) => p.id === d.activePersona).rules.find((x) => x.id === id);
+            const r = d.personas.find((p) => p.id === active().id).rules.find((x) => x.id === id);
             r.enabled = !r.enabled;
           });
           draft = null;
@@ -4472,7 +4513,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           if (dirty()) commitDraft();
           const r = rule();
           r.name = t("newRule");
-          store.update((d) => d.personas.find((p) => p.id === d.activePersona).rules.push(r));
+          store.update((d) => d.personas.find((p) => p.id === active().id).rules.push(r));
           selectedRuleId = r.id;
           draft = null;
           render();
@@ -4490,10 +4531,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
           render();
         }
       );
-      root.querySelectorAll('[data-act="deleteSelectedRule"]').forEach(
+      root.querySelectorAll('[data-act="deleteRuleRow"]').forEach(
         (b) => b.onclick = (e) => {
           e.stopPropagation();
-          modal = { type: "confirm", mode: "rule", id: selectedRuleId, message: t("removeConfirm") };
+          modal = {
+            type: "confirm",
+            mode: "rule",
+            id: b.closest(".rl-rule").dataset.id,
+            message: t("removeConfirm")
+          };
           render();
         }
       );
@@ -4824,7 +4870,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           draft = null;
           if (restore)
             store.update((d) => {
-              const p = d.personas.find((x) => x.id === d.activePersona);
+              const p = d.personas.find((x) => x.id === active().id);
               p.name = restore.name;
               p.rules = clone(restore.rules);
             });
@@ -4855,11 +4901,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
         } else if (m.type === "confirm" && m.mode === "rule") {
           if (draft?.id === m.id) draft = null;
           store.update((d) => {
-            const p = d.personas.find((x) => x.id === d.activePersona);
+            const p = d.personas.find((x) => x.id === active().id);
             p.rules = p.rules.filter((r) => r.id !== m.id);
           });
-          selectedRuleId = active().rules[0]?.id ?? null;
-          ruleDeleteMode = false;
+          if (selectedRuleId === m.id) selectedRuleId = active().rules[0]?.id ?? null;
+          if (!active().rules.length) ruleDeleteMode = false;
         } else if (m.type === "confirm") {
           store.update((d) => {
             d.personas = d.personas.filter((p) => p.id !== m.id);
@@ -4904,7 +4950,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           const input = root.querySelector("[data-list]");
           if (input) m[input.dataset.list] = input.value;
           store.update((d) => {
-            const p = d.personas.find((x) => x.id === d.activePersona);
+            const p = d.personas.find((x) => x.id === active().id);
             p.listMode = m.listMode;
             p.whiteList = parseMembers(m.white);
             p.blackList = parseMembers(m.black);
@@ -4926,16 +4972,41 @@ One of mods you are using is using an old version of SDK. It will work for now b
         transform: `scale(${b.width / 2e3},${b.height / 1e3})`
       });
     }
+    function resetView() {
+      page = "home";
+      editingPersonaId = null;
+      selectedRuleId = null;
+      draft = null;
+      sessionBaseline = null;
+      modal = null;
+      inlineEdit = null;
+      deleteMode = false;
+      ruleDeleteMode = false;
+      responseDelete = false;
+      primaryMode = false;
+      filter = "all";
+      ruleQuery = "";
+      ruleScrollTop = 0;
+      pickerGroup = "ItemHead";
+      pickerScope = "current";
+      pickerSelected = /* @__PURE__ */ new Set();
+      pickerQuery = "";
+      pickerInput = "";
+      pickerMode = "trigger";
+      notice = "";
+    }
     function load() {
       root?.remove();
       root = host.document.createElement("div");
       root.className = "rl-root";
       host.document.body.appendChild(root);
-      if (!wardrobePending) page = "home";
+      if (!wardrobePending) resetView();
       render();
     }
     function unload() {
       clearTimeout(noticeTimer);
+      notice = "";
+      if (!wardrobePending) resetView();
       picker.reset();
       root?.remove();
       root = null;
@@ -4982,6 +5053,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
         crown: svg("M3 6l4 4 5-7 5 7 4-4-2 13H5L3 6Zm2 10h14"),
         edit: svg("M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"),
         trash: svg("M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6"),
+        copy: svg("M8 8h12v13H8zM16 8V3H3v13h5"),
+        paste: svg("M9 4H5v17h14V4h-4M9 2h6v5H9z"),
         close: svg("M18 6 6 18M6 6l12 12")
       };
     }
@@ -5053,7 +5126,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
         mouth = createMouth({ sdk, owns: coordination.owns, host });
         const valid = (event) => !stopped && store.loaded && store.data.settings.enabled && store.data.settings.reactions && host.CurrentScreen === "ChatRoom" && host.Player.MemberNumber === account && event.room === events.roomKey() && !host.Player.GhostList?.includes(event.actor) && (event.event === "leave" || host.ChatRoomCharacter.some((c) => c.MemberNumber === event.actor));
         scheduler = createScheduler({ active: () => store.active, valid, execute: output.execute, report });
-        events = installEvents({ sdk, submit: (e) => scheduler.submit(e), mouth, reset, host });
+        events = installEvents({
+          sdk,
+          submit: (e) => {
+            if (e.kind === "event" && e.event === "join") lastScreen = host.CurrentScreen;
+            return scheduler.submit(e);
+          },
+          mouth,
+          reset,
+          host
+        });
         ui = installSettings({ store, t, host });
         lastScreen = host.CurrentScreen;
         unsubscribe = store.subscribe(() => {
