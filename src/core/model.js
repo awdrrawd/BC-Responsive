@@ -108,7 +108,7 @@ export function rule() {
     name: 'New rule',
     enabled: true,
     trigger: { kind: 'activity', activities: [], groups: [], members: [], self: false },
-    dedupeMs: 3000,
+    dedupeMs: 0,
     delayMs: 0,
     choices: [{ id: uid(), steps: [{ type: 'chat', text: '' }] }],
   };
@@ -174,7 +174,8 @@ export function validatePersona(input) {
         assert(Number.isFinite(t[key]) && t[key] >= 0 && t[key] <= 100, `Invalid ${key}`);
     if (t.min !== undefined && t.max !== undefined) assert(t.min <= t.max, 'Minimum exceeds maximum');
     if (t.kind === 'spicer') delete t.arousalSource;
-    r.dedupeMs ??= 3000;
+    // Retain the legacy field for export compatibility; rule-level dedupe is retired.
+    r.dedupeMs = 0;
     r.delayMs ??= 0;
     for (const key of ['dedupeMs', 'delayMs'])
       assert(Number.isFinite(r[key]) && r[key] >= 0 && r[key] <= 600000, `Invalid ${key}`);

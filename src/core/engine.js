@@ -66,29 +66,28 @@ export function createScheduler({
   report = console.warn,
 }) {
   const timers = new Set();
-  const seen = new Map();
+  const actorCooldowns = new Map();
   let generation = 0;
-  const keyFor = (r, e) => `${e.room}|${e.actor}|${r.id}`;
   return {
     cancel() {
       generation++;
       timers.forEach(clearTimer);
       timers.clear();
-      seen.clear();
+      actorCooldowns.clear();
     },
     submit(event) {
       const p = active();
       if (!p || !valid(event)) return false;
       const time = now();
-      for (const [key, expires] of seen) if (expires <= time) seen.delete(key);
-      // Filter duplicate rules before drawing, so a blocked choice doesn't hide eligible alternatives.
-      const eligible = { ...p, rules: p.rules.filter((r) => !seen.has(keyFor(r, event))) };
-      const selected = selectResponse(eligible, event, random);
+      const actorKey = `${event.room}|${event.actor}`;
+      for (const [key, expires] of actorCooldowns) if (expires <= time) actorCooldowns.delete(key);
+      if (event.kind === 'activity' && actorCooldowns.has(actorKey)) return false;
+      const selected = selectResponse(p, event, random);
       if (!selected) return false;
+      // Shared across rules for this person; other people and room events are independent.
+      if (event.kind === 'activity') actorCooldowns.set(actorKey, time + 300);
       // The room and chat input disappear as soon as the leave hook returns.
       const leaving = event.kind === 'event' && event.event === 'leave';
-      const key = keyFor(selected.rule, event);
-      seen.set(key, time + selected.rule.delayMs + selected.rule.dedupeMs);
       const token = generation;
       const run = () => {
         if (token !== generation || !valid(event)) return;
@@ -96,6 +95,8 @@ export function createScheduler({
           for (const step of steps) {
             if (token !== generation || !valid(event)) break;
             try {
+              // Refresh at actual output time too, including delayed replies.
+              if (event.kind === 'activity') actorCooldowns.set(actorKey, now() + 300);
               execute(step, event);
             } catch (error) {
               report(error);

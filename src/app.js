@@ -72,7 +72,7 @@ export function start(namespace, host = globalThis) {
         enabled: () =>
           !stopped && store.loaded && store.data.settings.enabled && host.Player.MemberNumber === account,
       });
-      output = createOutput({ store, host, owns: coordination.owns, report });
+      output = createOutput({ store, host, owns: coordination.owns, report, sdk });
       mouth = createMouth({ sdk, owns: coordination.owns, host });
       const valid = (event) =>
         !stopped &&

@@ -47,7 +47,7 @@ test('own room lifecycle bypasses member lists while visitor filters remain acti
     assert.equal(selectResponse(p, { ...event(2), event: 'visitor' }), null);
   }
 });
-test('dedupe is per person/rule, and delayed responses cancel on disable', () => {
+test('delayed responses cancel on disable without legacy rule dedupe', () => {
   const { p } = fixture();
   const timers = new Map();
   let id = 0,
@@ -65,9 +65,9 @@ test('dedupe is per person/rule, and delayed responses cancel on disable', () =>
     clearTimer: (id) => timers.delete(id),
   });
   assert.equal(scheduler.submit(event(2)), true);
-  assert.equal(scheduler.submit(event(2)), false);
+  assert.equal(scheduler.submit(event(2)), true);
   assert.equal(scheduler.submit(event(3)), true);
-  assert.equal(timers.size, 2);
+  assert.equal(timers.size, 3);
   scheduler.cancel();
   assert.equal(timers.size, 0);
   assert.deepEqual(calls, []);
@@ -168,4 +168,31 @@ test('flavour prepends only a chat step and does not replace the group', () => {
     selectResponse(p, { kind: 'activity', actor: 2, self: 1 }).steps.map((s) => s.text),
     ['Well, hello', 'waves'],
   );
+});
+
+test('activity cooldown is per person across rules and expires at 300 ms', () => {
+  const { p, r } = fixture();
+  r.trigger = { kind: 'activity' };
+  r.delayMs = 0;
+  r.dedupeMs = 3000; // Legacy saved values must not add a hidden cooldown.
+  let time = 0;
+  const scheduler = createScheduler({ active: () => p, valid: () => true, execute() {}, now: () => time });
+  const activity = (actor) => ({ ...event(actor), kind: 'activity' });
+  assert.equal(scheduler.submit(activity(2)), true);
+  time = 299;
+  assert.equal(scheduler.submit(activity(2)), false);
+  assert.equal(scheduler.submit(activity(3)), true);
+  time = 300;
+  assert.equal(scheduler.submit(activity(2)), true);
+  scheduler.cancel();
+  assert.equal(scheduler.submit(activity(2)), true);
+});
+
+test('legacy rule cooldown is normalized without changing its response delay', () => {
+  const { p, r } = fixture();
+  r.dedupeMs = 60000;
+  const normalized = validatePersona(p);
+  assert.equal(normalized.rules[0].dedupeMs, 0);
+  assert.equal(normalized.rules[0].delayMs, r.delayMs);
+  assert.equal(r.dedupeMs, 60000, 'validation does not mutate imported input');
 });

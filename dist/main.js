@@ -887,7 +887,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       name: "New rule",
       enabled: true,
       trigger: { kind: "activity", activities: [], groups: [], members: [], self: false },
-      dedupeMs: 3e3,
+      dedupeMs: 0,
       delayMs: 0,
       choices: [{ id: uid(), steps: [{ type: "chat", text: "" }] }]
     };
@@ -951,7 +951,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           assert(Number.isFinite(t[key]) && t[key] >= 0 && t[key] <= 100, `Invalid ${key}`);
       if (t.min !== void 0 && t.max !== void 0) assert(t.min <= t.max, "Minimum exceeds maximum");
       if (t.kind === "spicer") delete t.arousalSource;
-      r.dedupeMs ??= 3e3;
+      r.dedupeMs = 0;
       r.delayMs ??= 0;
       for (const key of ["dedupeMs", "delayMs"])
         assert(Number.isFinite(r[key]) && r[key] >= 0 && r[key] <= 6e5, `Invalid ${key}`);
@@ -1312,27 +1312,26 @@ One of mods you are using is using an old version of SDK. It will work for now b
     report = console.warn
   }) {
     const timers = /* @__PURE__ */ new Set();
-    const seen = /* @__PURE__ */ new Map();
+    const actorCooldowns = /* @__PURE__ */ new Map();
     let generation = 0;
-    const keyFor = (r, e) => `${e.room}|${e.actor}|${r.id}`;
     return {
       cancel() {
         generation++;
         timers.forEach(clearTimer);
         timers.clear();
-        seen.clear();
+        actorCooldowns.clear();
       },
       submit(event) {
         const p = active();
         if (!p || !valid(event)) return false;
         const time = now();
-        for (const [key2, expires] of seen) if (expires <= time) seen.delete(key2);
-        const eligible = { ...p, rules: p.rules.filter((r) => !seen.has(keyFor(r, event))) };
-        const selected = selectResponse(eligible, event, random);
+        const actorKey = `${event.room}|${event.actor}`;
+        for (const [key, expires] of actorCooldowns) if (expires <= time) actorCooldowns.delete(key);
+        if (event.kind === "activity" && actorCooldowns.has(actorKey)) return false;
+        const selected = selectResponse(p, event, random);
         if (!selected) return false;
+        if (event.kind === "activity") actorCooldowns.set(actorKey, time + 300);
         const leaving = event.kind === "event" && event.event === "leave";
-        const key = keyFor(selected.rule, event);
-        seen.set(key, time + selected.rule.delayMs + selected.rule.dedupeMs);
         const token = generation;
         const run = () => {
           if (token !== generation || !valid(event)) return;
@@ -1340,6 +1339,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             for (const step2 of steps) {
               if (token !== generation || !valid(event)) break;
               try {
+                if (event.kind === "activity") actorCooldowns.set(actorKey, now() + 300);
                 execute(step2, event);
               } catch (error) {
                 report(error);
@@ -3203,9 +3203,20 @@ One of mods you are using is using an old version of SDK. It will work for now b
       (token) => values[token] ?? token
     );
   }
-  function createOutput({ store, host = globalThis, owns, report }) {
+  function createOutput({ store, host = globalThis, owns, report, sdk }) {
+    let automaticActivity = false;
+    sdk?.hookFunction("ServerSend", 0, (args, next) => {
+      if (automaticActivity && args[0] === "ChatRoomChat" && args[1]?.Type === "Activity") {
+        const data = args[1];
+        return next([
+          args[0],
+          { ...data, Dictionary: [...data.Dictionary ?? [], { Tag: `${ID}_AutoActivity`, Text: "1" }] },
+          ...args.slice(2)
+        ]);
+      }
+      return next(args);
+    });
     const restores = /* @__PURE__ */ new Set();
-    const activitySeen = /* @__PURE__ */ new Map();
     const animations = /* @__PURE__ */ new Map();
     function textMessage(step2, event) {
       const text = renderText(step2.text, event, host).trim();
@@ -3355,7 +3366,6 @@ One of mods you are using is using an old version of SDK. It will work for now b
             report(error);
           }
         }
-        activitySeen.clear();
       },
       execute(step2, event) {
         const check = checkBCX(step2, store.data.settings.bcx, host);
@@ -3369,31 +3379,21 @@ One of mods you are using is using an old version of SDK. It will work for now b
         if (step2.type === "activity") {
           const target = host.ChatRoomCharacter.find((c) => c.MemberNumber === event.actor);
           if (!target || event.event === "leave") return;
-          const key = `${event.room}|${event.actor}|${step2.group}|${step2.activity}`;
-          const time = Date.now();
-          for (const [k, expires] of activitySeen) if (expires <= time) activitySeen.delete(k);
-          if (activitySeen.has(key)) return;
           const activity = allowedActivity(target, step2.activity, step2.group, host);
           if (!activity) {
             report(`Unavailable activity: ${step2.activity} / ${step2.group} / target ${event.actor}`);
             return;
           }
-          activitySeen.set(key, time + 5e3);
           const group = host.ActivityGetGroupOrMirror(target.AssetFamily, step2.group);
           if (!group) {
-            activitySeen.delete(key);
             report(`Unavailable activity group: ${step2.group} / target ${event.actor}`);
             return;
           }
-          const previousFocus = target.FocusGroup;
           try {
-            target.FocusGroup = host.AssetGroupGet?.(target.AssetFamily, step2.group) ?? group;
+            automaticActivity = true;
             host.ActivityRun(host.Player, target, group, activity);
-          } catch (error) {
-            activitySeen.delete(key);
-            throw error;
           } finally {
-            target.FocusGroup = previousFocus;
+            automaticActivity = false;
           }
         }
       }
@@ -3561,7 +3561,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
             const outcome = /^Orgasm\d+$/.test(key) ? "Orgasmed" : /^OrgasmFailResist\d+$/.test(key) ? "Resisted" : /^OrgasmFail(?:Timeout|Surrender)\d+$/.test(key) ? "Ruined" : null;
             if (outcome) submit(event("orgasm", host.Player, { outcome }));
           }
-          if (data.Type === "Activity" && metadata?.TargetCharacter?.MemberNumber === host.Player.MemberNumber && metadata.ActivityName && metadata.GroupName && sender) {
+          if (data.Type === "Activity" && !data.Dictionary?.some((entry) => entry.Tag === `${ID}_AutoActivity` && entry.Text === "1") && metadata?.TargetCharacter?.MemberNumber === host.Player.MemberNumber && metadata.ActivityName && metadata.GroupName && sender) {
             submit(event("activity", sender, { activity: metadata.ActivityName, group: metadata.GroupName }));
           }
         } catch (e) {
@@ -3648,6 +3648,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   }
   var init_events = __esm({
     "src/integrations/events.js"() {
+      init_model();
     }
   });
 
@@ -5244,7 +5245,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
           host,
           enabled: () => !stopped && store.loaded && store.data.settings.enabled && host.Player.MemberNumber === account
         });
-        output = createOutput({ store, host, owns: coordination.owns, report });
+        output = createOutput({ store, host, owns: coordination.owns, report, sdk });
         mouth = createMouth({ sdk, owns: coordination.owns, host });
         const valid = (event) => !stopped && store.loaded && store.data.settings.enabled && store.data.settings.reactions && host.CurrentScreen === "ChatRoom" && host.Player.MemberNumber === account && event.room === events.roomKey() && !host.Player.GhostList?.includes(event.actor) && (event.event === "leave" || host.ChatRoomCharacter.some((c) => c.MemberNumber === event.actor));
         scheduler = createScheduler({ active: () => store.active, valid, execute: output.execute, report });

@@ -1,3 +1,4 @@
+import { installEvents } from '../src/integrations/events.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import LZString from 'lz-string';
@@ -221,7 +222,7 @@ test('BCX emote rule is checked; disabled preflight does not touch BCX', () => {
   assert.equal(checkBCX({ type: 'emote' }, false, host).allowed, true);
 });
 
-test('activity execution keeps target focus, restores it on error, and allows retry', () => {
+test('activity execution uses target family, leaves focus untouched, and allows retry', () => {
   const old = { Name: 'ItemFeet' };
   const group = { Name: 'ItemHead' };
   const target = { MemberNumber: 2, AssetFamily: 'TargetFamily', FocusGroup: old };
@@ -237,7 +238,7 @@ test('activity execution keeps target focus, restores it on error, and allows re
       return group;
     },
     ActivityRun() {
-      assert.equal(target.FocusGroup, group);
+      assert.equal(target.FocusGroup, old);
       calls++;
       if (fail) throw Error('activity hook failed');
     },
@@ -256,4 +257,52 @@ test('activity execution keeps target focus, restores it on error, and allows re
   output.execute(step, event);
   assert.equal(calls, 2);
   assert.equal(target.FocusGroup, old);
+});
+
+test('automatic activity replies are tagged and do not trigger another automatic reply', () => {
+  let sendHook, handler;
+  const sent = [],
+    submitted = [];
+  const target = { MemberNumber: 2, AssetFamily: 'Female3DCG' };
+  const host = {
+    Player: { MemberNumber: 1 },
+    CurrentScreen: 'ChatRoom',
+    ChatRoomCharacter: [target],
+    ChatRoomRegisterMessageHandler(value) {
+      handler = value;
+    },
+    ActivityAllowedForGroup: () => [{ Activity: { Name: 'Hug' } }],
+    ActivityGetGroupOrMirror: () => ({ Name: 'ItemArms' }),
+    ActivityRun() {
+      sendHook(['ChatRoomChat', { Type: 'Activity', Dictionary: [] }], (args) => sent.push(args[1]));
+    },
+  };
+  const output = createOutput({
+    host,
+    store: { data: { settings: { bcx: false } } },
+    owns: () => true,
+    report() {},
+    sdk: {
+      hookFunction(name, priority, callback) {
+        sendHook = callback;
+      },
+    },
+  });
+  output.execute({ type: 'activity', activity: 'Hug', group: 'ItemArms' }, { actor: 2, room: 'test' });
+  installEvents({
+    host,
+    sdk: { hookFunction() {} },
+    submit: (e) => submitted.push(e),
+    mouth: { receive() {} },
+    reset() {},
+  });
+  const metadata = { TargetCharacter: host.Player, ActivityName: 'Hug', GroupName: 'ItemArms' };
+  handler.Callback(sent[0], target, 'Hug', metadata);
+  assert.equal(submitted.length, 0);
+  const manual = { Type: 'Activity', Dictionary: [] };
+  sendHook(['ChatRoomChat', manual], (args) => {
+    assert.equal(args[1], manual, 'manual sends are not copied or tagged');
+    handler.Callback(args[1], target, 'Hug', metadata);
+  });
+  assert.equal(submitted.length, 1);
 });

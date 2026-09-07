@@ -37,9 +37,20 @@ export function renderText(text, event, host = globalThis) {
     (token) => values[token] ?? token,
   );
 }
-export function createOutput({ store, host = globalThis, owns, report }) {
+export function createOutput({ store, host = globalThis, owns, report, sdk }) {
+  let automaticActivity = false;
+  sdk?.hookFunction('ServerSend', 0, (args, next) => {
+    if (automaticActivity && args[0] === 'ChatRoomChat' && args[1]?.Type === 'Activity') {
+      const data = args[1];
+      return next([
+        args[0],
+        { ...data, Dictionary: [...(data.Dictionary ?? []), { Tag: `${ID}_AutoActivity`, Text: '1' }] },
+        ...args.slice(2),
+      ]);
+    }
+    return next(args);
+  });
   const restores = new Set();
-  const activitySeen = new Map();
   const animations = new Map();
   function textMessage(step, event) {
     const text = renderText(step.text, event, host).trim();
@@ -209,7 +220,6 @@ export function createOutput({ store, host = globalThis, owns, report }) {
           report(error);
         }
       }
-      activitySeen.clear();
     },
     execute(step, event) {
       const check = checkBCX(step, store.data.settings.bcx, host);
@@ -223,32 +233,21 @@ export function createOutput({ store, host = globalThis, owns, report }) {
       if (step.type === 'activity') {
         const target = host.ChatRoomCharacter.find((c) => c.MemberNumber === event.actor);
         if (!target || event.event === 'leave') return;
-        const key = `${event.room}|${event.actor}|${step.group}|${step.activity}`;
-        const time = Date.now();
-        for (const [k, expires] of activitySeen) if (expires <= time) activitySeen.delete(k);
-        if (activitySeen.has(key)) return;
         const activity = allowedActivity(target, step.activity, step.group, host);
         if (!activity) {
           report(`Unavailable activity: ${step.activity} / ${step.group} / target ${event.actor}`);
           return;
         }
-        // Per recipient/action circuit breaker; no global cooldown across different people.
-        activitySeen.set(key, time + 5000);
         const group = host.ActivityGetGroupOrMirror(target.AssetFamily, step.group);
         if (!group) {
-          activitySeen.delete(key);
           report(`Unavailable activity group: ${step.group} / target ${event.actor}`);
           return;
         }
-        const previousFocus = target.FocusGroup;
         try {
-          target.FocusGroup = host.AssetGroupGet?.(target.AssetFamily, step.group) ?? group;
+          automaticActivity = true;
           host.ActivityRun(host.Player, target, group, activity);
-        } catch (error) {
-          activitySeen.delete(key);
-          throw error;
         } finally {
-          target.FocusGroup = previousFocus;
+          automaticActivity = false;
         }
       }
     },

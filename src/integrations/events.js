@@ -1,3 +1,5 @@
+import { ID } from '../core/model.js';
+
 export function installEvents({ sdk, submit, mouth, reset, host = globalThis }) {
   let syncing = 0,
     roomEpoch = 0;
@@ -38,6 +40,7 @@ export function installEvents({ sdk, submit, mouth, reset, host = globalThis }) 
         }
         if (
           data.Type === 'Activity' &&
+          !data.Dictionary?.some((entry) => entry.Tag === `${ID}_AutoActivity` && entry.Text === '1') &&
           metadata?.TargetCharacter?.MemberNumber === host.Player.MemberNumber &&
           metadata.ActivityName &&
           metadata.GroupName &&

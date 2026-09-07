@@ -193,11 +193,11 @@ test('bundled plugin registers with ModSDK and handles a visitor through actual 
   assert.equal(draft, 'draft');
   sandbox.ChatRoomSyncMemberLeave({ SourceMemberNumber: 2 });
   sandbox.ChatRoomAddCharacterToChatRoom({ MemberNumber: 2, Name: 'Friend' });
-  assert.equal(calls.length, 2);
+  assert.equal(calls.length, 4);
   sandbox.Liko[ID].stop();
   assert.equal(intervals.size, 1, 'stop clears the plugin monitor; the shared i18n service remains');
   sandbox.ChatRoomAddCharacterToChatRoom({ MemberNumber: 3, Name: 'Another' });
-  assert.equal(calls.length, 2);
+  assert.equal(calls.length, 4);
   // Re-executing the userscript must not register a second SDK instance or run twice.
   vm.runInContext(script, context);
   await new Promise((resolve) => setImmediate(resolve));
