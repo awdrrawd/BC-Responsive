@@ -1381,6 +1381,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var init_en = __esm({
     "Translation/en.js"() {
       en_default = {
+        testAnimation: "Test",
         copyText: "Copy",
         pasteText: "Paste",
         copiedText: "Copied",
@@ -1407,7 +1408,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         speechHint: "Weak: sentence ending. Medium: ending plus random insertion. Strong: up to three insertions. Addicted: also replaces 1\u20132 characters. Short messages receive fewer changes.",
         alwaysHint: "Guaranteed response (one per rule). Runs before a random response, 50 ms apart; no pause when leaving.",
         editAppearance: "Wardrobe",
-        animationSeconds: "A/B switch interval (seconds)",
+        animationSeconds: "Action interval (seconds)",
         chooseAnimationGroup: "Select at least one group and both states.",
         invalidAnimation: "Count must be 1\u2013100 and switch interval 0.001\u2013120 seconds.",
         HairAccessory2: "Ears",
@@ -1588,6 +1589,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var init_tw = __esm({
     "Translation/tw.js"() {
       tw_default = {
+        testAnimation: "\u6E2C\u8A66",
         copyText: "\u8907\u88FD",
         pasteText: "\u8CBC\u4E0A",
         copiedText: "\u5DF2\u8907\u88FD",
@@ -1614,7 +1616,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         speechHint: "\u5F31\uFF1A\u50C5\u53E5\u5C3E\u3002\u4E2D\uFF1A\u53E5\u5C3E\u5FC5\u5B9A\u52A0\u5165\uFF0C\u53E5\u4E2D\u96A8\u6A5F\u63D2\u5165\u3002\u5F37\uFF1A\u96A8\u6A5F\u63D2\u5165\u4E09\u689D\u3002\u4E2D\u6BD2\uFF1A\u53E6\u66FF\u63DB 1\uFF5E2 \u500B\u5B57\u3002\u77ED\u53E5\u6703\u6E1B\u5C11\u63D2\u5165\u91CF\uFF0C\u4E00\u5B57\u77ED\u53E5\u4E2D\u6BD2\u6642\u53EF\u76F4\u63A5\u66FF\u63DB\u3002",
         alwaysHint: "\u4FDD\u8B49\u89F8\u767C\u7684\u4E3B\u56DE\u61C9\uFF08\u6BCF\u689D\u898F\u5247\u4E00\u500B\uFF09\uFF0C\u5148\u65BC\u96A8\u6A5F\u56DE\u61C9\u57F7\u884C\uFF0C\u9593\u9694 50 \u6BEB\u79D2\uFF1B\u96E2\u623F\u6642\u4E0D\u7B49\u5F85\u3002",
         editAppearance: "\u66F4\u8863\u5BA4\u8A2D\u5B9A",
-        animationSeconds: "A\uFF0FB \u5207\u63DB\u9593\u9694\uFF08\u79D2\uFF09",
+        animationSeconds: "\u52D5\u4F5C\u9593\u9694\uFF08\u79D2\uFF09",
         chooseAnimationGroup: "\u8ACB\u9078\u64C7\u81F3\u5C11\u4E00\u500B\u90E8\u4F4D\u4E26\u8A2D\u5B9A A\uFF0FB\u3002",
         invalidAnimation: "\u8B8A\u5316\u6B21\u6578\u9808\u70BA 1\u2013100\uFF0C\u5207\u63DB\u9593\u9694\u9808\u70BA 0.001\u2013120 \u79D2\u3002",
         HairAccessory2: "\u8033\u6735",
@@ -1795,6 +1797,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var init_cn = __esm({
     "Translation/cn.js"() {
       cn_default = {
+        testAnimation: "\u6D4B\u8BD5",
         copyText: "\u590D\u5236",
         pasteText: "\u7C98\u8D34",
         copiedText: "\u5DF2\u590D\u5236",
@@ -1821,7 +1824,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         speechHint: "\u5F31\uFF1A\u50C5\u53E5\u5C3E\u3002\u4E2D\uFF1A\u53E5\u5C3E\u5FC5\u5B9A\u52A0\u5165\uFF0C\u53E5\u4E2D\u96A8\u6A5F\u63D2\u5165\u3002\u5F37\uFF1A\u96A8\u6A5F\u63D2\u5165\u4E09\u689D\u3002\u4E2D\u6BD2\uFF1A\u53E6\u66FF\u63DB 1\uFF5E2 \u500B\u5B57\u3002\u77ED\u53E5\u6703\u6E1B\u5C11\u63D2\u5165\u91CF\uFF0C\u4E00\u5B57\u77ED\u53E5\u4E2D\u6BD2\u6642\u53EF\u76F4\u63A5\u66FF\u63DB\u3002",
         alwaysHint: "\u4FDD\u8BC1\u89E6\u53D1\u7684\u4E3B\u56DE\u5E94\uFF08\u6BCF\u6761\u89C4\u5219\u4E00\u4E2A\uFF09\uFF0C\u5148\u4E8E\u968F\u673A\u56DE\u5E94\u6267\u884C\uFF0C\u95F4\u9694 50 \u6BEB\u79D2\uFF1B\u79BB\u623F\u65F6\u4E0D\u7B49\u5F85\u3002",
         editAppearance: "\u66F4\u8863\u5BA4\u8BBE\u7F6E",
-        animationSeconds: "A\uFF0FB \u5207\u6362\u95F4\u9694\uFF08\u79D2\uFF09",
+        animationSeconds: "\u52A8\u4F5C\u95F4\u9694\uFF08\u79D2\uFF09",
         chooseAnimationGroup: "\u8ACB\u9078\u64C7\u81F3\u5C11\u4E00\u500B\u90E8\u4F4D\u4E26\u8A2D\u5B9A A\uFF0FB\u3002",
         invalidAnimation: "\u53D8\u5316\u6B21\u6570\u987B\u4E3A 1\u2013100\uFF0C\u5207\u6362\u95F4\u9694\u987B\u4E3A 0.001\u2013120 \u79D2\u3002",
         HairAccessory2: "\u8033\u6735",
@@ -2002,6 +2005,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var init_de = __esm({
     "Translation/de.js"() {
       de_default = {
+        testAnimation: "Testen",
         copyText: "Kopieren",
         pasteText: "Einf\xFCgen",
         copiedText: "Kopiert",
@@ -2194,7 +2198,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         speechHint: "Schwach: Satzende. Mittel: Satzende und zuf\xE4llige Einf\xFCgung. Stark: bis zu drei Einf\xFCgungen. Abh\xE4ngig: ersetzt zus\xE4tzlich 1\u20132 Zeichen. Kurze Nachrichten werden weniger ver\xE4ndert.",
         alwaysHint: "Garantierte Antwort (eine pro Regel). Wird 50 ms vor einer zuf\xE4lligen Antwort ausgef\xFChrt; beim Verlassen ohne Pause.",
         editAppearance: "Garderobe",
-        animationSeconds: "A/B-Wechselintervall (Sekunden)",
+        animationSeconds: "Aktionsintervall (Sekunden)",
         chooseAnimationGroup: "Mindestens eine Gruppe und beide Zust\xE4nde ausw\xE4hlen.",
         invalidAnimation: "Anzahl: 1\u2013100; Wechselintervall: 0,001\u2013120 Sekunden.",
         HairAccessory2: "Ohren",
@@ -2209,6 +2213,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var init_fr = __esm({
     "Translation/fr.js"() {
       fr_default = {
+        testAnimation: "Tester",
         copyText: "Copier",
         pasteText: "Coller",
         copiedText: "Copi\xE9",
@@ -2401,7 +2406,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         speechHint: "Faible : fin de phrase. Moyenne : fin et insertion al\xE9atoire. Forte : jusqu\u2019\xE0 trois insertions. D\xE9pendance : remplace aussi 1 \xE0 2 caract\xE8res. Les messages courts sont moins modifi\xE9s.",
         alwaysHint: "R\xE9ponse garantie (une par r\xE8gle), ex\xE9cut\xE9e 50 ms avant une r\xE9ponse al\xE9atoire ; sans pause lors du d\xE9part.",
         editAppearance: "Garde-robe",
-        animationSeconds: "Intervalle A/B (secondes)",
+        animationSeconds: "Intervalle des actions (secondes)",
         chooseAnimationGroup: "S\xE9lectionnez au moins un groupe et les deux \xE9tats.",
         invalidAnimation: "Nombre : 1\u2013100 ; intervalle : 0,001\u2013120 secondes.",
         HairAccessory2: "Oreilles",
@@ -2416,6 +2421,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var init_ru = __esm({
     "Translation/ru.js"() {
       ru_default = {
+        testAnimation: "\u041F\u0440\u043E\u0432\u0435\u0440\u0438\u0442\u044C",
         copyText: "\u041A\u043E\u043F\u0438\u0440\u043E\u0432\u0430\u0442\u044C",
         pasteText: "\u0412\u0441\u0442\u0430\u0432\u0438\u0442\u044C",
         copiedText: "\u0421\u043A\u043E\u043F\u0438\u0440\u043E\u0432\u0430\u043D\u043E",
@@ -2608,7 +2614,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         speechHint: "\u0421\u043B\u0430\u0431\u0430\u044F: \u043A\u043E\u043D\u0435\u0446 \u043F\u0440\u0435\u0434\u043B\u043E\u0436\u0435\u043D\u0438\u044F. \u0421\u0440\u0435\u0434\u043D\u044F\u044F: \u043A\u043E\u043D\u0435\u0446 \u0438 \u0441\u043B\u0443\u0447\u0430\u0439\u043D\u0430\u044F \u0432\u0441\u0442\u0430\u0432\u043A\u0430. \u0421\u0438\u043B\u044C\u043D\u0430\u044F: \u0434\u043E \u0442\u0440\u0451\u0445 \u0432\u0441\u0442\u0430\u0432\u043E\u043A. \u0417\u0430\u0432\u0438\u0441\u0438\u043C\u043E\u0441\u0442\u044C: \u0442\u0430\u043A\u0436\u0435 \u0437\u0430\u043C\u0435\u043D\u044F\u0435\u0442 1\u20132 \u0441\u0438\u043C\u0432\u043E\u043B\u0430. \u041A\u043E\u0440\u043E\u0442\u043A\u0438\u0435 \u0441\u043E\u043E\u0431\u0449\u0435\u043D\u0438\u044F \u0438\u0437\u043C\u0435\u043D\u044F\u044E\u0442\u0441\u044F \u043C\u0435\u043D\u044C\u0448\u0435.",
         alwaysHint: "\u0413\u0430\u0440\u0430\u043D\u0442\u0438\u0440\u043E\u0432\u0430\u043D\u043D\u044B\u0439 \u043E\u0442\u0432\u0435\u0442 (\u043E\u0434\u0438\u043D \u043D\u0430 \u043F\u0440\u0430\u0432\u0438\u043B\u043E) \u0437\u0430 50 \u043C\u0441 \u0434\u043E \u0441\u043B\u0443\u0447\u0430\u0439\u043D\u043E\u0433\u043E \u043E\u0442\u0432\u0435\u0442\u0430; \u043F\u0440\u0438 \u0432\u044B\u0445\u043E\u0434\u0435 \u0431\u0435\u0437 \u043F\u0430\u0443\u0437\u044B.",
         editAppearance: "\u0413\u0430\u0440\u0434\u0435\u0440\u043E\u0431",
-        animationSeconds: "\u0418\u043D\u0442\u0435\u0440\u0432\u0430\u043B A/B (\u0441\u0435\u043A\u0443\u043D\u0434\u044B)",
+        animationSeconds: "\u0418\u043D\u0442\u0435\u0440\u0432\u0430\u043B \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u0439 (\u0441\u0435\u043A\u0443\u043D\u0434\u044B)",
         chooseAnimationGroup: "\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0445\u043E\u0442\u044F \u0431\u044B \u043E\u0434\u043D\u0443 \u0433\u0440\u0443\u043F\u043F\u0443 \u0438 \u043E\u0431\u0430 \u0441\u043E\u0441\u0442\u043E\u044F\u043D\u0438\u044F.",
         invalidAnimation: "\u041A\u043E\u043B\u0438\u0447\u0435\u0441\u0442\u0432\u043E: 1\u2013100; \u0438\u043D\u0442\u0435\u0440\u0432\u0430\u043B: 0,001\u2013120 \u0441\u0435\u043A\u0443\u043D\u0434.",
         HairAccessory2: "\u0423\u0448\u0438",
@@ -2623,6 +2629,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var init_ua = __esm({
     "Translation/ua.js"() {
       ua_default = {
+        testAnimation: "\u041F\u0435\u0440\u0435\u0432\u0456\u0440\u0438\u0442\u0438",
         copyText: "\u041A\u043E\u043F\u0456\u044E\u0432\u0430\u0442\u0438",
         pasteText: "\u0412\u0441\u0442\u0430\u0432\u0438\u0442\u0438",
         copiedText: "\u0421\u043A\u043E\u043F\u0456\u0439\u043E\u0432\u0430\u043D\u043E",
@@ -2815,7 +2822,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         speechHint: "\u0421\u043B\u0430\u0431\u043A\u0430: \u043A\u0456\u043D\u0435\u0446\u044C \u0440\u0435\u0447\u0435\u043D\u043D\u044F. \u0421\u0435\u0440\u0435\u0434\u043D\u044F: \u043A\u0456\u043D\u0435\u0446\u044C \u0456 \u0432\u0438\u043F\u0430\u0434\u043A\u043E\u0432\u0430 \u0432\u0441\u0442\u0430\u0432\u043A\u0430. \u0421\u0438\u043B\u044C\u043D\u0430: \u0434\u043E \u0442\u0440\u044C\u043E\u0445 \u0432\u0441\u0442\u0430\u0432\u043E\u043A. \u0417\u0430\u043B\u0435\u0436\u043D\u0456\u0441\u0442\u044C: \u0442\u0430\u043A\u043E\u0436 \u0437\u0430\u043C\u0456\u043D\u044E\u0454 1\u20132 \u0441\u0438\u043C\u0432\u043E\u043B\u0438. \u041A\u043E\u0440\u043E\u0442\u043A\u0456 \u043F\u043E\u0432\u0456\u0434\u043E\u043C\u043B\u0435\u043D\u043D\u044F \u0437\u043C\u0456\u043D\u044E\u044E\u0442\u044C\u0441\u044F \u043C\u0435\u043D\u0448\u0435.",
         alwaysHint: "\u0413\u0430\u0440\u0430\u043D\u0442\u043E\u0432\u0430\u043D\u0430 \u0432\u0456\u0434\u043F\u043E\u0432\u0456\u0434\u044C (\u043E\u0434\u043D\u0430 \u043D\u0430 \u043F\u0440\u0430\u0432\u0438\u043B\u043E) \u0437\u0430 50 \u043C\u0441 \u0434\u043E \u0432\u0438\u043F\u0430\u0434\u043A\u043E\u0432\u043E\u0457 \u0432\u0456\u0434\u043F\u043E\u0432\u0456\u0434\u0456; \u043F\u0456\u0434 \u0447\u0430\u0441 \u0432\u0438\u0445\u043E\u0434\u0443 \u0431\u0435\u0437 \u043F\u0430\u0443\u0437\u0438.",
         editAppearance: "\u0413\u0430\u0440\u0434\u0435\u0440\u043E\u0431",
-        animationSeconds: "\u0406\u043D\u0442\u0435\u0440\u0432\u0430\u043B A/B (\u0441\u0435\u043A\u0443\u043D\u0434\u0438)",
+        animationSeconds: "\u0406\u043D\u0442\u0435\u0440\u0432\u0430\u043B \u0434\u0456\u0439 (\u0441\u0435\u043A\u0443\u043D\u0434\u0438)",
         chooseAnimationGroup: "\u0412\u0438\u0431\u0435\u0440\u0456\u0442\u044C \u043F\u0440\u0438\u043D\u0430\u0439\u043C\u043D\u0456 \u043E\u0434\u043D\u0443 \u0433\u0440\u0443\u043F\u0443 \u0442\u0430 \u043E\u0431\u0438\u0434\u0432\u0430 \u0441\u0442\u0430\u043D\u0438.",
         invalidAnimation: "\u041A\u0456\u043B\u044C\u043A\u0456\u0441\u0442\u044C: 1\u2013100; \u0456\u043D\u0442\u0435\u0440\u0432\u0430\u043B: 0,001\u2013120 \u0441\u0435\u043A\u0443\u043D\u0434.",
         HairAccessory2: "\u0412\u0443\u0445\u0430",
@@ -3130,10 +3137,8 @@ One of mods you are using is using an old version of SDK. It will work for now b
       else delete item.Craft;
     }
   }
-  async function editAppearanceState(host, group, state, done) {
-    if (typeof host.CharacterAppearanceLoadCharacter !== "function") throw Error("Wardrobe unavailable");
-    const screen = host.CommonGetScreen();
-    const preview = host.CharacterLoadSimple("Responsive_Liko_StatePreview");
+  function createPreviewCharacter(host, name) {
+    const preview = host.CharacterLoadSimple(name);
     preview.Name = host.Player.Name;
     preview.AssetFamily = host.Player.AssetFamily;
     preview.Appearance = host.Player.Appearance.map((item) => ({
@@ -3142,6 +3147,18 @@ One of mods you are using is using an old version of SDK. It will work for now b
       Property: clone(item.Property ?? {}),
       ...item.Craft ? { Craft: clone(item.Craft) } : {}
     }));
+    return preview;
+  }
+  async function editAppearanceState(host, group, state, done) {
+    if (typeof host.CharacterAppearanceLoadCharacter !== "function") throw Error("Wardrobe unavailable");
+    const screen = host.CommonGetScreen();
+    const informationReturnScreen = host.InformationSheetReturnScreen ? [...host.InformationSheetReturnScreen] : void 0;
+    const returnToSettings = async () => {
+      await host.CommonSetScreen(...screen);
+      await host.PreferenceSubscreenExtensionsOpen?.(ID, informationReturnScreen);
+      if (informationReturnScreen) host.InformationSheetReturnScreen = [...informationReturnScreen];
+    };
+    const preview = createPreviewCharacter(host, "Responsive_Liko_StatePreview");
     const previewHost = Object.create(host);
     previewHost.Player = preview;
     const restore = () => {
@@ -3153,14 +3170,12 @@ One of mods you are using is using an old version of SDK. It will work for now b
       await host.CharacterAppearanceLoadCharacter(preview, async (accepted) => {
         const saved = accepted ? snapshotItem(host.InventoryGet(preview, group)) : null;
         restore();
-        await host.CommonSetScreen(...screen);
-        await host.PreferenceSubscreenExtensionsOpen?.(ID);
+        await returnToSettings();
         done(saved);
       });
     } catch (error) {
       restore();
-      await host.CommonSetScreen(...screen);
-      await host.PreferenceSubscreenExtensionsOpen?.(ID);
+      await returnToSettings();
       throw error;
     }
   }
@@ -3652,6 +3667,111 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
   });
 
+  // src/ui/animation-preview.js
+  function visibleBounds(source) {
+    try {
+      const { data } = source.getContext("2d").getImageData(0, 0, source.width, source.height);
+      let left = source.width, top = source.height, right = -1, bottom = -1;
+      for (let y2 = 0; y2 < source.height; y2++) {
+        for (let x = 0; x < source.width; x++) {
+          if (data[(y2 * source.width + x) * 4 + 3] > 0) {
+            left = Math.min(left, x);
+            right = Math.max(right, x);
+            top = Math.min(top, y2);
+            bottom = y2;
+          }
+        }
+      }
+      if (right >= left) return { x: left, y: top, width: right - left + 1, height: bottom - top + 1 };
+    } catch {
+    }
+    const y = source.height >= CANVAS_UPPER_OVERFLOW + CHARACTER_HEIGHT ? CANVAS_UPPER_OVERFLOW : 0;
+    return { x: 0, y, width: source.width, height: Math.min(CHARACTER_HEIGHT, source.height - y) };
+  }
+  function createAnimationPreview(host, now = () => performance.now()) {
+    let character, canvas, settings, bounds, started = null, frame = -1;
+    function apply(state) {
+      const local = Object.create(host);
+      local.Player = character;
+      for (const track of settings.tracks) wearState(local, track.group, animationState(track, state));
+      host.CharacterRefresh(character, false);
+      bounds = null;
+    }
+    return {
+      mount(element, value) {
+        canvas = element;
+        settings = clone(value);
+        started = null;
+        frame = -1;
+        character = createPreviewCharacter(host, "Responsive_Liko_AnimationPreview");
+        character.ActivePose = clone(host.Player.ActivePose ?? []);
+        apply("A");
+        this.draw();
+      },
+      play(value) {
+        if (!character) return;
+        if (!Number.isInteger(value.count) || value.count < 1 || value.count > 100 || !Number.isFinite(value.intervalMs) || value.intervalMs < 1 || value.intervalMs > 12e4 || !value.tracks.length || value.tracks.some((t) => !t.stateA.asset || !animationState(t, "B").asset))
+          throw Error("invalidAnimation");
+        settings = clone(value);
+        started = now();
+        frame = -1;
+        this.draw();
+      },
+      draw() {
+        if (!canvas || !character) return;
+        if (started !== null) {
+          const next = Math.min(settings.count, Math.floor((now() - started) / settings.intervalMs));
+          if (next !== frame) {
+            frame = next;
+            apply(next === settings.count || next % 2 ? "A" : "B");
+          }
+          if (next === settings.count) started = null;
+        }
+        if (character.MustDraw) {
+          host.CharacterLoadCanvas(character);
+          character.MustDraw = false;
+          bounds = null;
+        }
+        const context = canvas.getContext("2d");
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        if (character.Canvas) {
+          const source = character.Canvas;
+          bounds ??= visibleBounds(source);
+          const scale = Math.min(
+            (canvas.width - PREVIEW_PADDING * 2) / bounds.width,
+            (canvas.height - PREVIEW_PADDING * 2) / bounds.height
+          );
+          context.drawImage(
+            source,
+            bounds.x,
+            bounds.y,
+            bounds.width,
+            bounds.height,
+            (canvas.width - bounds.width * scale) / 2,
+            (canvas.height - bounds.height * scale) / 2,
+            bounds.width * scale,
+            bounds.height * scale
+          );
+        }
+      },
+      clear() {
+        canvas = character = settings = bounds = null;
+        started = null;
+        frame = -1;
+      }
+    };
+  }
+  var CHARACTER_HEIGHT, CANVAS_UPPER_OVERFLOW, PREVIEW_PADDING;
+  var init_animation_preview = __esm({
+    "src/ui/animation-preview.js"() {
+      init_model();
+      init_appearance();
+      CHARACTER_HEIGHT = 1e3;
+      CANVAS_UPPER_OVERFLOW = 700;
+      PREVIEW_PADDING = 20;
+    }
+  });
+
   // src/ui/input-controls.js
   function bindClearableInputs(root, host, label) {
     root.querySelectorAll("input.rl-search, input.rl-input").forEach((input) => {
@@ -3685,7 +3805,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var settings_default;
   var init_settings = __esm({
     "src/ui/settings.css"() {
-      settings_default = ".rl-chance-bar {\n  width: 100%;\n  height: 30px;\n  accent-color: #b23a56;\n  cursor: pointer;\n}\n.rl-response {\n  position: relative;\n  margin: 12px 0;\n  padding: 12px;\n  border: 2px solid transparent !important;\n  border-top-color: #f2e0e4 !important;\n  border-radius: 14px;\n}\n.rl-response.rl-primary-response {\n  border-color: #c08a3e !important;\n  background: #fff8e9;\n}\n.rl-response.rl-primary-pick {\n  cursor: pointer;\n  border-style: dashed !important;\n}\n.rl-primary-pick:hover {\n  border-color: #b23a56 !important;\n}\n.rl-crown {\n  position: absolute;\n  left: -13px;\n  top: -17px;\n  transform: rotate(-45deg);\n  color: #c08a3e;\n  pointer-events: none;\n  background: #fff8e9;\n  border-radius: 50%;\n  padding: 3px;\n}\n.rl-crown svg {\n  width: 28px !important;\n  height: 28px !important;\n}\n\n.rl-root * {\n  user-select: none;\n  -webkit-user-select: none;\n}\n.rl-root input,\n.rl-root textarea {\n  user-select: text;\n  -webkit-user-select: text;\n}\n.rl-exit img {\n  width: 72px;\n  height: 72px;\n  pointer-events: none;\n}\n.rl-box,\n.rl-rule-list {\n  cursor: grab;\n}\n.rl-box.rl-dragging,\n.rl-rule-list.rl-dragging {\n  cursor: grabbing;\n}\n.rl-root {\n  position: fixed;\n  width: 2000px;\n  height: 1000px;\n  transform-origin: top left;\n  z-index: 50;\n  font-family: Arial, 'Microsoft JhengHei', sans-serif;\n  color: #3a2430;\n  overflow: hidden;\n  --soft: #8a6b74;\n  --line: #e9cdd4;\n  --card: #fffafb;\n  --paper: #fdf3f5;\n  --rose: #b23a56;\n  --deep: #8c2540;\n  --light: #f7dee4;\n  --lighter: #fcf0f3;\n  --gold: #c08a3e;\n  --danger: #c0392b;\n}\n.rl-root * {\n  box-sizing: border-box;\n}\n.rl-root button,\n.rl-root input,\n.rl-root select,\n.rl-root textarea {\n  font: inherit;\n  color: inherit;\n}\n.rl-root button {\n  border: 2px solid var(--line);\n  background: var(--card);\n  height: 54px;\n  padding: 0 20px;\n  border-radius: 28px;\n  cursor: pointer;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  gap: 9px;\n  font-size: 21px;\n}\n.rl-root button:hover {\n  border-color: var(--rose);\n  color: var(--deep);\n}\n.rl-root button.primary {\n  color: white;\n  border-color: transparent;\n  background: linear-gradient(135deg, var(--rose), var(--deep));\n}\n.rl-root button.danger {\n  color: var(--danger);\n  border-color: #e4aaa4;\n  background: #f6dcd9;\n}\n.rl-root svg {\n  width: 26px;\n  height: 26px;\n}\n.rl-screen {\n  width: 100%;\n  height: 100%;\n  background:\n    radial-gradient(1100px 480px at 92% -10%, #fceef1 0, transparent 62%),\n    linear-gradient(160deg, #fdf2f5, #f3dee6);\n  border: 2px solid var(--line);\n}\n.rl-top {\n  height: 120px;\n  display: flex;\n  align-items: center;\n  padding: 0 180px;\n  border-bottom: 2px solid #f2e0e4;\n}\n.rl-top-rules {\n  padding-left: 65px;\n}\n.rl-brand {\n  display: flex;\n  align-items: center;\n  gap: 20px;\n  font:\n    italic 600 42px Georgia,\n    serif;\n}\n\n.rl-icon {\n  width: 43px !important;\n  height: 43px !important;\n  padding: 7px !important;\n  border: 0 !important;\n  background: transparent !important;\n}\n.rl-exit {\n  position: absolute !important;\n  left: 1815px;\n  top: 75px;\n  width: 90px !important;\n  height: 90px !important;\n  padding: 0 !important;\n  border-radius: 12px !important;\n  transform: translateY(-50%);\n  background: white !important;\n}\n.rl-main {\n  height: 880px;\n  padding: 20px 180px 38px;\n  display: grid;\n  grid-template-columns: 520px 1fr;\n  gap: 28px;\n}\n.rl-work {\n  height: 880px;\n  padding: 18px 65px 35px;\n  display: grid;\n  grid-template-columns: 470px 1fr;\n  gap: 24px;\n}\n.rl-panel {\n  background: var(--paper);\n  border: 2px solid var(--line);\n  border-radius: 23px;\n  padding: 26px;\n  overflow: auto;\n}\n.rl-head {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  margin-bottom: 16px;\n}\n.rl-head h2 {\n  font-size: 31px;\n  margin: 0;\n}\n.rl-grow {\n  flex: 1;\n  min-width: 0;\n}\n.rl-muted {\n  font-size: 18px;\n  color: var(--soft);\n}\n.rl-setting {\n  height: 100px;\n  display: flex;\n  align-items: center;\n  border-bottom: 2px solid #f2e0e4;\n  font-size: 25px;\n}\n.rl-switch {\n  width: 86px !important;\n  height: 46px !important;\n  padding: 5px !important;\n  border: 0 !important;\n  background: #cbbdc1 !important;\n  justify-content: flex-start !important;\n}\n.rl-switch:before {\n  content: '';\n  width: 36px;\n  height: 36px;\n  border-radius: 50%;\n  background: white;\n  box-shadow: 0 2px 5px #0004;\n}\n.rl-switch.on {\n  background: linear-gradient(135deg, var(--rose), var(--deep)) !important;\n  justify-content: flex-end !important;\n}\n.rl-small-switch {\n  width: 58px !important;\n  height: 31px !important;\n  padding: 4px !important;\n}\n.rl-small-switch:before {\n  width: 23px;\n  height: 23px;\n}\n.rl-tools {\n  display: flex;\n  gap: 9px;\n  flex-wrap: wrap;\n}\n.rl-tools button {\n  height: 46px;\n  font-size: 18px;\n  padding: 0 15px;\n}\n.rl-personas {\n  display: flex;\n  flex-direction: column;\n  gap: 14px;\n}\n.rl-card-wrap {\n  position: relative;\n  padding-right: 87px;\n}\n.rl-card {\n  position: relative;\n  height: 140px;\n  background: white;\n  border: 2px solid var(--line);\n  border-radius: 21px;\n  padding: 18px 23px;\n  display: flex;\n  align-items: center;\n  gap: 20px;\n}\n.rl-card,\n.rl-rule,\n.rl-response {\n  --hover-glow: #b23a5640;\n  transition: box-shadow 160ms ease;\n}\n.rl-card.active,\n.rl-response.rl-primary-response {\n  --hover-glow: #c08a3e66;\n}\n.rl-card-wrap:hover > .rl-card,\n.rl-rule:hover,\n.rl-response:hover {\n  box-shadow:\n    inset 0 0 16px var(--hover-glow),\n    0 0 9px var(--hover-glow);\n}\n@media (prefers-reduced-motion: reduce) {\n  .rl-card,\n  .rl-rule,\n  .rl-response {\n    transition: none;\n  }\n}\n.rl-transfer-field {\n  position: relative;\n}\n.rl-transfer-field .rl-textarea {\n  padding-bottom: 65px;\n}\n.rl-transfer-tools {\n  position: absolute;\n  right: 12px;\n  bottom: 12px;\n  align-items: center;\n  flex-direction: row-reverse;\n}\n.rl-card.active {\n  border-color: var(--gold);\n  background: linear-gradient(90deg, var(--lighter), white 60%);\n}\n.rl-card.delete {\n  margin-left: 20px;\n}\n.rl-card-name {\n  width: 220px;\n}\n\n.rl-meter {\n  flex: 1;\n}\n.rl-track {\n  height: 10px;\n  border-radius: 8px;\n  background: #f2e0e4;\n  overflow: hidden;\n  margin-bottom: 9px;\n}\n.rl-fill {\n  height: 100%;\n  background: linear-gradient(90deg, var(--rose), var(--gold));\n}\n.rl-count {\n  font-size: 21px;\n}\n.rl-count b {\n  font-size: 29px;\n  color: var(--deep);\n}\n.rl-card-side {\n  position: absolute;\n  right: 3px;\n  top: 35px;\n  width: 70px !important;\n  height: 70px !important;\n  padding: 0 !important;\n}\n.rl-browser {\n  padding: 24px;\n}\n.rl-search,\n.rl-input,\n.rl-select,\n.rl-textarea {\n  width: 100%;\n  border: 2px solid var(--line);\n  border-radius: 12px;\n  background: white;\n  padding: 0 15px;\n  font-size: 20px;\n}\n.rl-search,\n.rl-input,\n.rl-select {\n  height: 52px;\n}\n.rl-textarea {\n  height: 220px;\n  padding: 14px;\n  resize: none;\n}\n.rl-cats {\n  display: flex;\n  gap: 7px;\n  margin: 13px 0;\n}\n.rl-cats button {\n  height: 41px;\n  flex: 1;\n  padding: 0;\n  font-size: 17px;\n}\n.rl-cats .on,\n.rl-rule.active {\n  background: var(--lighter);\n  border-color: var(--rose);\n}\n.rl-rule {\n  height: 81px;\n  border: 2px solid var(--line);\n  border-radius: 13px;\n  margin-bottom: 9px;\n  display: flex;\n  align-items: center;\n  padding: 8px 9px 8px 14px;\n  background: white;\n}\n.rl-rule-main {\n  height: 61px !important;\n  border: 0 !important;\n  background: transparent !important;\n  border-radius: 8px !important;\n  justify-content: flex-start !important;\n  text-align: left;\n  padding: 0 !important;\n}\n.rl-rule-main b {\n  font-size: 20px;\n}\n.rl-rule-main small {\n  display: block;\n  color: var(--soft);\n  margin-top: 4px;\n}\n.rl-editor {\n  padding: 23px;\n}\n.rl-editor-grid {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 19px;\n}\n.rl-box {\n  background: white;\n  border: 2px solid var(--line);\n  border-radius: 17px;\n  padding: 22px;\n  height: 650px;\n  overflow: auto;\n}\n.rl-box h3 {\n  font-size: 24px;\n  color: var(--deep);\n  margin: 0 0 18px;\n}\n.rl-field {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  margin: 15px 0;\n  font-size: 20px;\n}\n.rl-field > span {\n  min-width: 80px;\n}\n.rl-summary {\n  border: 2px dashed var(--line);\n  border-radius: 13px;\n  padding: 18px;\n  margin-top: 18px;\n  color: var(--soft);\n  font-size: 19px;\n}\n.rl-response-head {\n  display: flex;\n  align-items: center;\n  gap: 7px;\n}\n.rl-response-head button {\n  height: 41px;\n  font-size: 17px;\n  padding: 0 13px;\n}\n.rl-response {\n  min-height: 80px;\n  display: grid;\n  grid-template-columns: 100px 1fr 92px;\n  gap: 9px;\n  align-items: center;\n  border-top: 2px solid #f2e0e4;\n  font-size: 19px;\n}\n.rl-response b {\n  color: var(--deep);\n}\n.rl-response button {\n  height: 40px;\n  font-size: 17px;\n  padding: 0 12px;\n}\n.rl-overlay {\n  position: absolute;\n  inset: 0;\n  background: #46203299;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  padding: 52px 105px;\n  backdrop-filter: blur(2px);\n  z-index: 9;\n}\n.rl-dialog {\n  width: 100%;\n  height: 100%;\n  background: var(--card);\n  border: 2px solid var(--line);\n  border-radius: 25px;\n  padding: 27px;\n  display: flex;\n  flex-direction: column;\n  box-shadow: 0 20px 60px #40152655;\n}\n.rl-dialog.compact {\n  width: 900px;\n  height: auto;\n  min-height: 420px;\n}\n.rl-dialog-head {\n  height: 68px;\n  display: flex;\n  align-items: center;\n  gap: 16px;\n}\n.rl-dialog-head h2 {\n  font-size: 30px;\n  margin: 0;\n}\n.rl-dialog-body {\n  flex: 1;\n  min-height: 0;\n}\n.rl-dialog-foot {\n  height: 75px;\n  display: flex;\n  align-items: flex-end;\n  gap: 11px;\n}\n.rl-picker-body {\n  display: grid;\n  grid-template-columns: 400px 1fr;\n  gap: 22px;\n}\n.rl-body-map {\n  position: relative;\n  background: var(--lighter);\n  border: 2px solid var(--line);\n  border-radius: 17px;\n  overflow: hidden;\n}\n.rl-zone {\n  position: absolute;\n  border: 2px solid #b23a5688;\n  background: #bdeeee88;\n  padding: 0 !important;\n  border-radius: 7px !important;\n  min-width: 4px !important;\n  min-height: 4px !important;\n  height: auto;\n}\n.rl-zone.selected {\n  background: #f4e4c4aa !important;\n  border-color: var(--gold) !important;\n}\n.rl-actions-wrap {\n  min-height: 0;\n  display: flex;\n  flex-direction: column;\n}\n.rl-actions-title {\n  font-size: 23px;\n  margin: 4px 0 13px;\n}\n.rl-actions {\n  min-height: 0;\n  overflow-y: auto;\n  display: grid;\n  grid-template-columns: repeat(4, minmax(0, 1fr));\n  gap: 12px;\n  align-content: start;\n  padding: 3px 11px 3px 3px;\n  scrollbar-color: var(--rose) #f2e0e4;\n}\n.rl-root .rl-action {\n  height: 80px !important;\n  border-radius: 14px !important;\n  display: block;\n  text-align: left;\n  padding: 11px 14px !important;\n  overflow: hidden;\n}\n.rl-action strong,\n.rl-action small {\n  display: block;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.rl-action strong {\n  font-size: 19px;\n}\n.rl-action small {\n  color: var(--soft);\n  font-size: 14px;\n  margin-top: 4px;\n}\n.rl-action.on {\n  background: var(--light);\n  border-color: var(--rose);\n}\n.rl-choice-row {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  gap: 10px;\n}\n.rl-choice-row button.on {\n  background: var(--light);\n  border-color: var(--rose);\n}\n.rl-segments {\n  display: flex;\n  gap: 8px;\n  flex-wrap: wrap;\n  margin: 12px 0;\n}\n.rl-segments button {\n  height: 45px;\n  font-size: 18px;\n  padding: 0 17px;\n}\n.rl-segments button.on {\n  background: var(--light);\n  border-color: var(--rose);\n  color: var(--deep);\n}\n\n.rl-root .rl-search,\n.rl-root .rl-input,\n.rl-root .rl-select,\n.rl-root .rl-textarea {\n  appearance: none !important;\n  -webkit-appearance: none !important;\n  background: #fff !important;\n  background-color: #fff !important;\n  color: #3a2430 !important;\n  -webkit-text-fill-color: #3a2430 !important;\n  border: 2px solid var(--line) !important;\n  box-shadow: none !important;\n  filter: none !important;\n  opacity: 1 !important;\n}\n.rl-root .rl-search::placeholder,\n.rl-root .rl-input::placeholder,\n.rl-root .rl-textarea::placeholder {\n  color: #a58b93 !important;\n  -webkit-text-fill-color: #a58b93 !important;\n  opacity: 1 !important;\n}\n.rl-box {\n  height: 700px;\n}\n.rl-number {\n  width: 100px !important;\n  flex: none !important;\n}\n.rl-cats,\n.rl-segments {\n  border-bottom: 1px solid var(--line);\n  gap: 5px;\n  padding: 0 8px 7px;\n}\n.rl-cats button,\n.rl-segments button {\n  position: relative;\n  border-color: transparent !important;\n  border-radius: 0 !important;\n  background: transparent !important;\n  box-shadow: none !important;\n  color: var(--soft);\n  transition:\n    color 0.18s,\n    transform 0.18s;\n}\n.rl-cats button:after,\n.rl-segments button:after {\n  content: '';\n  position: absolute;\n  left: 50%;\n  right: 50%;\n  bottom: -1px;\n  height: 3px;\n  background: var(--rose);\n  transition:\n    left 0.22s,\n    right 0.22s,\n    box-shadow 0.22s;\n}\n.rl-cats button:hover,\n.rl-segments button:hover {\n  color: var(--rose);\n  transform: translateY(-1px);\n}\n.rl-cats button.on,\n.rl-segments button.on {\n  color: var(--rose) !important;\n}\n.rl-cats button.on:after,\n.rl-segments button.on:after {\n  left: 8px;\n  right: 8px;\n  box-shadow: 0 0 8px var(--rose);\n}\n.rl-picker-head {\n  display: grid;\n  grid-template-columns: 400px 1fr;\n  gap: 22px;\n  height: 72px;\n  align-items: center;\n}\n.rl-picker-head h2 {\n  text-align: center;\n  font-size: 30px;\n  margin: 0;\n}\n.rl-picker-controls {\n  display: flex;\n  align-items: center;\n  gap: 10px;\n}\n.rl-action-search {\n  position: relative;\n  width: 500px;\n  flex: none;\n}\n.rl-action-search .rl-input {\n  width: 500px !important;\n  padding-right: 48px !important;\n}\n\n.rl-picker-controls > button {\n  height: 48px;\n  font-size: 18px;\n  padding: 0 14px;\n}\n.rl-notice {\n  position: absolute;\n  left: 50%;\n  bottom: 28px;\n  transform: translateX(-50%);\n  padding: 13px 28px;\n  border-radius: 24px;\n  background: #3a2430;\n  color: #fff;\n  font-size: 20px;\n  z-index: 12;\n  box-shadow: 0 8px 24px #0004;\n}\n.rl-browser {\n  overflow: hidden;\n  display: flex;\n  flex-direction: column;\n}\n.rl-rule-list {\n  flex: 1;\n  min-height: 0;\n  overflow-y: auto;\n  padding-right: 8px;\n}\n.rl-root * {\n  scrollbar-width: thin;\n  scrollbar-color: var(--rose) var(--light);\n}\n.rl-root *::-webkit-scrollbar {\n  width: 12px;\n  height: 12px;\n}\n.rl-root *::-webkit-scrollbar-track {\n  background: var(--light);\n  border-radius: 8px;\n}\n.rl-root *::-webkit-scrollbar-thumb {\n  background: var(--rose);\n  border: 3px solid var(--light);\n  border-radius: 8px;\n}\n.rl-root *::-webkit-scrollbar-thumb:hover {\n  background: var(--deep);\n}\n.rl-picker-scope {\n  width: 180px !important;\n  flex: none;\n}\n.rl-dialog.compact,\n.srl-dialog.compact {\n  width: 980px;\n  min-height: 470px;\n  font-size: 22px;\n}\n.rl-dialog.compact .rl-dialog-head h2,\n.srl-dialog.compact .rl-dialog-head h2 {\n  font-size: 34px;\n}\n.rl-dialog.compact p,\n.srl-dialog.compact p {\n  font-size: 22px;\n  line-height: 1.6;\n}\n.rl-settings-group {\n  background: #fff;\n  border: 2px solid var(--line);\n  border-radius: 15px;\n  padding: 18px;\n  margin: 14px 0;\n}\n.rl-settings-group h3 {\n  font-size: 23px;\n  margin: 0 0 8px;\n}\n.rl-relation-buttons {\n  display: flex;\n  gap: 8px;\n  flex-wrap: wrap;\n  margin: 10px 0;\n}\n.rl-relation-buttons button {\n  height: 39px;\n  padding: 0 14px;\n  font-size: 17px;\n}\n.rl-list-entry {\n  display: flex;\n  gap: 8px;\n}\n.rl-list-entry .rl-input {\n  flex: 1;\n}\n.rl-list-entry button {\n  width: 55px;\n  height: 52px;\n  padding: 0;\n}\n.rl-rule-trash {\n  width: 48px !important;\n  height: 48px !important;\n  padding: 9px !important;\n  margin-right: 8px;\n}\n.rl-rule.delete-active {\n  padding-left: 5px;\n}\n.rl-animation-grid {\n  display: grid;\n  grid-template-columns: 180px 1fr;\n  gap: 12px 15px;\n  align-items: center;\n}\n.rl-animation-grid .rl-number {\n  width: 160px !important;\n}\n.rl-animation-message {\n  margin-top: 16px;\n}\n.rl-animation-tracks {\n  max-height: 350px;\n  overflow: auto;\n}\n.rl-dialog.compact {\n  max-height: 95%;\n  overflow: auto;\n}\n.rl-response-head {\n  flex-wrap: wrap;\n}\n.rl-response-head h3 {\n  flex-basis: 100%;\n}\n.rl-response > b > button {\n  padding: 0 4px;\n  font-size: 23px;\n}\n.rl-response > b {\n  font-size: 16px;\n}\n.rl-dialog.compact .rl-dialog-body {\n  overflow-y: auto;\n  flex: 1 1 auto;\n  padding-right: 8px;\n}\n.rl-dialog.compact .rl-dialog-head,\n.rl-dialog.compact .rl-dialog-foot {\n  flex-shrink: 0;\n}\n.rl-dialog.compact .rl-dialog-foot {\n  height: 65px;\n}\n.rl-animation-tracks .rl-field > button {\n  white-space: nowrap;\n  flex-shrink: 0;\n}\n.rl-animation-tracks .rl-field > span {\n  min-width: 90px;\n}\n.rl-dialog.compact.rl-animation-dialog {\n  width: 1500px;\n}\n.rl-animation-dialog .rl-animation-tracks {\n  display: flex;\n  flex-direction: row;\n  gap: 18px;\n  overflow: auto;\n  max-height: 380px;\n  cursor: grab;\n  padding: 4px 3px 12px;\n  touch-action: none;\n}\n.rl-animation-dialog .rl-animation-track {\n  flex: 0 0 450px;\n  min-width: 450px;\n}\n.rl-animation-track .rl-field {\n  flex-wrap: wrap;\n}\n.rl-animation-track .rl-field > span {\n  flex-basis: 100%;\n}\n.rl-animation-track .rl-field > .rl-select {\n  width: 240px;\n  flex: 1;\n}\n.rl-animation-dialog .rl-dialog-body {\n  cursor: grab;\n}\n.rl-animation-dialog .rl-dragging {\n  cursor: grabbing;\n}\n.rl-animation-dialog .rl-animation-tracks {\n  justify-content: space-between;\n}\n.rl-animation-dialog .rl-animation-track:only-child {\n  margin-left: auto;\n  margin-right: auto;\n}\n.rl-response-gap {\n  width: 22px;\n  flex: none;\n}\n.rl-response-head .rl-response-delete {\n  margin-left: auto;\n}\n\n.rl-root .rl-action[hidden] {\n  display: none;\n}\n\n.rl-editable-name {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n  min-width: 0;\n  max-width: 620px;\n  color: rgb(58, 36, 48);\n  font-family: Arial, 'Microsoft JhengHei', sans-serif;\n  font-style: normal;\n  font-weight: 600;\n  line-height: 1.3;\n}\n.rl-inline-title {\n  font-size: 31px;\n}\n.rl-context {\n  font-size: 42px;\n}\n.rl-context::before {\n  content: '\u2726';\n  flex: none;\n  margin-right: 8px;\n}\n.rl-name-row {\n  font-size: 24px;\n}\n.rl-brand-icon {\n  width: 58px;\n  height: 58px;\n  flex: none;\n  object-fit: contain;\n}\n.rl-name-text {\n  min-width: 0;\n  overflow: hidden;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n}\n.rl-editable-name > .rl-icon {\n  flex: none;\n}\n.rl-root .rl-inline-input {\n  box-sizing: border-box;\n  width: auto;\n  min-width: 0;\n  max-width: 100%;\n  height: 48px;\n  padding: 0 10px;\n  border: 2px solid var(--rose);\n  border-radius: 10px;\n  background: white;\n  color: inherit;\n  font: inherit;\n}\n.rl-clearable {\n  position: relative;\n  width: 100%;\n  min-width: 0;\n}\n.rl-clearable-number {\n  width: 100px;\n}\n.rl-root .rl-clearable > input {\n  padding-right: 40px;\n}\n.rl-root .rl-clearable > .rl-input-clear {\n  position: absolute;\n  right: 4px;\n  top: 50%;\n  transform: translateY(-50%);\n  width: 32px;\n  height: 36px;\n  padding: 0;\n  border: 0;\n  background: transparent;\n  border-radius: 8px;\n  font-size: 24px;\n}\n.rl-list-entry > .rl-clearable {\n  flex: 1;\n}\n";
+      settings_default = ".rl-chance-bar {\n  width: 100%;\n  height: 30px;\n  accent-color: #b23a56;\n  cursor: pointer;\n}\n.rl-response {\n  position: relative;\n  margin: 12px 0;\n  padding: 12px;\n  border: 2px solid transparent !important;\n  border-top-color: #f2e0e4 !important;\n  border-radius: 14px;\n}\n.rl-response.rl-primary-response {\n  border-color: #c08a3e !important;\n  background: #fff8e9;\n}\n.rl-response.rl-primary-pick {\n  cursor: pointer;\n  border-style: dashed !important;\n}\n.rl-primary-pick:hover {\n  border-color: #b23a56 !important;\n}\n.rl-crown {\n  position: absolute;\n  left: -13px;\n  top: -17px;\n  transform: rotate(-45deg);\n  color: #c08a3e;\n  pointer-events: none;\n  background: #fff8e9;\n  border-radius: 50%;\n  padding: 3px;\n}\n.rl-crown svg {\n  width: 28px !important;\n  height: 28px !important;\n}\n\n.rl-root * {\n  user-select: none;\n  -webkit-user-select: none;\n}\n.rl-root input,\n.rl-root textarea {\n  user-select: text;\n  -webkit-user-select: text;\n}\n.rl-exit img {\n  width: 72px;\n  height: 72px;\n  pointer-events: none;\n}\n.rl-box,\n.rl-rule-list {\n  cursor: grab;\n}\n.rl-box.rl-dragging,\n.rl-rule-list.rl-dragging {\n  cursor: grabbing;\n}\n.rl-root {\n  position: fixed;\n  width: 2000px;\n  height: 1000px;\n  transform-origin: top left;\n  z-index: 50;\n  font-family: Arial, 'Microsoft JhengHei', sans-serif;\n  color: #3a2430;\n  overflow: hidden;\n  --soft: #8a6b74;\n  --line: #e9cdd4;\n  --card: #fffafb;\n  --paper: #fdf3f5;\n  --rose: #b23a56;\n  --deep: #8c2540;\n  --light: #f7dee4;\n  --lighter: #fcf0f3;\n  --gold: #c08a3e;\n  --danger: #c0392b;\n}\n.rl-root * {\n  box-sizing: border-box;\n}\n.rl-root button,\n.rl-root input,\n.rl-root select,\n.rl-root textarea {\n  font: inherit;\n  color: inherit;\n}\n.rl-root button {\n  border: 2px solid var(--line);\n  background: var(--card);\n  height: 54px;\n  padding: 0 20px;\n  border-radius: 28px;\n  cursor: pointer;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  gap: 9px;\n  font-size: 21px;\n}\n.rl-root button:hover {\n  border-color: var(--rose);\n  color: var(--deep);\n}\n.rl-root button.primary {\n  color: white;\n  border-color: transparent;\n  background: linear-gradient(135deg, var(--rose), var(--deep));\n}\n.rl-root button.danger {\n  color: var(--danger);\n  border-color: #e4aaa4;\n  background: #f6dcd9;\n}\n.rl-root svg {\n  width: 26px;\n  height: 26px;\n}\n.rl-screen {\n  width: 100%;\n  height: 100%;\n  background:\n    radial-gradient(1100px 480px at 92% -10%, #fceef1 0, transparent 62%),\n    linear-gradient(160deg, #fdf2f5, #f3dee6);\n  border: 2px solid var(--line);\n}\n.rl-top {\n  height: 120px;\n  display: flex;\n  align-items: center;\n  padding: 0 180px;\n  border-bottom: 2px solid #f2e0e4;\n}\n.rl-top-rules {\n  padding-left: 65px;\n}\n.rl-brand {\n  display: flex;\n  align-items: center;\n  gap: 20px;\n  font:\n    italic 600 42px Georgia,\n    serif;\n}\n\n.rl-icon {\n  width: 43px !important;\n  height: 43px !important;\n  padding: 7px !important;\n  border: 0 !important;\n  background: transparent !important;\n}\n.rl-exit {\n  position: absolute !important;\n  left: 1815px;\n  top: 75px;\n  width: 90px !important;\n  height: 90px !important;\n  padding: 0 !important;\n  border-radius: 12px !important;\n  transform: translateY(-50%);\n  background: white !important;\n}\n.rl-main {\n  height: 880px;\n  padding: 20px 180px 38px;\n  display: grid;\n  grid-template-columns: 520px 1fr;\n  gap: 28px;\n}\n.rl-work {\n  height: 880px;\n  padding: 18px 65px 35px;\n  display: grid;\n  grid-template-columns: 470px 1fr;\n  gap: 24px;\n}\n.rl-panel {\n  background: var(--paper);\n  border: 2px solid var(--line);\n  border-radius: 23px;\n  padding: 26px;\n  overflow: auto;\n}\n.rl-head {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  margin-bottom: 16px;\n}\n.rl-head h2 {\n  font-size: 31px;\n  margin: 0;\n}\n.rl-grow {\n  flex: 1;\n  min-width: 0;\n}\n.rl-muted {\n  font-size: 18px;\n  color: var(--soft);\n}\n.rl-setting {\n  height: 100px;\n  display: flex;\n  align-items: center;\n  border-bottom: 2px solid #f2e0e4;\n  font-size: 25px;\n}\n.rl-switch {\n  width: 86px !important;\n  height: 46px !important;\n  padding: 5px !important;\n  border: 0 !important;\n  background: #cbbdc1 !important;\n  justify-content: flex-start !important;\n}\n.rl-switch:before {\n  content: '';\n  width: 36px;\n  height: 36px;\n  border-radius: 50%;\n  background: white;\n  box-shadow: 0 2px 5px #0004;\n}\n.rl-switch.on {\n  background: linear-gradient(135deg, var(--rose), var(--deep)) !important;\n  justify-content: flex-end !important;\n}\n.rl-small-switch {\n  width: 58px !important;\n  height: 31px !important;\n  padding: 4px !important;\n}\n.rl-small-switch:before {\n  width: 23px;\n  height: 23px;\n}\n.rl-tools {\n  display: flex;\n  gap: 9px;\n  flex-wrap: wrap;\n}\n.rl-tools button {\n  height: 46px;\n  font-size: 18px;\n  padding: 0 15px;\n}\n.rl-personas {\n  display: flex;\n  flex-direction: column;\n  gap: 14px;\n}\n.rl-card-wrap {\n  position: relative;\n  padding-right: 87px;\n}\n.rl-card {\n  position: relative;\n  height: 140px;\n  background: white;\n  border: 2px solid var(--line);\n  border-radius: 21px;\n  padding: 18px 23px;\n  display: flex;\n  align-items: center;\n  gap: 20px;\n}\n.rl-card,\n.rl-rule,\n.rl-response {\n  --hover-glow: #b23a5640;\n  transition: box-shadow 160ms ease;\n}\n.rl-card.active,\n.rl-response.rl-primary-response {\n  --hover-glow: #c08a3e66;\n}\n.rl-card-wrap:hover > .rl-card,\n.rl-rule:hover,\n.rl-response:hover {\n  box-shadow:\n    inset 0 0 16px var(--hover-glow),\n    0 0 9px var(--hover-glow);\n}\n@media (prefers-reduced-motion: reduce) {\n  .rl-card,\n  .rl-rule,\n  .rl-response {\n    transition: none;\n  }\n}\n.rl-transfer-field {\n  position: relative;\n}\n.rl-transfer-field .rl-textarea {\n  padding-bottom: 65px;\n}\n.rl-transfer-tools {\n  position: absolute;\n  right: 12px;\n  bottom: 12px;\n  align-items: center;\n  flex-direction: row-reverse;\n}\n.rl-card.active {\n  border-color: var(--gold);\n  background: linear-gradient(90deg, var(--lighter), white 60%);\n}\n.rl-card.delete {\n  margin-left: 20px;\n}\n.rl-card-name {\n  width: 220px;\n}\n\n.rl-meter {\n  flex: 1;\n}\n.rl-track {\n  height: 10px;\n  border-radius: 8px;\n  background: #f2e0e4;\n  overflow: hidden;\n  margin-bottom: 9px;\n}\n.rl-fill {\n  height: 100%;\n  background: linear-gradient(90deg, var(--rose), var(--gold));\n}\n.rl-count {\n  font-size: 21px;\n}\n.rl-count b {\n  font-size: 29px;\n  color: var(--deep);\n}\n.rl-card-side {\n  position: absolute;\n  right: 3px;\n  top: 35px;\n  width: 70px !important;\n  height: 70px !important;\n  padding: 0 !important;\n}\n.rl-browser {\n  padding: 24px;\n}\n.rl-search,\n.rl-input,\n.rl-select,\n.rl-textarea {\n  width: 100%;\n  border: 2px solid var(--line);\n  border-radius: 12px;\n  background: white;\n  padding: 0 15px;\n  font-size: 20px;\n}\n.rl-search,\n.rl-input,\n.rl-select {\n  height: 52px;\n}\n.rl-textarea {\n  height: 220px;\n  padding: 14px;\n  resize: none;\n}\n.rl-cats {\n  display: flex;\n  gap: 7px;\n  margin: 13px 0;\n}\n.rl-cats button {\n  height: 41px;\n  flex: 1;\n  padding: 0;\n  font-size: 17px;\n}\n.rl-cats .on,\n.rl-rule.active {\n  background: var(--lighter);\n  border-color: var(--rose);\n}\n.rl-rule {\n  height: 81px;\n  border: 2px solid var(--line);\n  border-radius: 13px;\n  margin-bottom: 9px;\n  display: flex;\n  align-items: center;\n  padding: 8px 9px 8px 14px;\n  background: white;\n}\n.rl-rule-main {\n  height: 61px !important;\n  border: 0 !important;\n  background: transparent !important;\n  border-radius: 8px !important;\n  justify-content: flex-start !important;\n  text-align: left;\n  padding: 0 !important;\n}\n.rl-rule-main b {\n  font-size: 20px;\n}\n.rl-rule-main small {\n  display: block;\n  color: var(--soft);\n  margin-top: 4px;\n}\n.rl-editor {\n  padding: 23px;\n}\n.rl-editor-grid {\n  display: grid;\n  grid-template-columns: 1fr 1fr;\n  gap: 19px;\n}\n.rl-box {\n  background: white;\n  border: 2px solid var(--line);\n  border-radius: 17px;\n  padding: 22px;\n  height: 650px;\n  overflow: auto;\n}\n.rl-box h3 {\n  font-size: 24px;\n  color: var(--deep);\n  margin: 0 0 18px;\n}\n.rl-field {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  margin: 15px 0;\n  font-size: 20px;\n}\n.rl-field > span {\n  min-width: 80px;\n}\n.rl-summary {\n  border: 2px dashed var(--line);\n  border-radius: 13px;\n  padding: 18px;\n  margin-top: 18px;\n  color: var(--soft);\n  font-size: 19px;\n}\n.rl-response-head {\n  display: flex;\n  align-items: center;\n  gap: 7px;\n}\n.rl-response-head button {\n  height: 41px;\n  font-size: 17px;\n  padding: 0 13px;\n}\n.rl-response {\n  min-height: 80px;\n  display: grid;\n  grid-template-columns: 100px 1fr 92px;\n  gap: 9px;\n  align-items: center;\n  border-top: 2px solid #f2e0e4;\n  font-size: 19px;\n}\n.rl-response b {\n  color: var(--deep);\n}\n.rl-response button {\n  height: 40px;\n  font-size: 17px;\n  padding: 0 12px;\n}\n.rl-overlay {\n  position: absolute;\n  inset: 0;\n  background: #46203299;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  padding: 52px 105px;\n  backdrop-filter: blur(2px);\n  z-index: 9;\n}\n.rl-dialog {\n  width: 100%;\n  height: 100%;\n  background: var(--card);\n  border: 2px solid var(--line);\n  border-radius: 25px;\n  padding: 27px;\n  display: flex;\n  flex-direction: column;\n  box-shadow: 0 20px 60px #40152655;\n}\n.rl-dialog.compact {\n  width: 900px;\n  height: auto;\n  min-height: 420px;\n}\n.rl-dialog-head {\n  height: 68px;\n  display: flex;\n  align-items: center;\n  gap: 16px;\n}\n.rl-dialog-head h2 {\n  font-size: 30px;\n  margin: 0;\n}\n.rl-dialog-body {\n  flex: 1;\n  min-height: 0;\n}\n.rl-dialog-foot {\n  height: 75px;\n  display: flex;\n  align-items: flex-end;\n  gap: 11px;\n}\n.rl-picker-body {\n  display: grid;\n  grid-template-columns: 400px 1fr;\n  gap: 22px;\n}\n.rl-body-map {\n  position: relative;\n  background: var(--lighter);\n  border: 2px solid var(--line);\n  border-radius: 17px;\n  overflow: hidden;\n}\n.rl-zone {\n  position: absolute;\n  border: 2px solid #b23a5688;\n  background: #bdeeee88;\n  padding: 0 !important;\n  border-radius: 7px !important;\n  min-width: 4px !important;\n  min-height: 4px !important;\n  height: auto;\n}\n.rl-zone.selected {\n  background: #f4e4c4aa !important;\n  border-color: var(--gold) !important;\n}\n.rl-actions-wrap {\n  min-height: 0;\n  display: flex;\n  flex-direction: column;\n}\n.rl-actions-title {\n  font-size: 23px;\n  margin: 4px 0 13px;\n}\n.rl-actions {\n  min-height: 0;\n  overflow-y: auto;\n  display: grid;\n  grid-template-columns: repeat(4, minmax(0, 1fr));\n  gap: 12px;\n  align-content: start;\n  padding: 3px 11px 3px 3px;\n  scrollbar-color: var(--rose) #f2e0e4;\n}\n.rl-root .rl-action {\n  height: 80px !important;\n  border-radius: 14px !important;\n  display: block;\n  text-align: left;\n  padding: 11px 14px !important;\n  overflow: hidden;\n}\n.rl-action strong,\n.rl-action small {\n  display: block;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.rl-action strong {\n  font-size: 19px;\n}\n.rl-action small {\n  color: var(--soft);\n  font-size: 14px;\n  margin-top: 4px;\n}\n.rl-action.on {\n  background: var(--light);\n  border-color: var(--rose);\n}\n.rl-choice-row {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  gap: 10px;\n}\n.rl-choice-row button {\n  height: 40px;\n  min-height: 40px;\n  padding-top: 0;\n  padding-bottom: 0;\n}\n.rl-choice-row button.on {\n  background: var(--light);\n  border-color: var(--rose);\n}\n.rl-segments {\n  display: flex;\n  gap: 8px;\n  flex-wrap: wrap;\n  margin: 12px 0;\n}\n.rl-segments button {\n  height: 45px;\n  font-size: 18px;\n  padding: 0 17px;\n}\n.rl-segments button.on {\n  background: var(--light);\n  border-color: var(--rose);\n  color: var(--deep);\n}\n\n.rl-root .rl-search,\n.rl-root .rl-input,\n.rl-root .rl-select,\n.rl-root .rl-textarea {\n  appearance: none !important;\n  -webkit-appearance: none !important;\n  background: #fff !important;\n  background-color: #fff !important;\n  color: #3a2430 !important;\n  -webkit-text-fill-color: #3a2430 !important;\n  border: 2px solid var(--line) !important;\n  box-shadow: none !important;\n  filter: none !important;\n  opacity: 1 !important;\n}\n.rl-root .rl-search::placeholder,\n.rl-root .rl-input::placeholder,\n.rl-root .rl-textarea::placeholder {\n  color: #a58b93 !important;\n  -webkit-text-fill-color: #a58b93 !important;\n  opacity: 1 !important;\n}\n.rl-box {\n  height: 700px;\n}\n.rl-number {\n  width: 100px !important;\n  flex: none !important;\n}\n.rl-cats,\n.rl-segments {\n  border-bottom: 1px solid var(--line);\n  gap: 5px;\n  padding: 0 8px 7px;\n}\n.rl-cats button,\n.rl-segments button {\n  position: relative;\n  border-color: transparent !important;\n  border-radius: 0 !important;\n  background: transparent !important;\n  box-shadow: none !important;\n  color: var(--soft);\n  transition:\n    color 0.18s,\n    transform 0.18s;\n}\n.rl-cats button:after,\n.rl-segments button:after {\n  content: '';\n  position: absolute;\n  left: 50%;\n  right: 50%;\n  bottom: -1px;\n  height: 3px;\n  background: var(--rose);\n  transition:\n    left 0.22s,\n    right 0.22s,\n    box-shadow 0.22s;\n}\n.rl-cats button:hover,\n.rl-segments button:hover {\n  color: var(--rose);\n  transform: translateY(-1px);\n}\n.rl-cats button.on,\n.rl-segments button.on {\n  color: var(--rose) !important;\n}\n.rl-cats button.on:after,\n.rl-segments button.on:after {\n  left: 8px;\n  right: 8px;\n  box-shadow: 0 0 8px var(--rose);\n}\n.rl-picker-head {\n  display: grid;\n  grid-template-columns: 400px 1fr;\n  gap: 22px;\n  height: 72px;\n  align-items: center;\n}\n.rl-picker-head h2 {\n  text-align: center;\n  font-size: 30px;\n  margin: 0;\n}\n.rl-picker-controls {\n  display: flex;\n  align-items: center;\n  gap: 10px;\n}\n.rl-action-search {\n  position: relative;\n  width: 500px;\n  flex: none;\n}\n.rl-action-search .rl-input {\n  width: 500px !important;\n  padding-right: 48px !important;\n}\n\n.rl-picker-controls > button {\n  height: 48px;\n  font-size: 18px;\n  padding: 0 14px;\n}\n.rl-notice {\n  position: absolute;\n  left: 50%;\n  bottom: 28px;\n  transform: translateX(-50%);\n  padding: 13px 28px;\n  border-radius: 24px;\n  background: #3a2430;\n  color: #fff;\n  font-size: 20px;\n  z-index: 12;\n  box-shadow: 0 8px 24px #0004;\n}\n.rl-browser {\n  overflow: hidden;\n  display: flex;\n  flex-direction: column;\n}\n.rl-rule-list {\n  flex: 1;\n  min-height: 0;\n  overflow-y: auto;\n  padding-right: 8px;\n}\n.rl-root * {\n  scrollbar-width: thin;\n  scrollbar-color: var(--rose) var(--light);\n}\n.rl-root *::-webkit-scrollbar {\n  width: 12px;\n  height: 12px;\n}\n.rl-root *::-webkit-scrollbar-track {\n  background: var(--light);\n  border-radius: 8px;\n}\n.rl-root *::-webkit-scrollbar-thumb {\n  background: var(--rose);\n  border: 3px solid var(--light);\n  border-radius: 8px;\n}\n.rl-root *::-webkit-scrollbar-thumb:hover {\n  background: var(--deep);\n}\n.rl-picker-scope {\n  width: 180px !important;\n  flex: none;\n}\n.rl-dialog.compact,\n.srl-dialog.compact {\n  width: 980px;\n  min-height: 470px;\n  font-size: 22px;\n}\n.rl-dialog.compact .rl-dialog-head h2,\n.srl-dialog.compact .rl-dialog-head h2 {\n  font-size: 34px;\n}\n.rl-dialog.compact p,\n.srl-dialog.compact p {\n  font-size: 22px;\n  line-height: 1.6;\n}\n.rl-settings-group {\n  background: #fff;\n  border: 2px solid var(--line);\n  border-radius: 15px;\n  padding: 18px;\n  margin: 14px 0;\n}\n.rl-settings-group h3 {\n  font-size: 23px;\n  margin: 0 0 8px;\n}\n.rl-relation-buttons {\n  display: flex;\n  gap: 8px;\n  flex-wrap: wrap;\n  margin: 10px 0;\n}\n.rl-relation-buttons button {\n  height: 39px;\n  padding: 0 14px;\n  font-size: 17px;\n}\n.rl-list-entry {\n  display: flex;\n  gap: 8px;\n}\n.rl-list-entry .rl-input {\n  flex: 1;\n}\n.rl-list-entry button {\n  width: 55px;\n  height: 52px;\n  padding: 0;\n}\n.rl-rule-trash {\n  width: 48px !important;\n  height: 48px !important;\n  padding: 9px !important;\n  margin-right: 8px;\n}\n.rl-rule.delete-active {\n  padding-left: 5px;\n}\n.rl-animation-layout {\n  display: grid;\n  grid-template-columns: var(--preview-width) minmax(0, 1fr);\n  gap: 24px;\n}\n.rl-animation-preview {\n  align-self: start;\n  position: sticky;\n  top: 0;\n  text-align: center;\n  border-radius: 12px;\n  background: var(--lighter);\n}\n.rl-animation-preview > .rl-muted {\n  margin: 0;\n  padding: 4px 0;\n  line-height: 1.2;\n}\n.rl-animation-preview canvas {\n  position: static;\n  inset: auto;\n  transform: none;\n  margin: 0;\n  max-width: none;\n  max-height: none;\n  display: block;\n  width: 100%;\n  height: 600px;\n  object-fit: contain;\n}\n.rl-animation-controls {\n  min-width: 0;\n}\n.rl-preview-foot {\n  width: var(--preview-width);\n  flex: none;\n  display: flex;\n  justify-content: center;\n}\n\n.rl-animation-message .rl-choice-row {\n  display: flex;\n  align-items: center;\n  flex-wrap: wrap;\n}\n.rl-animation-message [data-animation-message-type] {\n  width: 150px;\n  flex: 0 0 150px;\n}\n.rl-animation-tokens {\n  display: flex;\n  gap: 10px;\n  margin-left: auto;\n}\n.rl-animation-grid {\n  display: grid;\n  grid-template-columns: max-content 120px max-content 120px;\n  gap: 12px 15px;\n  align-items: center;\n}\n.rl-animation-grid > span:nth-child(3) {\n  margin-left: 15px;\n}\n.rl-animation-grid .rl-number {\n  width: 120px !important;\n}\n.rl-animation-message {\n  margin-top: 16px;\n}\n.rl-animation-tracks {\n  max-height: 350px;\n  overflow: auto;\n}\n.rl-dialog.compact {\n  max-height: 95%;\n  overflow: auto;\n}\n.rl-response-head {\n  flex-wrap: wrap;\n}\n.rl-response-head h3 {\n  flex-basis: 100%;\n}\n.rl-response > b > button {\n  padding: 0 4px;\n  font-size: 23px;\n}\n.rl-response > b {\n  font-size: 16px;\n}\n.rl-dialog.compact .rl-dialog-body {\n  overflow-y: auto;\n  flex: 1 1 auto;\n  padding-right: 8px;\n}\n.rl-dialog.compact .rl-dialog-head,\n.rl-dialog.compact .rl-dialog-foot {\n  flex-shrink: 0;\n}\n.rl-dialog.compact .rl-dialog-foot {\n  height: 65px;\n}\n.rl-animation-tracks .rl-field > button {\n  white-space: nowrap;\n  flex-shrink: 0;\n}\n.rl-animation-tracks .rl-field > span {\n  min-width: 90px;\n}\n.rl-dialog.compact.rl-animation-dialog {\n  width: 1800px;\n  --preview-width: 400px;\n}\n.rl-animation-dialog .rl-animation-tracks {\n  display: flex;\n  flex-direction: row;\n  gap: 18px;\n  overflow: auto;\n  max-height: 380px;\n  cursor: grab;\n  padding: 4px 3px 12px;\n  touch-action: none;\n}\n.rl-animation-dialog .rl-animation-track {\n  flex: 0 0 450px;\n  min-width: 450px;\n}\n.rl-animation-track .rl-field {\n  flex-wrap: wrap;\n}\n.rl-animation-track .rl-field > span {\n  flex-basis: 100%;\n}\n.rl-animation-track .rl-field > .rl-select {\n  width: 240px;\n  flex: 1;\n}\n.rl-animation-dialog .rl-dialog-body {\n  cursor: grab;\n}\n.rl-animation-dialog .rl-dragging {\n  cursor: grabbing;\n}\n.rl-animation-dialog .rl-animation-tracks {\n  justify-content: space-between;\n}\n.rl-animation-dialog .rl-animation-track:only-child {\n  margin-left: auto;\n  margin-right: auto;\n}\n.rl-response-gap {\n  width: 22px;\n  flex: none;\n}\n.rl-response-head .rl-response-delete {\n  margin-left: auto;\n}\n\n.rl-root .rl-action[hidden] {\n  display: none;\n}\n\n.rl-editable-name {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n  min-width: 0;\n  max-width: 620px;\n  color: rgb(58, 36, 48);\n  font-family: Arial, 'Microsoft JhengHei', sans-serif;\n  font-style: normal;\n  font-weight: 600;\n  line-height: 1.3;\n}\n.rl-inline-title {\n  font-size: 31px;\n}\n.rl-context {\n  font-size: 42px;\n}\n.rl-context::before {\n  content: '\u2726';\n  flex: none;\n  margin-right: 8px;\n}\n.rl-name-row {\n  font-size: 24px;\n}\n.rl-brand-icon {\n  width: 58px;\n  height: 58px;\n  flex: none;\n  object-fit: contain;\n}\n.rl-name-text {\n  min-width: 0;\n  overflow: hidden;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n}\n.rl-editable-name > .rl-icon {\n  flex: none;\n}\n.rl-root .rl-inline-input {\n  box-sizing: border-box;\n  width: auto;\n  min-width: 0;\n  max-width: 100%;\n  height: 48px;\n  padding: 0 10px;\n  border: 2px solid var(--rose);\n  border-radius: 10px;\n  background: white;\n  color: inherit;\n  font: inherit;\n}\n.rl-clearable {\n  position: relative;\n  width: 100%;\n  min-width: 0;\n}\n.rl-clearable-number {\n  width: 100px;\n}\n.rl-root .rl-clearable > input {\n  padding-right: 40px;\n}\n.rl-root .rl-clearable > .rl-input-clear {\n  position: absolute;\n  right: 4px;\n  top: 50%;\n  transform: translateY(-50%);\n  width: 32px;\n  height: 36px;\n  padding: 0;\n  border: 0;\n  background: transparent;\n  border-radius: 8px;\n  font-size: 24px;\n}\n.rl-list-entry > .rl-clearable {\n  flex: 1;\n}\n";
     }
   });
 
@@ -4023,6 +4143,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
 
   // src/ui/dom-settings.js
   function installSettings({ store, t, host = globalThis }) {
+    const animationPreview = createAnimationPreview(host);
     let root, page = "home", deleteMode = false, ruleDeleteMode = false, editingPersonaId = null, selectedRuleId = null, draft = null, sessionBaseline = null, pickerGroup = "ItemHead", pickerScope = "current", pickerSelected = /* @__PURE__ */ new Set(), pickerQuery = "", pickerInput = "", pickerMode = "trigger", responseDelete = false, primaryMode = false, modal = null, filter = "all", ruleQuery = "", inlineEdit = null, notice = "", ruleScrollTop = 0;
     const esc = (v) => String(v ?? "").replace(
       /[&<>"']/g,
@@ -4184,7 +4305,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       container.scrollTop = 0;
     }
     function animationModalBody() {
-      return `<div class="rl-segments">${animationGroups().map(
+      return `<div class="rl-animation-layout"><aside class="rl-animation-preview"><canvas width="800" height="1200" data-animation-preview aria-label="${esc(t("preview"))}"></canvas><p class="rl-muted">${esc(t("preview"))}</p></aside><div class="rl-animation-controls"><div class="rl-segments">${animationGroups().map(
         (g) => `<button data-animation-group="${g}" class="${modal.tracks.some((x) => x.group === g) ? "on" : ""}">${esc(groupLabel(g))}</button>`
       ).join("")}</div><div class="rl-animation-tracks">${modal.tracks.map(
         (track, i) => `<div class="rl-settings-group rl-animation-track"><h3>${esc(groupLabel(track.group))}</h3>${[
@@ -4201,7 +4322,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         ).join("")}</div>`
       ).join(
         ""
-      )}</div><div class="rl-animation-grid"><span>${esc(t("animationCount"))}</span><input class="rl-input rl-number" type="number" min="1" max="100" data-animation-field="count" value="${modal.count}"><span>${esc(t("animationSeconds"))}</span><input class="rl-input rl-number" type="number" min="0.001" max="120" step="0.001" data-animation-seconds value="${modal.intervalMs / 1e3}"></div><div class="rl-animation-message"><div class="rl-muted">${esc(t("animationMessageHint"))}</div><div class="rl-choice-row">${["chat", "emote", "action"].map((x) => `<button class="${modal.messageType === x ? "on" : ""}" data-animation-message-type="${x}">${esc(t(x))}</button>`).join("")}</div><textarea class="rl-textarea" style="height:90px" data-animation-field="text">${esc(modal.text)}</textarea><div class="rl-tools"><button data-animation-token="{Self}">${esc(t("insertSelfName"))}</button><button data-animation-token="{Other}">${esc(t("insertOtherName"))}</button></div></div>`;
+      )}</div><div class="rl-animation-grid"><span>${esc(t("animationCount"))}</span><input class="rl-input rl-number" type="number" min="1" max="100" data-animation-field="count" value="${modal.count}"><span>${esc(t("animationSeconds"))}</span><input class="rl-input rl-number" type="number" min="0.001" max="120" step="0.001" data-animation-seconds value="${modal.intervalMs / 1e3}"></div><div class="rl-animation-message"><div class="rl-muted">${esc(t("animationMessageHint"))}</div><div class="rl-choice-row">${["chat", "emote", "action"].map((x) => `<button class="${modal.messageType === x ? "on" : ""}" data-animation-message-type="${x}">${esc(t(x))}</button>`).join("")}<div class="rl-animation-tokens"><button data-animation-token="{Self}">${esc(t("insertSelfName"))}</button><button data-animation-token="{Other}">${esc(t("insertOtherName"))}</button></div></div><textarea class="rl-textarea" style="height:90px" data-animation-field="text">${esc(modal.text)}</textarea></div></div></div>`;
     }
     function pickerHtml() {
       const zones = bodyZones(host.Player, host), rows = pickerRows();
@@ -4241,17 +4362,26 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const key = modal.listMode === "whitelist" ? "white" : "black", value = key === "white" ? modal.white : modal.black;
         body = `<div class="rl-settings-group"><h3>${esc(t("interactionTargets"))}</h3><div class="rl-segments"><button class="${modal.listMode === "whitelist" ? "on" : ""}" data-list-mode="whitelist">${esc(t("onlyWhitelist"))}</button><button class="${modal.listMode === "blacklist" ? "on" : ""}" data-list-mode="blacklist">${esc(t("onlyBlacklist"))}</button></div></div><div class="rl-settings-group"><h3>${esc(t(key === "white" ? "whiteList" : "blackList"))}</h3><div class="rl-muted">${esc(t(key === "white" ? "whiteListHint" : "blackListHint"))}</div>${relationButtons("persona")}<div class="rl-list-entry"><input class="rl-input" data-list="${key}" value="${esc(value)}" placeholder="${esc(t("memberNumbersPlaceholder"))}"><button data-act="normalizeList">\uFF0B</button></div></div>`;
       }
-      return `<div class="rl-overlay"><section class="rl-dialog compact ${modal.type === "animation" ? "rl-animation-dialog" : ""}"><div class="rl-dialog-head"><h2 class="rl-grow">${esc(titles[modal.type])}</h2><button data-act="closeModal">${ICON.close}</button></div><div class="rl-dialog-body">${modal.error ? `<p role="alert">${esc(modal.error)}</p>` : ""}${body}</div><div class="rl-dialog-foot"><span class="rl-grow"></span>${modal.mode === "export" ? "" : `<button class="primary" data-act="confirmModal">${esc(t("save"))}</button>`}<button data-act="closeModal">${esc(t("cancel"))}</button></div></section></div>`;
+      return `<div class="rl-overlay"><section class="rl-dialog compact ${modal.type === "animation" ? "rl-animation-dialog" : ""}"><div class="rl-dialog-head"><h2 class="rl-grow">${esc(titles[modal.type])}</h2><button data-act="closeModal">${ICON.close}</button></div><div class="rl-dialog-body">${modal.error ? `<p role="alert">${esc(modal.error)}</p>` : ""}${body}</div><div class="rl-dialog-foot">${modal.type === "animation" ? `<div class="rl-preview-foot"><button class="primary" data-act="testAnimation">${esc(t("testAnimation"))}</button></div>` : ""}<span class="rl-grow"></span>${modal.mode === "export" ? "" : `<button class="primary" data-act="confirmModal">${esc(t("save"))}</button>`}<button data-act="closeModal">${esc(t("cancel"))}</button></div></section></div>`;
     }
     function render() {
       if (!root) return;
       if (modal?.type !== "picker") picker.reset();
+      animationPreview.clear();
       const oldRuleList = root.querySelector(".rl-rule-list");
       if (oldRuleList) ruleScrollTop = oldRuleList.scrollTop;
       root.innerHTML = shell(page === "home" ? homeHtml() : rulesHtml(), page === "rules" ? active().name : "");
       const newRuleList = root.querySelector(".rl-rule-list");
       if (newRuleList) newRuleList.scrollTop = ruleScrollTop;
       bind();
+      if (modal?.type === "animation") {
+        try {
+          animationPreview.mount(root.querySelector("[data-animation-preview]"), modal);
+        } catch (error) {
+          animationPreview.clear();
+          console.warn("Responsive_Liko preview", error);
+        }
+      }
       if (modal?.type === "picker") updatePickerResults();
       position();
       const inline = root.querySelector("[data-inline-edit]");
@@ -4919,6 +5049,17 @@ One of mods you are using is using an old version of SDK. It will work for now b
           }
         }
       );
+      const testAnimation = root.querySelector('[data-act="testAnimation"]');
+      if (testAnimation) {
+        testAnimation.onclick = () => {
+          try {
+            animationPreview.play(modal);
+          } catch {
+            modal.error = t("invalidAnimation");
+            render();
+          }
+        };
+      }
       const captureAnimation = () => root.querySelectorAll("[data-animation-field]").forEach((el) => {
         modal[el.dataset.animationField] = ["count", "intervalMs"].includes(el.dataset.animationField) ? Number(el.value) : el.value;
       });
@@ -5088,6 +5229,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     function position() {
       if (!root) return;
+      if (!wardrobePending) animationPreview.draw();
       const b = drawingContext(host).canvas.getBoundingClientRect();
       Object.assign(root.style, {
         left: `${b.left}px`,
@@ -5127,6 +5269,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       render();
     }
     function unload() {
+      animationPreview.clear();
       clearTimeout(noticeTimer);
       notice = "";
       if (!wardrobePending) resetView();
@@ -5161,6 +5304,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var svg, ICON;
   var init_dom_settings = __esm({
     "src/ui/dom-settings.js"() {
+      init_animation_preview();
       init_input_controls();
       init_settings();
       init_activity_picker();

@@ -38,11 +38,8 @@ export function wearState(host, group, state) {
   }
 }
 
-// The native wardrobe owns rendering, color controls, extended properties and coordinates.
-export async function editAppearanceState(host, group, state, done) {
-  if (typeof host.CharacterAppearanceLoadCharacter !== 'function') throw Error('Wardrobe unavailable');
-  const screen = host.CommonGetScreen();
-  const preview = host.CharacterLoadSimple('Responsive_Liko_StatePreview');
+export function createPreviewCharacter(host, name) {
+  const preview = host.CharacterLoadSimple(name);
   preview.Name = host.Player.Name;
   preview.AssetFamily = host.Player.AssetFamily;
   preview.Appearance = host.Player.Appearance.map((item) => ({
@@ -51,6 +48,23 @@ export async function editAppearanceState(host, group, state, done) {
     Property: clone(item.Property ?? {}),
     ...(item.Craft ? { Craft: clone(item.Craft) } : {}),
   }));
+  return preview;
+}
+
+// The native wardrobe owns rendering, color controls, extended properties and coordinates.
+export async function editAppearanceState(host, group, state, done) {
+  if (typeof host.CharacterAppearanceLoadCharacter !== 'function') throw Error('Wardrobe unavailable');
+  const screen = host.CommonGetScreen();
+  const informationReturnScreen = host.InformationSheetReturnScreen
+    ? [...host.InformationSheetReturnScreen]
+    : undefined;
+  const returnToSettings = async () => {
+    await host.CommonSetScreen(...screen);
+    await host.PreferenceSubscreenExtensionsOpen?.(ID, informationReturnScreen);
+    // PreferenceOpenSubscreen may itself visit InformationSheet while reopening.
+    if (informationReturnScreen) host.InformationSheetReturnScreen = [...informationReturnScreen];
+  };
+  const preview = createPreviewCharacter(host, 'Responsive_Liko_StatePreview');
   const previewHost = Object.create(host);
   previewHost.Player = preview;
   const restore = () => {
@@ -62,14 +76,12 @@ export async function editAppearanceState(host, group, state, done) {
     await host.CharacterAppearanceLoadCharacter(preview, async (accepted) => {
       const saved = accepted ? snapshotItem(host.InventoryGet(preview, group)) : null;
       restore();
-      await host.CommonSetScreen(...screen);
-      await host.PreferenceSubscreenExtensionsOpen?.(ID);
+      await returnToSettings();
       done(saved);
     });
   } catch (error) {
     restore();
-    await host.CommonSetScreen(...screen);
-    await host.PreferenceSubscreenExtensionsOpen?.(ID);
+    await returnToSettings();
     throw error;
   }
 }

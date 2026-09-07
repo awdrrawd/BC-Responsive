@@ -1,4 +1,5 @@
 export default {
+  testAnimation: 'Перевірити',
   copyText: 'Копіювати',
   pasteText: 'Вставити',
   copiedText: 'Скопійовано',
@@ -199,7 +200,7 @@ export default {
   alwaysHint:
     'Гарантована відповідь (одна на правило) за 50 мс до випадкової відповіді; під час виходу без паузи.',
   editAppearance: 'Гардероб',
-  animationSeconds: 'Інтервал A/B (секунди)',
+  animationSeconds: 'Інтервал дій (секунди)',
   chooseAnimationGroup: 'Виберіть принаймні одну групу та обидва стани.',
   invalidAnimation: 'Кількість: 1–100; інтервал: 0,001–120 секунд.',
   HairAccessory2: 'Вуха',

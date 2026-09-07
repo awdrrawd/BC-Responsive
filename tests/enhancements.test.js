@@ -361,8 +361,13 @@ test('wardrobe saves full state from a preview character without changing player
   let callback, saved;
   const host = {
     Player: player,
+    InformationSheetReturnScreen: ['Online', 'ChatRoom'],
     CommonGetScreen: () => ['Character', 'Preference'],
     CommonSetScreen: async () => {},
+    PreferenceSubscreenExtensionsOpen: async (_id, returnScreen) => {
+      assert.deepEqual(returnScreen, ['Online', 'ChatRoom']);
+      host.InformationSheetReturnScreen = returnScreen ?? ['Character', 'Preference'];
+    },
     CharacterLoadSimple: () => preview,
     CharacterRefresh() {},
     InventoryWear: (c, asset, g, color) => {
@@ -382,11 +387,13 @@ test('wardrobe saves full state from a preview character without changing player
     (v) => (saved = v),
   );
   await callback(true);
+  assert.deepEqual(host.InformationSheetReturnScreen, ['Online', 'ChatRoom']);
   assert.equal(saved.color, 'blue');
   assert.equal(saved.property.OverrideHeight.Height, 20);
   assert.equal(player.Appearance[0], original);
   assert.equal(original.Color, 'red');
   await editAppearanceState(host, 'HairAccessory2', saved, (v) => (saved = v));
   await callback(false);
+  assert.deepEqual(host.InformationSheetReturnScreen, ['Online', 'ChatRoom']);
   assert.equal(saved, null);
 });

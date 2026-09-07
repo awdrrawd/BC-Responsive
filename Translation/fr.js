@@ -1,4 +1,5 @@
 export default {
+  testAnimation: 'Tester',
   copyText: 'Copier',
   pasteText: 'Coller',
   copiedText: 'Copié',
@@ -199,7 +200,7 @@ export default {
   alwaysHint:
     'Réponse garantie (une par règle), exécutée 50 ms avant une réponse aléatoire ; sans pause lors du départ.',
   editAppearance: 'Garde-robe',
-  animationSeconds: 'Intervalle A/B (secondes)',
+  animationSeconds: 'Intervalle des actions (secondes)',
   chooseAnimationGroup: 'Sélectionnez au moins un groupe et les deux états.',
   invalidAnimation: 'Nombre : 1–100 ; intervalle : 0,001–120 secondes.',
   HairAccessory2: 'Oreilles',

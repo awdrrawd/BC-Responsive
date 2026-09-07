@@ -1,4 +1,5 @@
 export default {
+  testAnimation: '测试',
   copyText: '复制',
   pasteText: '粘贴',
   copiedText: '已复制',
@@ -26,7 +27,7 @@ export default {
     '弱：僅句尾。中：句尾必定加入，句中隨機插入。強：隨機插入三條。中毒：另替換 1～2 個字。短句會減少插入量，一字短句中毒時可直接替換。',
   alwaysHint: '保证触发的主回应（每条规则一个），先于随机回应执行，间隔 50 毫秒；离房时不等待。',
   editAppearance: '更衣室设置',
-  animationSeconds: 'A／B 切换间隔（秒）',
+  animationSeconds: '动作间隔（秒）',
   chooseAnimationGroup: '請選擇至少一個部位並設定 A／B。',
   invalidAnimation: '变化次数须为 1–100，切换间隔须为 0.001–120 秒。',
   HairAccessory2: '耳朵',

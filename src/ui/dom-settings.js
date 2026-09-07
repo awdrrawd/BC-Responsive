@@ -1,3 +1,4 @@
+import { createAnimationPreview } from './animation-preview.js';
 import { bindClearableInputs } from './input-controls.js';
 import CSS from './settings.css';
 import { createActivityPicker } from './activity-picker.js';
@@ -26,6 +27,7 @@ const ICON = {
 };
 
 export function installSettings({ store, t, host = globalThis }) {
+  const animationPreview = createAnimationPreview(host);
   let root,
     page = 'home',
     deleteMode = false,
@@ -260,7 +262,7 @@ export function installSettings({ store, t, host = globalThis }) {
   }
 
   function animationModalBody() {
-    return `<div class="rl-segments">${animationGroups()
+    return `<div class="rl-animation-layout"><aside class="rl-animation-preview"><canvas width="800" height="1200" data-animation-preview aria-label="${esc(t('preview'))}"></canvas><p class="rl-muted">${esc(t('preview'))}</p></aside><div class="rl-animation-controls"><div class="rl-segments">${animationGroups()
       .map(
         (g) =>
           `<button data-animation-group="${g}" class="${modal.tracks.some((x) => x.group === g) ? 'on' : ''}">${esc(groupLabel(g))}</button>`,
@@ -289,7 +291,7 @@ export function installSettings({ store, t, host = globalThis }) {
       )
       .join(
         '',
-      )}</div><div class="rl-animation-grid"><span>${esc(t('animationCount'))}</span><input class="rl-input rl-number" type="number" min="1" max="100" data-animation-field="count" value="${modal.count}"><span>${esc(t('animationSeconds'))}</span><input class="rl-input rl-number" type="number" min="0.001" max="120" step="0.001" data-animation-seconds value="${modal.intervalMs / 1000}"></div><div class="rl-animation-message"><div class="rl-muted">${esc(t('animationMessageHint'))}</div><div class="rl-choice-row">${['chat', 'emote', 'action'].map((x) => `<button class="${modal.messageType === x ? 'on' : ''}" data-animation-message-type="${x}">${esc(t(x))}</button>`).join('')}</div><textarea class="rl-textarea" style="height:90px" data-animation-field="text">${esc(modal.text)}</textarea><div class="rl-tools"><button data-animation-token="{Self}">${esc(t('insertSelfName'))}</button><button data-animation-token="{Other}">${esc(t('insertOtherName'))}</button></div></div>`;
+      )}</div><div class="rl-animation-grid"><span>${esc(t('animationCount'))}</span><input class="rl-input rl-number" type="number" min="1" max="100" data-animation-field="count" value="${modal.count}"><span>${esc(t('animationSeconds'))}</span><input class="rl-input rl-number" type="number" min="0.001" max="120" step="0.001" data-animation-seconds value="${modal.intervalMs / 1000}"></div><div class="rl-animation-message"><div class="rl-muted">${esc(t('animationMessageHint'))}</div><div class="rl-choice-row">${['chat', 'emote', 'action'].map((x) => `<button class="${modal.messageType === x ? 'on' : ''}" data-animation-message-type="${x}">${esc(t(x))}</button>`).join('')}<div class="rl-animation-tokens"><button data-animation-token="{Self}">${esc(t('insertSelfName'))}</button><button data-animation-token="{Other}">${esc(t('insertOtherName'))}</button></div></div><textarea class="rl-textarea" style="height:90px" data-animation-field="text">${esc(modal.text)}</textarea></div></div></div>`;
   }
   function pickerHtml() {
     const zones = bodyZones(host.Player, host),
@@ -333,17 +335,26 @@ export function installSettings({ store, t, host = globalThis }) {
         value = key === 'white' ? modal.white : modal.black;
       body = `<div class="rl-settings-group"><h3>${esc(t('interactionTargets'))}</h3><div class="rl-segments"><button class="${modal.listMode === 'whitelist' ? 'on' : ''}" data-list-mode="whitelist">${esc(t('onlyWhitelist'))}</button><button class="${modal.listMode === 'blacklist' ? 'on' : ''}" data-list-mode="blacklist">${esc(t('onlyBlacklist'))}</button></div></div><div class="rl-settings-group"><h3>${esc(t(key === 'white' ? 'whiteList' : 'blackList'))}</h3><div class="rl-muted">${esc(t(key === 'white' ? 'whiteListHint' : 'blackListHint'))}</div>${relationButtons('persona')}<div class="rl-list-entry"><input class="rl-input" data-list="${key}" value="${esc(value)}" placeholder="${esc(t('memberNumbersPlaceholder'))}"><button data-act="normalizeList">＋</button></div></div>`;
     }
-    return `<div class="rl-overlay"><section class="rl-dialog compact ${modal.type === 'animation' ? 'rl-animation-dialog' : ''}"><div class="rl-dialog-head"><h2 class="rl-grow">${esc(titles[modal.type])}</h2><button data-act="closeModal">${ICON.close}</button></div><div class="rl-dialog-body">${modal.error ? `<p role="alert">${esc(modal.error)}</p>` : ''}${body}</div><div class="rl-dialog-foot"><span class="rl-grow"></span>${modal.mode === 'export' ? '' : `<button class="primary" data-act="confirmModal">${esc(t('save'))}</button>`}<button data-act="closeModal">${esc(t('cancel'))}</button></div></section></div>`;
+    return `<div class="rl-overlay"><section class="rl-dialog compact ${modal.type === 'animation' ? 'rl-animation-dialog' : ''}"><div class="rl-dialog-head"><h2 class="rl-grow">${esc(titles[modal.type])}</h2><button data-act="closeModal">${ICON.close}</button></div><div class="rl-dialog-body">${modal.error ? `<p role="alert">${esc(modal.error)}</p>` : ''}${body}</div><div class="rl-dialog-foot">${modal.type === 'animation' ? `<div class="rl-preview-foot"><button class="primary" data-act="testAnimation">${esc(t('testAnimation'))}</button></div>` : ''}<span class="rl-grow"></span>${modal.mode === 'export' ? '' : `<button class="primary" data-act="confirmModal">${esc(t('save'))}</button>`}<button data-act="closeModal">${esc(t('cancel'))}</button></div></section></div>`;
   }
   function render() {
     if (!root) return;
     if (modal?.type !== 'picker') picker.reset();
+    animationPreview.clear();
     const oldRuleList = root.querySelector('.rl-rule-list');
     if (oldRuleList) ruleScrollTop = oldRuleList.scrollTop;
     root.innerHTML = shell(page === 'home' ? homeHtml() : rulesHtml(), page === 'rules' ? active().name : '');
     const newRuleList = root.querySelector('.rl-rule-list');
     if (newRuleList) newRuleList.scrollTop = ruleScrollTop;
     bind();
+    if (modal?.type === 'animation') {
+      try {
+        animationPreview.mount(root.querySelector('[data-animation-preview]'), modal);
+      } catch (error) {
+        animationPreview.clear();
+        console.warn('Responsive_Liko preview', error);
+      }
+    }
     if (modal?.type === 'picker') updatePickerResults();
     position();
     const inline = root.querySelector('[data-inline-edit]');
@@ -1104,6 +1115,17 @@ export function installSettings({ store, t, host = globalThis }) {
           }
         }),
     );
+    const testAnimation = root.querySelector('[data-act="testAnimation"]');
+    if (testAnimation) {
+      testAnimation.onclick = () => {
+        try {
+          animationPreview.play(modal);
+        } catch {
+          modal.error = t('invalidAnimation');
+          render();
+        }
+      };
+    }
     const captureAnimation = () =>
       root.querySelectorAll('[data-animation-field]').forEach((el) => {
         modal[el.dataset.animationField] = ['count', 'intervalMs'].includes(el.dataset.animationField)
@@ -1295,6 +1317,7 @@ export function installSettings({ store, t, host = globalThis }) {
   }
   function position() {
     if (!root) return;
+    if (!wardrobePending) animationPreview.draw();
     const b = drawingContext(host).canvas.getBoundingClientRect();
     Object.assign(root.style, {
       left: `${b.left}px`,
@@ -1334,6 +1357,7 @@ export function installSettings({ store, t, host = globalThis }) {
     render();
   }
   function unload() {
+    animationPreview.clear();
     clearTimeout(noticeTimer);
     notice = '';
     if (!wardrobePending) resetView();

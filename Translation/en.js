@@ -1,4 +1,5 @@
 export default {
+  testAnimation: 'Test',
   copyText: 'Copy',
   pasteText: 'Paste',
   copiedText: 'Copied',
@@ -27,7 +28,7 @@ export default {
   alwaysHint:
     'Guaranteed response (one per rule). Runs before a random response, 50 ms apart; no pause when leaving.',
   editAppearance: 'Wardrobe',
-  animationSeconds: 'A/B switch interval (seconds)',
+  animationSeconds: 'Action interval (seconds)',
   chooseAnimationGroup: 'Select at least one group and both states.',
   invalidAnimation: 'Count must be 1–100 and switch interval 0.001–120 seconds.',
   HairAccessory2: 'Ears',
