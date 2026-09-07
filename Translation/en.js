@@ -63,7 +63,7 @@ export default {
   orgasm: 'Climax event',
   spicer: 'Flavour',
   event: 'Room event',
-  join: 'Arrival / welcome',
+  join: 'Enter room',
   leave: 'Departure',
   Any: 'Any outcome',
   Orgasmed: 'Completed',

@@ -36,7 +36,7 @@ export default {
   orgasm: 'Orgasme',
   spicer: 'Amusement',
   event: 'Événement de salon',
-  join: 'Arrivée / accueil',
+  join: 'Entrée dans le salon',
   leave: 'Départ',
   Any: 'Tous les résultats',
   Orgasmed: 'Orgasme atteint',

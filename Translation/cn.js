@@ -62,7 +62,7 @@ export default {
   orgasm: '高潮',
   spicer: '趣味',
   event: '事件',
-  join: '进房／欢迎',
+  join: '进房',
   leave: '离开',
   Any: '所有结果',
   Orgasmed: '完成',
