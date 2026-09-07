@@ -229,17 +229,27 @@ export function createOutput({ store, host = globalThis, owns, report }) {
         if (activitySeen.has(key)) return;
         const activity = allowedActivity(target, step.activity, step.group, host);
         if (!activity) {
-          report(`Unavailable activity: ${step.activity}`);
+          report(`Unavailable activity: ${step.activity} / ${step.group} / target ${event.actor}`);
           return;
         }
         // Per recipient/action circuit breaker; no global cooldown across different people.
         activitySeen.set(key, time + 5000);
-        host.ActivityRun(
-          host.Player,
-          target,
-          host.ActivityGetGroupOrMirror(host.Player.AssetFamily, step.group),
-          activity,
-        );
+        const group = host.ActivityGetGroupOrMirror(target.AssetFamily, step.group);
+        if (!group) {
+          activitySeen.delete(key);
+          report(`Unavailable activity group: ${step.group} / target ${event.actor}`);
+          return;
+        }
+        const previousFocus = target.FocusGroup;
+        try {
+          target.FocusGroup = host.AssetGroupGet?.(target.AssetFamily, step.group) ?? group;
+          host.ActivityRun(host.Player, target, group, activity);
+        } catch (error) {
+          activitySeen.delete(key);
+          throw error;
+        } finally {
+          target.FocusGroup = previousFocus;
+        }
       }
     },
   };

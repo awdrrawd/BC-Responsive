@@ -3375,16 +3375,26 @@ One of mods you are using is using an old version of SDK. It will work for now b
           if (activitySeen.has(key)) return;
           const activity = allowedActivity(target, step2.activity, step2.group, host);
           if (!activity) {
-            report(`Unavailable activity: ${step2.activity}`);
+            report(`Unavailable activity: ${step2.activity} / ${step2.group} / target ${event.actor}`);
             return;
           }
           activitySeen.set(key, time + 5e3);
-          host.ActivityRun(
-            host.Player,
-            target,
-            host.ActivityGetGroupOrMirror(host.Player.AssetFamily, step2.group),
-            activity
-          );
+          const group = host.ActivityGetGroupOrMirror(target.AssetFamily, step2.group);
+          if (!group) {
+            activitySeen.delete(key);
+            report(`Unavailable activity group: ${step2.group} / target ${event.actor}`);
+            return;
+          }
+          const previousFocus = target.FocusGroup;
+          try {
+            target.FocusGroup = host.AssetGroupGet?.(target.AssetFamily, step2.group) ?? group;
+            host.ActivityRun(host.Player, target, group, activity);
+          } catch (error) {
+            activitySeen.delete(key);
+            throw error;
+          } finally {
+            target.FocusGroup = previousFocus;
+          }
         }
       }
     };
@@ -4087,7 +4097,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       if (r.trigger.kind === "speech")
         return `<div class="rl-field">${esc(t("speechChannel"))}</div><div class="rl-segments">${["all", "chat", "whisper"].map((v) => `<button data-trigger-value="channel" data-value="${v}" class="${r.trigger.channel === v ? "on" : ""}">${esc(t("speech_" + v))}</button>`).join("")}</div><div class="rl-field"><span>${esc(t("chance"))}</span><output data-chance-value>${r.trigger.chance ?? 100}%</output></div><input class="rl-chance-bar" type="range" min="0" max="100" step="1" aria-label="${esc(t("chance"))}" data-chance value="${r.trigger.chance ?? 100}"><div class="rl-field">${esc(t("severity"))}</div><div class="rl-segments">${["weak", "medium", "strong", "addicted"].map((v) => `<button data-trigger-value="severity" data-value="${v}" class="${r.trigger.severity === v ? "on" : ""}">${esc(t(v))}</button>`).join("")}</div><p class="rl-muted">${esc(t("speechHint"))}</p>`;
       if (r.trigger.kind === "activity")
-        return `<div class="rl-summary"><b>${esc(r.trigger.groups?.join(", ") || t("allGroups"))}</b><br>${esc(r.trigger.activities?.map((a) => activityLabel(a, r.trigger.groups?.[0] || "", host)).join(", ") || t("allActivities"))}</div><button class="primary" style="margin-top:18px" data-act="picker" data-mode="trigger">${esc(t("openActionPicker"))}</button>`;
+        return `<div class="rl-summary"><b>${esc(r.trigger.groups?.join(", ") || t("allGroups"))}</b><br>${esc(r.trigger.activities?.map((a) => activityLabel(a, r.trigger.groups?.[0] || "", host)).join(", ") || t("allActivities"))}</div><button class="primary" style="margin-top:18px" data-act="picker" data-mode="trigger">${esc(t("openActionPicker"))}</button><button style="margin-left:12px" data-act="allTriggerActivities">${esc(t("allActivities"))}</button>`;
       if (r.trigger.kind === "orgasm")
         return `<div class="rl-field"><span>${esc(t("outcome"))}</span></div><div class="rl-segments">${["Any", "Orgasmed", "Ruined", "Resisted"].map((x) => `<button class="${r.trigger.outcome === x ? "on" : ""}" data-trigger-value="outcome" data-value="${x}">${esc(t(x))}</button>`).join("")}</div>`;
       if (r.trigger.kind === "spicer")
@@ -4770,6 +4780,15 @@ One of mods you are using is using an old version of SDK. It will work for now b
           render();
         }
       );
+      root.querySelectorAll('[data-act="allTriggerActivities"]').forEach((button) => {
+        button.onclick = () => {
+          draft.trigger.groups = [];
+          draft.trigger.activities = [];
+          delete draft.trigger.matchNone;
+          pickerSelected.clear();
+          render();
+        };
+      });
       root.querySelectorAll('[data-act="confirmPicker"]').forEach(
         (b) => b.onclick = () => {
           const picked = [...pickerSelected].map((k) => {

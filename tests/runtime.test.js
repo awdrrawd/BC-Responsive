@@ -220,3 +220,40 @@ test('BCX emote rule is checked; disabled preflight does not touch BCX', () => {
   assert.equal(checkBCX({ type: 'emote' }, true, host).allowed, false);
   assert.equal(checkBCX({ type: 'emote' }, false, host).allowed, true);
 });
+
+test('activity execution keeps target focus, restores it on error, and allows retry', () => {
+  const old = { Name: 'ItemFeet' };
+  const group = { Name: 'ItemHead' };
+  const target = { MemberNumber: 2, AssetFamily: 'TargetFamily', FocusGroup: old };
+  let fail = true,
+    calls = 0;
+  const host = {
+    Player: { AssetFamily: 'ActorFamily' },
+    ChatRoomCharacter: [target],
+    AssetGroupGet: () => group,
+    ActivityAllowedForGroup: () => [{ Activity: { Name: 'Pet' } }],
+    ActivityGetGroupOrMirror(family) {
+      assert.equal(family, 'TargetFamily');
+      return group;
+    },
+    ActivityRun() {
+      assert.equal(target.FocusGroup, group);
+      calls++;
+      if (fail) throw Error('activity hook failed');
+    },
+  };
+  const output = createOutput({
+    host,
+    store: { data: { settings: { bcx: false } } },
+    owns: () => true,
+    report() {},
+  });
+  const step = { type: 'activity', activity: 'Pet', group: 'ItemHead' };
+  const event = { actor: 2, room: 'room' };
+  assert.throws(() => output.execute(step, event), /activity hook failed/);
+  assert.equal(target.FocusGroup, old);
+  fail = false;
+  output.execute(step, event);
+  assert.equal(calls, 2);
+  assert.equal(target.FocusGroup, old);
+});

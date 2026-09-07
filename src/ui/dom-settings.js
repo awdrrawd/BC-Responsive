@@ -145,7 +145,7 @@ export function installSettings({ store, t, host = globalThis }) {
     if (r.trigger.kind === 'speech')
       return `<div class="rl-field">${esc(t('speechChannel'))}</div><div class="rl-segments">${['all', 'chat', 'whisper'].map((v) => `<button data-trigger-value="channel" data-value="${v}" class="${r.trigger.channel === v ? 'on' : ''}">${esc(t('speech_' + v))}</button>`).join('')}</div><div class="rl-field"><span>${esc(t('chance'))}</span><output data-chance-value>${r.trigger.chance ?? 100}%</output></div><input class="rl-chance-bar" type="range" min="0" max="100" step="1" aria-label="${esc(t('chance'))}" data-chance value="${r.trigger.chance ?? 100}"><div class="rl-field">${esc(t('severity'))}</div><div class="rl-segments">${['weak', 'medium', 'strong', 'addicted'].map((v) => `<button data-trigger-value="severity" data-value="${v}" class="${r.trigger.severity === v ? 'on' : ''}">${esc(t(v))}</button>`).join('')}</div><p class="rl-muted">${esc(t('speechHint'))}</p>`;
     if (r.trigger.kind === 'activity')
-      return `<div class="rl-summary"><b>${esc(r.trigger.groups?.join(', ') || t('allGroups'))}</b><br>${esc(r.trigger.activities?.map((a) => activityLabel(a, r.trigger.groups?.[0] || '', host)).join(', ') || t('allActivities'))}</div><button class="primary" style="margin-top:18px" data-act="picker" data-mode="trigger">${esc(t('openActionPicker'))}</button>`;
+      return `<div class="rl-summary"><b>${esc(r.trigger.groups?.join(', ') || t('allGroups'))}</b><br>${esc(r.trigger.activities?.map((a) => activityLabel(a, r.trigger.groups?.[0] || '', host)).join(', ') || t('allActivities'))}</div><button class="primary" style="margin-top:18px" data-act="picker" data-mode="trigger">${esc(t('openActionPicker'))}</button><button style="margin-left:12px" data-act="allTriggerActivities">${esc(t('allActivities'))}</button>`;
     if (r.trigger.kind === 'orgasm')
       return `<div class="rl-field"><span>${esc(t('outcome'))}</span></div><div class="rl-segments">${['Any', 'Orgasmed', 'Ruined', 'Resisted'].map((x) => `<button class="${r.trigger.outcome === x ? 'on' : ''}" data-trigger-value="outcome" data-value="${x}">${esc(t(x))}</button>`).join('')}</div>`;
     if (r.trigger.kind === 'spicer')
@@ -955,6 +955,15 @@ export function installSettings({ store, t, host = globalThis }) {
           render();
         }),
     );
+    root.querySelectorAll('[data-act="allTriggerActivities"]').forEach((button) => {
+      button.onclick = () => {
+        draft.trigger.groups = [];
+        draft.trigger.activities = [];
+        delete draft.trigger.matchNone;
+        pickerSelected.clear();
+        render();
+      };
+    });
     root.querySelectorAll('[data-act="confirmPicker"]').forEach(
       (b) =>
         (b.onclick = () => {
