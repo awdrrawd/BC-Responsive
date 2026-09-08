@@ -1,4 +1,6 @@
 export default {
+  expressionEngineConflict:
+    'Die Ausdrucks-Engine von {engines} wurde erkannt. Deaktiviere eine der Ausdrucksfunktionen, um Konflikte zu vermeiden.',
   testAnimation: 'Testen',
   copyText: 'Kopieren',
   pasteText: 'Einfügen',

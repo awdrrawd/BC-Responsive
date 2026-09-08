@@ -1,4 +1,6 @@
 export default {
+  expressionEngineConflict:
+    'Виявлено рушій виразів {engines}. Вимкніть одну з функцій виразів, щоб уникнути конфліктів.',
   testAnimation: 'Перевірити',
   copyText: 'Копіювати',
   pasteText: 'Вставити',

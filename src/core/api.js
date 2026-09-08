@@ -1,3 +1,4 @@
+import { lceFeatureEnabled } from '../integrations/compat.js';
 import { ID, VERSION, clone } from './model.js';
 export function createAPI(namespace, store, host = globalThis) {
   const listeners = new Set();
@@ -69,14 +70,14 @@ export function createAPI(namespace, store, host = globalThis) {
           ),
       };
       const next = { ...desired };
-      // Old LCE versions have no cooperation adapter: do not race their active writers.
-      if (host.Liko?.LCE && !consumers.has('LCE')) {
-        if (host.Liko.LCE.getFeature?.('autoMouthOnTalk')) next.mouth = false;
-        if (host.Liko.LCE.getFeature?.('animationEngine')) next.expressions = false;
-      }
-      for (const handler of consumers.values()) {
+      // Mouth has one writer. Never ask an enabled LCE mouth to yield back to us.
+      if (lceFeatureEnabled('autoMouthOnTalk', host)) next.mouth = false;
+      for (const [name, handler] of consumers) {
         try {
-          const accepted = handler(clone(desired));
+          // Expressions are independently managed; the settings panel warns about overlap.
+          // Release the older LCE adapter's expression ownership instead of disabling LCE.
+          const request = name === 'LCE' ? { ...next, expressions: false } : next;
+          const accepted = handler(clone(request));
           if (accepted !== true) {
             next.mouth = false;
             next.expressions = false;

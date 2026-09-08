@@ -1,3 +1,4 @@
+import { expressionConflicts } from '../integrations/compat.js';
 import { createAnimationPreview } from './animation-preview.js';
 import { bindClearableInputs } from './input-controls.js';
 import CSS from './settings.css';
@@ -344,6 +345,14 @@ export function installSettings({ store, t, host = globalThis }) {
     const oldRuleList = root.querySelector('.rl-rule-list');
     if (oldRuleList) ruleScrollTop = oldRuleList.scrollTop;
     root.innerHTML = shell(page === 'home' ? homeHtml() : rulesHtml(), page === 'rules' ? active().name : '');
+    const panel = root.querySelector(page === 'home' ? '.rl-panel' : '.rl-editor');
+    if (panel) {
+      const warning = host.document.createElement('p');
+      warning.className = 'rl-engine-warning';
+      warning.setAttribute('role', 'status');
+      warning.setAttribute('data-engine-warning', '');
+      panel.appendChild(warning);
+    }
     const newRuleList = root.querySelector('.rl-rule-list');
     if (newRuleList) newRuleList.scrollTop = ruleScrollTop;
     bind();
@@ -1317,6 +1326,13 @@ export function installSettings({ store, t, host = globalThis }) {
   }
   function position() {
     if (!root) return;
+    const warning = root.querySelector('[data-engine-warning]');
+    if (warning) {
+      const engines = expressionConflicts(store, host);
+      const text = engines.length ? fmt('expressionEngineConflict', { engines: engines.join('/') }) : '';
+      if (warning.textContent !== text) warning.textContent = text;
+      warning.hidden = engines.length === 0;
+    }
     if (!wardrobePending) animationPreview.draw();
     const b = drawingContext(host).canvas.getBoundingClientRect();
     Object.assign(root.style, {

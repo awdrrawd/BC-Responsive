@@ -1,4 +1,6 @@
 export default {
+  expressionEngineConflict:
+    'Обнаружен движок выражений {engines}. Отключите одну из функций выражений, чтобы избежать конфликтов.',
   testAnimation: 'Проверить',
   copyText: 'Копировать',
   pasteText: 'Вставить',

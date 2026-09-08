@@ -1,5 +1,7 @@
+import { lceFeatureEnabled } from '../integrations/compat.js';
 export function createMouth({ sdk, owns, host = globalThis }) {
   const animations = new Map();
+  const mouthOn = () => owns('mouth') && !lceFeatureEnabled('autoMouthOnTalk', host);
   const refresh = (c) => host.CharacterRefresh(c, false);
   function clear() {
     for (const { timer } of animations.values()) clearTimeout(timer);
@@ -8,7 +10,7 @@ export function createMouth({ sdk, owns, host = globalThis }) {
     chars.forEach(refresh);
   }
   sdk.hookFunction('CommonDrawAppearanceBuild', 0, (args, next) => {
-    if (!owns('mouth')) return next(args);
+    if (!mouthOn()) return next(args);
     const state = animations.get(args[0]?.MemberNumber);
     if (!state) return next(args);
     const item = host.InventoryGet(args[0], 'Mouth');
@@ -30,7 +32,7 @@ export function createMouth({ sdk, owns, host = globalThis }) {
     clear,
     receive(data, sender, message) {
       if (
-        !owns('mouth') ||
+        !mouthOn() ||
         data.Type !== 'Chat' ||
         data.Target != null ||
         !sender ||
@@ -46,7 +48,7 @@ export function createMouth({ sdk, owns, host = globalThis }) {
       animations.set(sender.MemberNumber, state);
       const run = () => {
         if (
-          !owns('mouth') ||
+          !mouthOn() ||
           host.CurrentScreen !== 'ChatRoom' ||
           !host.ChatRoomCharacter.includes(sender) ||
           index >= frames.length

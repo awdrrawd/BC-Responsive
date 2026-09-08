@@ -1,4 +1,5 @@
 export default {
+  expressionEngineConflict: '偵測到{engines}的表情引擎，請關閉其中一方，否則可能發生衝突',
   testAnimation: '測試',
   copyText: '複製',
   pasteText: '貼上',

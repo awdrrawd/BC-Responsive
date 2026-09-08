@@ -1,4 +1,6 @@
 export default {
+  expressionEngineConflict:
+    'Le moteur d’expressions de {engines} est actif. Désactivez l’une des fonctions d’expression pour éviter les conflits.',
   testAnimation: 'Tester',
   copyText: 'Copier',
   pasteText: 'Coller',

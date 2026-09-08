@@ -72,7 +72,7 @@ test('new on-account personas blacklist self by default', () => {
   assert.equal(data.personas[0].listMode, 'blacklist');
   assert.deepEqual(data.personas[0].blackList, [1234]);
 });
-test('old LCE blocks competing mouth; registered LCE pauses before ownership, resumes after disable', () => {
+test('Responsive mouth yields to LCE even with a registered consumer', () => {
   const data = defaults();
   data.settings.enabled = true;
   data.settings.mouth = true;
@@ -89,6 +89,10 @@ test('old LCE blocks competing mouth; registered LCE pauses before ownership, re
     paused = desired.mouth;
     return true;
   });
+  assert.equal(paused, false);
+  assert.equal(namespace.isActive('mouth'), false);
+  host.Liko.LCE.getFeature = () => false;
+  coordination.refresh();
   assert.equal(paused, true);
   assert.equal(namespace.isActive('mouth'), true);
   data.settings.enabled = false;
