@@ -99,7 +99,7 @@ export default {
   type: 'Type',
   allGroups: 'Toutes les zones du corps',
   allActivities: 'Toutes les activités',
-  openActionPicker: 'Choisir les activités par zone du corps',
+  openActionPicker: "Sélecteur d'actions",
   activityStep: 'Activité',
   textStep: 'Texte',
   selectRuleHint: 'Sélectionnez ou ajoutez une règle',

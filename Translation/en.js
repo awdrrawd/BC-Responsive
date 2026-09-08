@@ -126,7 +126,7 @@ export default {
   type: 'Type',
   allGroups: 'All body areas',
   allActivities: 'All activities',
-  openActionPicker: 'Open body activity picker',
+  openActionPicker: 'Open action panel',
   activityStep: 'Activity',
   textStep: 'Text',
   selectRuleHint: 'Select or add a rule',

@@ -98,7 +98,7 @@ export default {
   type: 'Тип',
   allGroups: 'Все области тела',
   allActivities: 'Все действия',
-  openActionPicker: 'Выбрать действия по области тела',
+  openActionPicker: 'Выбор действий',
   activityStep: 'Взаимодействие',
   textStep: 'Текст',
   selectRuleHint: 'Выберите или добавьте правило',

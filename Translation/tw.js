@@ -122,7 +122,7 @@ export default {
   type: '類型',
   allGroups: '所有部位',
   allActivities: '所有動作',
-  openActionPicker: '開啟人體動作面板',
+  openActionPicker: '開啟動作面板',
   activityStep: '動作',
   textStep: '文字',
   selectRuleHint: '請選擇或新增一條規則',

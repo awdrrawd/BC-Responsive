@@ -100,7 +100,7 @@ export default {
   type: 'Typ',
   allGroups: 'Alle Körperbereiche',
   allActivities: 'Alle Aktivitäten',
-  openActionPicker: 'Körperaktivitäten auswählen',
+  openActionPicker: 'Aktionsauswahl',
   activityStep: 'Aktivität',
   textStep: 'Text',
   selectRuleHint: 'Eine Regel auswählen oder hinzufügen',

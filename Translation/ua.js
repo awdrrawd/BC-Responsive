@@ -99,7 +99,7 @@ export default {
   type: 'Тип',
   allGroups: 'Усі ділянки тіла',
   allActivities: 'Усі дії',
-  openActionPicker: 'Вибрати дії за ділянкою тіла',
+  openActionPicker: 'Вибір дій',
   activityStep: 'Взаємодія',
   textStep: 'Текст',
   selectRuleHint: 'Виберіть або додайте правило',
