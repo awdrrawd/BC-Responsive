@@ -1,3 +1,4 @@
+import './i18n-engine.js';
 import EN from '../../Translation/en.js';
 import TW from '../../Translation/tw.js';
 import CN from '../../Translation/cn.js';
@@ -13,6 +14,15 @@ const normalize = (value) =>
   ] ?? String(value || 'EN').toUpperCase();
 export function initI18n(host = globalThis) {
   host.Liko ??= {};
+  const engine = host.Liko.__Sys_i18n__;
+  if (engine?.register && engine?.t) {
+    const strings = Object.create(null);
+    for (const [language, table] of Object.entries(tables)) {
+      for (const [key, value] of Object.entries(table)) (strings[key] ??= {})[language] = value;
+    }
+    engine.register(ID, strings);
+    return key => engine.t(ID, key, undefined, normalize(host.TranslationLanguage));
+  }
   if (!host.Liko.I18N) {
     const registry = new Map();
     const callbacks = new Set();
