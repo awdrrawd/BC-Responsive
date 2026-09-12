@@ -1,4 +1,5 @@
 export default {
+  preferenceName: 'Автоответ (Liko)',
   expressionEngineConflict:
     'Обнаружен движок выражений {engines}. Отключите одну из функций выражений, чтобы избежать конфликтов.',
   testAnimation: 'Проверить',

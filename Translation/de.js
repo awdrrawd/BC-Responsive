@@ -1,4 +1,5 @@
 export default {
+  preferenceName: 'Automatische Antwort (Liko)',
   expressionEngineConflict:
     'Die Ausdrucks-Engine von {engines} wurde erkannt. Deaktiviere eine der Ausdrucksfunktionen, um Konflikte zu vermeiden.',
   testAnimation: 'Testen',

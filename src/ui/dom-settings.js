@@ -1383,7 +1383,7 @@ export function installSettings({ store, t, host = globalThis }) {
   }
   host.PreferenceRegisterExtensionSetting({
     Identifier: ID,
-    ButtonText: () => ID,
+    ButtonText: () => t('preferenceName'),
     Image: preferenceIcon,
     load,
     run: position,

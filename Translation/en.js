@@ -1,4 +1,5 @@
 export default {
+  preferenceName: 'Auto Response (Liko)',
   expressionEngineConflict:
     'Detected the {engines} expression engine. Disable one of the expression features to avoid conflicts.',
   testAnimation: 'Test',

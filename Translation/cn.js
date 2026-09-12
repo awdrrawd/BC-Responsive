@@ -1,4 +1,5 @@
 export default {
+  preferenceName: '自动回应(Liko)',
   expressionEngineConflict: '检测到{engines}的表情引擎，请关闭其中一方，否则可能发生冲突',
   testAnimation: '测试',
   copyText: '复制',

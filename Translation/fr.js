@@ -1,4 +1,5 @@
 export default {
+  preferenceName: 'Réponse automatique (Liko)',
   expressionEngineConflict:
     'Le moteur d’expressions de {engines} est actif. Désactivez l’une des fonctions d’expression pour éviter les conflits.',
   testAnimation: 'Tester',

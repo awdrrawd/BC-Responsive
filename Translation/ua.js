@@ -1,4 +1,5 @@
 export default {
+  preferenceName: 'Автовідповідь (Liko)',
   expressionEngineConflict:
     'Виявлено рушій виразів {engines}. Вимкніть одну з функцій виразів, щоб уникнути конфліктів.',
   testAnimation: 'Перевірити',

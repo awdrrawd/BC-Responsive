@@ -1965,6 +1965,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var init_en = __esm({
     "Translation/en.js"() {
       en_default = {
+        preferenceName: "Auto Response (Liko)",
         expressionEngineConflict: "Detected the {engines} expression engine. Disable one of the expression features to avoid conflicts.",
         testAnimation: "Test",
         copyText: "Copy",
@@ -2174,6 +2175,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var init_tw = __esm({
     "Translation/tw.js"() {
       tw_default = {
+        preferenceName: "\u81EA\u52D5\u56DE\u61C9(Liko)",
         expressionEngineConflict: "\u5075\u6E2C\u5230{engines}\u7684\u8868\u60C5\u5F15\u64CE\uFF0C\u8ACB\u95DC\u9589\u5176\u4E2D\u4E00\u65B9\uFF0C\u5426\u5247\u53EF\u80FD\u767C\u751F\u885D\u7A81",
         testAnimation: "\u6E2C\u8A66",
         copyText: "\u8907\u88FD",
@@ -2383,6 +2385,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var init_cn = __esm({
     "Translation/cn.js"() {
       cn_default = {
+        preferenceName: "\u81EA\u52A8\u56DE\u5E94(Liko)",
         expressionEngineConflict: "\u68C0\u6D4B\u5230{engines}\u7684\u8868\u60C5\u5F15\u64CE\uFF0C\u8BF7\u5173\u95ED\u5176\u4E2D\u4E00\u65B9\uFF0C\u5426\u5219\u53EF\u80FD\u53D1\u751F\u51B2\u7A81",
         testAnimation: "\u6D4B\u8BD5",
         copyText: "\u590D\u5236",
@@ -2592,6 +2595,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var init_de = __esm({
     "Translation/de.js"() {
       de_default = {
+        preferenceName: "Automatische Antwort (Liko)",
         expressionEngineConflict: "Die Ausdrucks-Engine von {engines} wurde erkannt. Deaktiviere eine der Ausdrucksfunktionen, um Konflikte zu vermeiden.",
         testAnimation: "Testen",
         copyText: "Kopieren",
@@ -2801,6 +2805,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var init_fr = __esm({
     "Translation/fr.js"() {
       fr_default = {
+        preferenceName: "R\xE9ponse automatique (Liko)",
         expressionEngineConflict: "Le moteur d\u2019expressions de {engines} est actif. D\xE9sactivez l\u2019une des fonctions d\u2019expression pour \xE9viter les conflits.",
         testAnimation: "Tester",
         copyText: "Copier",
@@ -3010,6 +3015,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var init_ru = __esm({
     "Translation/ru.js"() {
       ru_default = {
+        preferenceName: "\u0410\u0432\u0442\u043E\u043E\u0442\u0432\u0435\u0442 (Liko)",
         expressionEngineConflict: "\u041E\u0431\u043D\u0430\u0440\u0443\u0436\u0435\u043D \u0434\u0432\u0438\u0436\u043E\u043A \u0432\u044B\u0440\u0430\u0436\u0435\u043D\u0438\u0439 {engines}. \u041E\u0442\u043A\u043B\u044E\u0447\u0438\u0442\u0435 \u043E\u0434\u043D\u0443 \u0438\u0437 \u0444\u0443\u043D\u043A\u0446\u0438\u0439 \u0432\u044B\u0440\u0430\u0436\u0435\u043D\u0438\u0439, \u0447\u0442\u043E\u0431\u044B \u0438\u0437\u0431\u0435\u0436\u0430\u0442\u044C \u043A\u043E\u043D\u0444\u043B\u0438\u043A\u0442\u043E\u0432.",
         testAnimation: "\u041F\u0440\u043E\u0432\u0435\u0440\u0438\u0442\u044C",
         copyText: "\u041A\u043E\u043F\u0438\u0440\u043E\u0432\u0430\u0442\u044C",
@@ -3219,6 +3225,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
   var init_ua = __esm({
     "Translation/ua.js"() {
       ua_default = {
+        preferenceName: "\u0410\u0432\u0442\u043E\u0432\u0456\u0434\u043F\u043E\u0432\u0456\u0434\u044C (Liko)",
         expressionEngineConflict: "\u0412\u0438\u044F\u0432\u043B\u0435\u043D\u043E \u0440\u0443\u0448\u0456\u0439 \u0432\u0438\u0440\u0430\u0437\u0456\u0432 {engines}. \u0412\u0438\u043C\u043A\u043D\u0456\u0442\u044C \u043E\u0434\u043D\u0443 \u0437 \u0444\u0443\u043D\u043A\u0446\u0456\u0439 \u0432\u0438\u0440\u0430\u0437\u0456\u0432, \u0449\u043E\u0431 \u0443\u043D\u0438\u043A\u043D\u0443\u0442\u0438 \u043A\u043E\u043D\u0444\u043B\u0456\u043A\u0442\u0456\u0432.",
         testAnimation: "\u041F\u0435\u0440\u0435\u0432\u0456\u0440\u0438\u0442\u0438",
         copyText: "\u041A\u043E\u043F\u0456\u044E\u0432\u0430\u0442\u0438",
@@ -5897,7 +5904,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     host.PreferenceRegisterExtensionSetting({
       Identifier: ID,
-      ButtonText: () => ID,
+      ButtonText: () => t("preferenceName"),
       Image: preference_icon_default,
       load,
       run: position,
