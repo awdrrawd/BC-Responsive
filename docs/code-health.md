@@ -28,3 +28,15 @@
 `npm run build`、`npm test`、`npm run format:check`。測試涵蓋載入／取消競態、房間同步失敗、訂閱替換、停止監控、動畫共用畫格／取消、搜尋與既有規則功能。瀏覽器預覽確認繁簡混合、英文、篩選後全選及特殊動作面板。
 
 設定頁的 HTML 模板仍集中於 dom-settings.js，檔案偏大；目前按函式分責，後續新增大型頁面宜再獨立模組。CSS 的既有元件優先級仍有 `!important`，本次移除的是搜尋顯示補救，不宣稱全站樣式已完全重寫。遊戲權限、第三方 hooks 與更衣室完整操作仍需遊戲內驗證。
+
+## 表情疊層與 HSC／LCE 協調（2026-10-06）
+
+對應 LCE `docs/responsive-ownership-review.md` 追蹤的 Responsive 端問題，邏輯集中在 `src/features/expression-layers.js`。
+
+- 每個表情效果有獨立識別碼，依實際部位（Eyes／Eyes2／其他）疊層；到期只撤銷自己。顯示最新的有效效果，全部結束才回到基底；已結束或已取消的效果不會復活，重複回呼無作用。
+- 雙眼效果以單次 `Eyes` 別名寫入與還原，避免送出大小眼中間態；單眼效果（`Eyes1`／`Eyes2`）可與雙眼效果重疊。
+- 結束時若該部位已被他人修改（手動、其他插件、物品被換掉、帳號切換），放棄該部位疊層且不寫回舊值。`clear()` 與停用、離房、人格更新共用同一流程。
+- 讀取 `Liko.HSC.expressions.getState()`（`apiVersion: 1`）：受控部位不寫入也不排程；效果在催眠期間到期則直接遺忘，催眠結束後不補播。雙眼效果只要任一眼受控就整個略過。口型繪圖對玩家自己的 `Mouth` 讓位，其他玩家的口型不受影響。
+- LCE／WCE 動畫引擎攔截 `CharacterSetFacialExpression` 時（`lceAnimationEngineEnabled`／`bceAnimationEngineEnabled`），改以 Timer 秒數送出，引擎視為限時事件並自行到期；Responsive 不再另設還原計時器，也不再寫回「永久手動覆寫」。這不改變 `registerConsumer` 的接管協議（LCE 仍收到 `expressions: false`）。
+
+限制：引擎模式下取消（停用、離房）無法撤回已送出的限時事件，最長影響至該步驟的 `durationMs`。以上為離線測試（`tests/expression-layers.test.js`）驗證，尚待遊戲內與 HSC／LCE／WCE 同用實測。

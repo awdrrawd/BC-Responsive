@@ -2,6 +2,7 @@ import { ID } from '../core/model.js';
 import { allowedActivity } from '../integrations/catalog.js';
 import { checkBCX } from '../integrations/bcx.js';
 import { snapshotItem, wearState, animationState } from './appearance.js';
+import { createExpressionLayers } from './expression-layers.js';
 export function renderText(text, event, host = globalThis) {
   const me = host.Player;
   const other = host.ChatRoomCharacter?.find((c) => c.MemberNumber === event.actor) ?? event.actorCharacter;
@@ -52,6 +53,7 @@ export function createOutput({ store, host = globalThis, owns, report, sdk }) {
   });
   const restores = new Set();
   const animations = new Map();
+  const expressionLayers = createExpressionLayers({ host, report });
   function textMessage(step, event) {
     const text = renderText(step.text, event, host).trim();
     if (!text) return;
@@ -105,33 +107,7 @@ export function createOutput({ store, host = globalThis, owns, report, sdk }) {
       report('Expression ownership unavailable');
       return;
     }
-    const item = host.InventoryGet(host.Player, step.group);
-    if (!item || (step.value && !item.Asset.Group.AllowExpression?.includes(step.value))) return;
-    const previous = item.Property?.Expression ?? null;
-    // BC's Eyes alias writes both eyes. Snapshot both so restore does not erase a manual right-eye edit.
-    const paired = step.group === 'Eyes' ? host.InventoryGet(host.Player, 'Eyes2') : null;
-    const pairedPrevious = paired?.Property?.Expression ?? null;
-    host.CharacterSetFacialExpression(host.Player, step.group, step.value);
-    let timer;
-    const restore = () => {
-      clearTimeout(timer);
-      restores.delete(restore);
-      const current = host.InventoryGet(host.Player, step.group);
-      if (current === item && (current.Property?.Expression ?? null) === step.value)
-        host.CharacterSetFacialExpression(
-          host.Player,
-          step.group === 'Eyes' ? 'Eyes1' : step.group,
-          previous,
-        );
-      if (
-        paired &&
-        host.InventoryGet(host.Player, 'Eyes2') === paired &&
-        (paired.Property?.Expression ?? null) === step.value
-      )
-        host.CharacterSetFacialExpression(host.Player, 'Eyes2', pairedPrevious);
-    };
-    timer = setTimeout(restore, step.durationMs);
-    restores.add(restore);
+    expressionLayers.apply(step);
   }
   function animation(step, event) {
     const groups = step.tracks?.map((track) => track.group) ?? [step.group];
@@ -213,6 +189,7 @@ export function createOutput({ store, host = globalThis, owns, report, sdk }) {
 
   return {
     clear() {
+      expressionLayers.clear();
       for (const restore of [...restores]) {
         try {
           restore();

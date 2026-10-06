@@ -1,8 +1,13 @@
-import { lceFeatureEnabled } from '../integrations/compat.js';
+import { hscExpressionGroups, lceFeatureEnabled } from '../integrations/compat.js';
 export function createMouth({ sdk, owns, host = globalThis }) {
   const animations = new Map();
   const mouthOn = () => owns('mouth') && !lceFeatureEnabled('autoMouthOnTalk', host);
   const refresh = (c) => host.CharacterRefresh(c, false);
+  // Hypnosis controls only the player's own face; other people's mouths keep animating.
+  const hscHoldsMouth = (c) =>
+    c?.MemberNumber !== undefined &&
+    c.MemberNumber === host.Player?.MemberNumber &&
+    hscExpressionGroups(host).has('Mouth');
   function clear() {
     for (const { timer } of animations.values()) clearTimeout(timer);
     const chars = [...animations.values()].map((v) => v.character);
@@ -10,7 +15,7 @@ export function createMouth({ sdk, owns, host = globalThis }) {
     chars.forEach(refresh);
   }
   sdk.hookFunction('CommonDrawAppearanceBuild', 0, (args, next) => {
-    if (!mouthOn()) return next(args);
+    if (!mouthOn() || hscHoldsMouth(args[0])) return next(args);
     const state = animations.get(args[0]?.MemberNumber);
     if (!state) return next(args);
     const item = host.InventoryGet(args[0], 'Mouth');
@@ -36,6 +41,7 @@ export function createMouth({ sdk, owns, host = globalThis }) {
         data.Type !== 'Chat' ||
         data.Target != null ||
         !sender ||
+        hscHoldsMouth(sender) ||
         !message?.trim() ||
         /^[\/!*(@.]|^https?:/i.test(message.trimStart())
       )
@@ -49,6 +55,7 @@ export function createMouth({ sdk, owns, host = globalThis }) {
       const run = () => {
         if (
           !mouthOn() ||
+          hscHoldsMouth(sender) ||
           host.CurrentScreen !== 'ChatRoom' ||
           !host.ChatRoomCharacter.includes(sender) ||
           index >= frames.length
