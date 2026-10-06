@@ -1191,6 +1191,27 @@ One of mods you are using is using an old version of SDK. It will work for now b
     if (!store.data.settings.enabled || !store.data.settings.reactions) return [];
     return expressionEngines(host);
   }
+  function hscExpressionGroups(host = globalThis) {
+    const api = host.Liko?.HSC?.expressions;
+    if (api?.apiVersion !== 1 || typeof api.getState !== "function") return /* @__PURE__ */ new Set();
+    try {
+      const state = api.getState();
+      return new Set(
+        state?.active === true && Array.isArray(state.groups) ? state.groups.filter((group) => typeof group === "string") : []
+      );
+    } catch {
+      return /* @__PURE__ */ new Set();
+    }
+  }
+  function expressionEngineIntercepts(host = globalThis) {
+    for (const key of ["lceAnimationEngineEnabled", "bceAnimationEngineEnabled"]) {
+      try {
+        if (host[key]?.()) return true;
+      } catch {
+      }
+    }
+    return false;
+  }
   var init_compat = __esm({
     "src/integrations/compat.js"() {
     }
@@ -3795,6 +3816,135 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
   });
 
+  // src/features/expression-layers.js
+  function createExpressionLayers({ host = globalThis, report = () => {
+  } } = {}) {
+    const later = (fn, ms) => (host.setTimeout ?? setTimeout)(fn, ms);
+    const cancel = (timer) => (host.clearTimeout ?? clearTimeout)(timer);
+    const slots = /* @__PURE__ */ new Map();
+    const effects = /* @__PURE__ */ new Set();
+    let nextId = 0;
+    const current = (name) => host.InventoryGet(host.Player, name);
+    function write(names, values) {
+      if (!names.length) return;
+      const pair = names.includes("Eyes") && names.includes("Eyes2") && values.Eyes === values.Eyes2;
+      if (pair) host.CharacterSetFacialExpression(host.Player, "Eyes", values.Eyes);
+      for (const name of names)
+        if (!pair || name !== "Eyes" && name !== "Eyes2")
+          host.CharacterSetFacialExpression(host.Player, writeGroup(name), values[name]);
+    }
+    function detach(effect, name) {
+      effect.names.delete(name);
+      if (!effect.names.size) {
+        cancel(effect.timer);
+        effects.delete(effect);
+      }
+    }
+    function drop(name) {
+      const slot = slots.get(name);
+      if (!slot) return;
+      slots.delete(name);
+      for (const effect of [...slot.layers]) detach(effect, name);
+    }
+    const ownsFace = (name, slot, held = hscExpressionGroups(host)) => !held.has(name) && current(name) === slot.item && valueOf(slot.item) === slot.shown;
+    function expire(effect) {
+      effects.delete(effect);
+      const names = [...effect.names];
+      effect.names.clear();
+      const held = hscExpressionGroups(host);
+      const writes = {};
+      for (const name of names) {
+        const slot = slots.get(name);
+        const index = slot ? slot.layers.indexOf(effect) : -1;
+        if (index < 0) continue;
+        slot.layers.splice(index, 1);
+        if (!ownsFace(name, slot, held)) {
+          drop(name);
+          continue;
+        }
+        const desired = slot.layers.length ? slot.layers.at(-1).value : slot.base;
+        if (!slot.layers.length) slots.delete(name);
+        if (desired !== slot.shown) {
+          writes[name] = desired;
+          slot.shown = desired;
+        }
+      }
+      try {
+        write(Object.keys(writes), writes);
+      } catch (error) {
+        report(error);
+      }
+    }
+    return {
+      apply(step2) {
+        const names = slotsFor(step2.group);
+        const items = Object.fromEntries(names.map((name) => [name, current(name)]));
+        const allowed = names.filter(
+          (name) => items[name] && (!step2.value || items[name].Asset.Group.AllowExpression?.includes(step2.value))
+        );
+        if (allowed[0] !== names[0]) return;
+        const held = hscExpressionGroups(host);
+        if (names.some((name) => held.has(name))) {
+          report("Expression skipped: hypnosis controls this group");
+          return;
+        }
+        const value = step2.value ?? null;
+        if (expressionEngineIntercepts(host)) {
+          for (const name of allowed) drop(name);
+          host.CharacterSetFacialExpression(host.Player, step2.group, value, step2.durationMs / 1e3);
+          return;
+        }
+        const effect = { id: ++nextId, value, names: new Set(allowed), timer: null };
+        for (const name of allowed) {
+          let slot = slots.get(name);
+          if (slot && !ownsFace(name, slot, held)) {
+            drop(name);
+            slot = void 0;
+          }
+          if (!slot) {
+            const shown = valueOf(items[name]);
+            slot = { item: items[name], base: shown, shown, layers: [] };
+            slots.set(name, slot);
+          }
+          slot.layers.push(effect);
+        }
+        effect.timer = later(() => expire(effect), step2.durationMs);
+        effects.add(effect);
+        const writes = {};
+        for (const name of allowed) {
+          const slot = slots.get(name);
+          if (value !== slot.shown) writes[name] = value;
+        }
+        write(Object.keys(writes), writes);
+        for (const name of Object.keys(writes)) slots.get(name).shown = value;
+      },
+      // Cancel every pending effect and give back the original face where this module still owns it.
+      clear() {
+        const held = hscExpressionGroups(host);
+        const writes = {};
+        for (const [name, slot] of slots)
+          if (ownsFace(name, slot, held) && slot.base !== slot.shown) writes[name] = slot.base;
+        for (const effect of effects) cancel(effect.timer);
+        effects.clear();
+        slots.clear();
+        try {
+          write(Object.keys(writes), writes);
+        } catch (error) {
+          report(error);
+        }
+      }
+    };
+  }
+  var slotsFor, writeGroup, valueOf;
+  var init_expression_layers = __esm({
+    "src/features/expression-layers.js"() {
+      init_compat();
+      slotsFor = (group) => group === "Eyes" ? ["Eyes", "Eyes2"] : group === "Eyes1" ? ["Eyes"] : [group];
+      writeGroup = (slot) => slot === "Eyes" ? "Eyes1" : slot;
+      valueOf = (item) => item?.Property?.Expression ?? null;
+    }
+  });
+
   // src/features/output.js
   function renderText(text, event, host = globalThis) {
     const me = host.Player;
@@ -3841,6 +3991,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     });
     const restores = /* @__PURE__ */ new Set();
     const animations = /* @__PURE__ */ new Map();
+    const expressionLayers = createExpressionLayers({ host, report });
     function textMessage(step2, event) {
       const text = renderText(step2.text, event, host).trim();
       if (!text) return;
@@ -3885,28 +4036,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         report("Expression ownership unavailable");
         return;
       }
-      const item = host.InventoryGet(host.Player, step2.group);
-      if (!item || step2.value && !item.Asset.Group.AllowExpression?.includes(step2.value)) return;
-      const previous = item.Property?.Expression ?? null;
-      const paired = step2.group === "Eyes" ? host.InventoryGet(host.Player, "Eyes2") : null;
-      const pairedPrevious = paired?.Property?.Expression ?? null;
-      host.CharacterSetFacialExpression(host.Player, step2.group, step2.value);
-      let timer;
-      const restore = () => {
-        clearTimeout(timer);
-        restores.delete(restore);
-        const current = host.InventoryGet(host.Player, step2.group);
-        if (current === item && (current.Property?.Expression ?? null) === step2.value)
-          host.CharacterSetFacialExpression(
-            host.Player,
-            step2.group === "Eyes" ? "Eyes1" : step2.group,
-            previous
-          );
-        if (paired && host.InventoryGet(host.Player, "Eyes2") === paired && (paired.Property?.Expression ?? null) === step2.value)
-          host.CharacterSetFacialExpression(host.Player, "Eyes2", pairedPrevious);
-      };
-      timer = setTimeout(restore, step2.durationMs);
-      restores.add(restore);
+      expressionLayers.apply(step2);
     }
     function animation(step2, event) {
       const groups = step2.tracks?.map((track) => track.group) ?? [step2.group];
@@ -3982,6 +4112,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     }
     return {
       clear() {
+        expressionLayers.clear();
         for (const restore of [...restores]) {
           try {
             restore();
@@ -4028,6 +4159,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       init_catalog();
       init_bcx();
       init_appearance();
+      init_expression_layers();
     }
   });
 
@@ -4036,6 +4168,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     const animations = /* @__PURE__ */ new Map();
     const mouthOn = () => owns("mouth") && !lceFeatureEnabled("autoMouthOnTalk", host);
     const refresh = (c) => host.CharacterRefresh(c, false);
+    const hscHoldsMouth = (c) => c?.MemberNumber !== void 0 && c.MemberNumber === host.Player?.MemberNumber && hscExpressionGroups(host).has("Mouth");
     function clear() {
       for (const { timer } of animations.values()) clearTimeout(timer);
       const chars = [...animations.values()].map((v) => v.character);
@@ -4043,7 +4176,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       chars.forEach(refresh);
     }
     sdk.hookFunction("CommonDrawAppearanceBuild", 0, (args, next) => {
-      if (!mouthOn()) return next(args);
+      if (!mouthOn() || hscHoldsMouth(args[0])) return next(args);
       const state = animations.get(args[0]?.MemberNumber);
       if (!state) return next(args);
       const item = host.InventoryGet(args[0], "Mouth");
@@ -4064,7 +4197,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
     return {
       clear,
       receive(data, sender, message) {
-        if (!mouthOn() || data.Type !== "Chat" || data.Target != null || !sender || !message?.trim() || /^[\/!*(@.]|^https?:/i.test(message.trimStart()))
+        if (!mouthOn() || data.Type !== "Chat" || data.Target != null || !sender || hscHoldsMouth(sender) || !message?.trim() || /^[\/!*(@.]|^https?:/i.test(message.trimStart()))
           return;
         const existing = animations.get(sender.MemberNumber);
         if (existing) clearTimeout(existing.timer);
@@ -4073,7 +4206,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const state = { character: sender, value: null, timer: null };
         animations.set(sender.MemberNumber, state);
         const run = () => {
-          if (!mouthOn() || host.CurrentScreen !== "ChatRoom" || !host.ChatRoomCharacter.includes(sender) || index >= frames.length) {
+          if (!mouthOn() || hscHoldsMouth(sender) || host.CurrentScreen !== "ChatRoom" || !host.ChatRoomCharacter.includes(sender) || index >= frames.length) {
             animations.delete(sender.MemberNumber);
             refresh(sender);
             return;
