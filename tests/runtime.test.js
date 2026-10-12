@@ -2,7 +2,7 @@ import { installEvents } from '../src/integrations/events.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import LZString from 'lz-string';
-import { createStore } from '../src/core/store.js';
+import { createStore, MAX_TRANSFER_BYTES, transferBytes } from '../src/core/store.js';
 import { createAPI } from '../src/core/api.js';
 import { defaults, ID } from '../src/core/model.js';
 import { createOutput, renderText } from '../src/features/output.js';
@@ -26,18 +26,18 @@ test('disposing an older consumer preserves the replacement registration', () =>
   assert.equal(calls, 2);
 });
 test('storage validates before saving and rolls back failed persistence', () => {
-  const host = { Player: { ExtensionSettings: {} }, LZString, ServerPlayerExtensionSettingsSync() {} };
+  const host = { Player: { ExtensionSettings: {} }, LZString, ServerSend() {} };
   const store = createStore(host);
   store.load();
   store.update((d) => (d.settings.enabled = true));
-  const saved = host.Player.ExtensionSettings[ID];
+  const saved = JSON.stringify(host.Player.ExtensionSettings[ID]);
   assert.equal(store.data.settings.enabled, true);
-  host.ServerPlayerExtensionSettingsSync = () => {
+  host.ServerSend = () => {
     throw Error('offline');
   };
   assert.throws(() => store.update((d) => (d.settings.enabled = false)));
   assert.equal(store.data.settings.enabled, true);
-  assert.equal(host.Player.ExtensionSettings[ID], saved);
+  assert.equal(JSON.stringify(host.Player.ExtensionSettings[ID]), saved);
   assert.throws(() => store.update((d) => d.personas[0].rules.push(null)));
 });
 test('malformed stored data is not overwritten', () => {
@@ -55,8 +55,8 @@ test('the former empty initial persona receives starter responses once', () => {
   const host = {
     Player: { ExtensionSettings: { [ID]: LZString.compressToBase64(JSON.stringify(old)) } },
     LZString,
-    ServerPlayerExtensionSettingsSync() {
-      syncs++;
+    ServerSend(message) {
+      if (message === 'AccountUpdate') syncs++;
     },
   };
   const store = createStore(host);
@@ -65,7 +65,7 @@ test('the former empty initial persona receives starter responses once', () => {
   assert.ok(store.active.rules.some((r) => r.trigger.kind === 'orgasm'));
   assert.ok(store.active.rules.some((r) => r.trigger.kind === 'spicer'));
   assert.equal(store.data.starterVersion, 1);
-  assert.equal(syncs, 1);
+  assert.equal(syncs, 1, 'legacy profile converted by one whole-key replace');
 });
 test('new on-account personas blacklist self by default', () => {
   const data = defaults(1234);
@@ -309,4 +309,124 @@ test('automatic activity replies are tagged and do not trigger another automatic
     handler.Callback(args[1], target, 'Hug', metadata);
   });
   assert.equal(submitted.length, 1);
+});
+
+const noisy = (n) => {
+  let out = '';
+  while (out.length < n) out += Math.random().toString(36).slice(2);
+  return out.slice(0, n);
+};
+function bigPersona(d, name, rules) {
+  const p = { ...d.personas[0], id: `id-${name}`, name, rules: [] };
+  for (let i = 0; i < rules; i++)
+    p.rules.push({
+      id: `r${i}`,
+      name: 'r',
+      enabled: true,
+      trigger: { kind: 'activity', activities: ['Pet'], groups: [], members: [], self: false },
+      dedupeMs: 0,
+      delayMs: 0,
+      choices: [{ id: `c${i}`, steps: [{ type: 'chat', text: noisy(4000) }] }],
+    });
+  return p;
+}
+function splitHost() {
+  const sent = [];
+  const host = {
+    Player: { ExtensionSettings: {} },
+    LZString,
+    ServerSend(message, payload) {
+      assert.equal(message, 'AccountUpdate');
+      const [field] = Object.keys(payload);
+      assert.equal(Object.keys(payload).length, 1, 'one field per transfer');
+      sent.push({ field, bytes: new TextEncoder().encode(JSON.stringify([message, payload])).byteLength });
+    },
+  };
+  return { host, sent };
+}
+const P = `ExtensionSettings.${ID}`;
+test('Settings and every persona are separate keys; changes send only the affected key', () => {
+  const { host, sent } = splitHost();
+  const store = createStore(host);
+  store.load();
+  store.update((d) => (d.settings.mouth = false)); // first split save: one whole-key replace
+  assert.deepEqual(
+    sent.map((m) => m.field),
+    [P],
+  );
+  assert.deepEqual(Object.keys(host.Player.ExtensionSettings[ID]), ['Settings', 'Personas']);
+  sent.length = 0;
+  store.update((d) => d.personas.push(bigPersona(d, 'A', 30), bigPersona(d, 'B', 30)));
+  assert.deepEqual(
+    sent.map((m) => m.field),
+    [`${P}.Personas.P1`, `${P}.Personas.P2`, `${P}.Settings`],
+  );
+  const total = JSON.stringify(host.Player.ExtensionSettings[ID]).length;
+  assert.ok(total > MAX_TRANSFER_BYTES, `test data must exceed one transfer (got ${total})`);
+  assert.ok(sent.every((m) => m.bytes <= MAX_TRANSFER_BYTES));
+  sent.length = 0;
+  store.update((d) => (d.settings.mouth = !d.settings.mouth));
+  assert.deepEqual(
+    sent.map((m) => m.field),
+    [`${P}.Settings`],
+  );
+  sent.length = 0;
+  store.update((d) => (d.personas.find((p) => p.id === 'id-A').name = 'A2'));
+  assert.deepEqual(
+    sent.map((m) => m.field),
+    [`${P}.Personas.P1`],
+  );
+  const reloaded = createStore({ ...host });
+  reloaded.load();
+  assert.deepEqual(reloaded.data, store.data);
+});
+test('a single persona over the transfer budget is rejected without touching storage', () => {
+  const { host, sent } = splitHost();
+  const store = createStore(host);
+  store.load();
+  store.update((d) => d.personas.push(bigPersona(d, 'ok', 5)));
+  const before = JSON.stringify(host.Player.ExtensionSettings);
+  sent.length = 0;
+  assert.throws(() => store.update((d) => d.personas.push(bigPersona(d, 'huge', 500))), /too large/);
+  assert.equal(JSON.stringify(host.Player.ExtensionSettings), before);
+  assert.equal(sent.length, 0);
+});
+test('legacy single-string profiles load, then convert to split keys in one transfer', () => {
+  const legacy = defaults();
+  const { host, sent } = splitHost();
+  host.Player.ExtensionSettings[ID] = LZString.compressToBase64(JSON.stringify(legacy));
+  const store = createStore(host);
+  store.load();
+  assert.equal(store.active.id, legacy.activePersona);
+  store.update((d) => (d.settings.mouth = true));
+  assert.deepEqual(
+    sent.map((m) => m.field),
+    [P],
+    'whole-key replace, not a path update inside a string',
+  );
+  assert.equal(typeof host.Player.ExtensionSettings[ID], 'object');
+  const again = createStore(host);
+  again.load();
+  assert.equal(again.data.settings.mouth, true);
+});
+test('removing a persona sends Settings first, then empties its key; missing blobs are never overwritten', () => {
+  const { host, sent } = splitHost();
+  const store = createStore(host);
+  store.load();
+  store.update((d) => d.personas.push(bigPersona(d, 'B', 3)));
+  sent.length = 0;
+  store.update((d) => d.personas.splice(1, 1));
+  assert.deepEqual(
+    sent.map((m) => m.field),
+    [`${P}.Settings`, `${P}.Personas.P1`],
+  );
+  assert.equal(host.Player.ExtensionSettings[ID].Personas.P1, '');
+  store.update((d) => d.personas.push(bigPersona(d, 'C', 3)));
+  assert.notEqual(host.Player.ExtensionSettings[ID].Personas.P1, '', 'emptied key is reused');
+  const broken = splitHost();
+  broken.host.Player.ExtensionSettings = JSON.parse(JSON.stringify(host.Player.ExtensionSettings));
+  broken.host.Player.ExtensionSettings[ID].Personas.P0 = '';
+  const before = JSON.stringify(broken.host.Player.ExtensionSettings);
+  assert.throws(() => createStore(broken.host).load());
+  assert.equal(JSON.stringify(broken.host.Player.ExtensionSettings), before);
 });

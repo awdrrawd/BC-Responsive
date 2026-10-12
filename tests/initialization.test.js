@@ -14,7 +14,7 @@ test('initial registration uses persisted game language and preserves saved name
     localStorage: { getItem: () => 'TW' },
     Player: { MemberNumber: 42, ExtensionSettings: {} },
     LZString,
-    ServerPlayerExtensionSettingsSync() {},
+    ServerSend() {},
   };
   const store = createStore(host);
   store.load();
