@@ -1,8 +1,12 @@
 import { clone, object, persona, rule, uid, validatePersona } from './model.js';
 
+/* One import file/paste may be at most 180 KB (UTF-8 bytes), the same figure BC uses for one transmission. */
+export const MAX_IMPORT_BYTES = 180_000;
 function decode(text, lz) {
-  if (typeof text !== 'string' || !text.trim() || text.length > 1000000)
-    throw new Error('Invalid import size');
+  if (typeof text !== 'string' || !text.trim()) throw new Error('Invalid import size');
+  const bytes = new TextEncoder().encode(text).byteLength;
+  if (bytes > MAX_IMPORT_BYTES)
+    throw new Error(`Import too large (${bytes} bytes; limit ${MAX_IMPORT_BYTES} bytes / 180 KB)`);
   try {
     return JSON.parse(text);
   } catch {

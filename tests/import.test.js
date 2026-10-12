@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import LZString from 'lz-string';
-import { importPersonas, exportPersona } from '../src/core/import.js';
+import { MAX_IMPORT_BYTES, importPersonas, exportPersona } from '../src/core/import.js';
 import { persona, rule, validateData, defaults } from '../src/core/model.js';
 test('legacy compressed persona preserves rules, chat/action, placeholders and inactive state', () => {
   const original = {
@@ -97,4 +97,16 @@ test('null and malformed settings/imports fail without silently resetting', () =
   const d = defaults();
   d.settings.enabled = 'yes';
   assert.throws(() => validateData(d));
+});
+test('an import file is limited to 180 KB, measured in UTF-8 bytes', () => {
+  const small = JSON.stringify({ format: 'Responsive_Liko', schemaVersion: 1, personas: [persona('ok')] });
+  assert.equal(importPersonas(small, LZString).personas.length, 1);
+  const pad = (n) => JSON.stringify({ name: 'x', rules: [], pad: 'a'.repeat(n) });
+  assert.ok(new TextEncoder().encode(pad(MAX_IMPORT_BYTES - 40)).byteLength <= MAX_IMPORT_BYTES);
+  assert.doesNotThrow(() => importPersonas(pad(MAX_IMPORT_BYTES - 40), LZString));
+  assert.throws(() => importPersonas(pad(MAX_IMPORT_BYTES), LZString), /Import too large/);
+  // 3-byte characters: character count is below the limit but the byte size is above it
+  const wide = JSON.stringify({ name: 'x', rules: [], pad: '中'.repeat(MAX_IMPORT_BYTES / 3) });
+  assert.ok(wide.length < MAX_IMPORT_BYTES);
+  assert.throws(() => importPersonas(wide, LZString), /Import too large/);
 });

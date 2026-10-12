@@ -1103,6 +1103,95 @@ One of mods you are using is using an old version of SDK. It will work for now b
     let loaded = false;
     const listeners = /* @__PURE__ */ new Set();
     const notify = () => listeners.forEach((fn) => fn(data));
+    const encode = (value) => host.LZString.compressToBase64(JSON.stringify(value));
+    const decode2 = (raw) => JSON.parse(host.LZString.decompressFromBase64(raw));
+    const isSplit = (root) => object(root) && typeof root.Settings === "string" && object(root.Personas);
+    function read(root) {
+      if (typeof root === "string") return validateData(decode2(root));
+      if (!isSplit(root)) throw new Error("Unknown settings layout");
+      const index = decode2(root.Settings);
+      if (!object(index) || !Array.isArray(index.order)) throw new Error("Invalid settings index");
+      const personas = index.order.map(({ id, key }) => {
+        if (typeof key !== "string" || !KEY.test(key)) throw new Error("Invalid settings index");
+        if (!root.Personas[key]) throw new Error(`Missing persona data: ${id}`);
+        return decode2(root.Personas[key]);
+      });
+      const { order, ...rest } = index;
+      return validateData({ ...rest, personas });
+    }
+    const get = (path) => path.reduce((o, k) => o?.[k], host.Player.ExtensionSettings[ID]);
+    function set(path, value) {
+      const settings = host.Player.ExtensionSettings;
+      if (!path.length) {
+        if (value === void 0) delete settings[ID];
+        else settings[ID] = value;
+        return;
+      }
+      const parent = path.slice(0, -1).reduce((o, k) => o[k], settings[ID]);
+      if (value === void 0) delete parent[path.at(-1)];
+      else parent[path.at(-1)] = value;
+    }
+    function checkSize(path, value, label) {
+      const bytes = transferBytes(path, value);
+      if (bytes > MAX_TRANSFER_BYTES)
+        throw new Error(`${label} too large (${bytes} bytes; single transfer budget ${MAX_TRANSFER_BYTES})`);
+    }
+    function plan(next) {
+      const root = host.Player.ExtensionSettings[ID];
+      let keyOf = /* @__PURE__ */ new Map();
+      if (isSplit(root)) {
+        try {
+          keyOf = new Map(decode2(root.Settings).order.map((e) => [e.id, e.key]));
+        } catch {
+        }
+      }
+      const used = new Set(next.personas.map((p) => keyOf.get(p.id)).filter(Boolean));
+      let n = 0;
+      const free = () => {
+        while (used.has(`P${n}`)) n++;
+        used.add(`P${n}`);
+        return `P${n}`;
+      };
+      const order = next.personas.map((p) => ({ id: p.id, key: keyOf.get(p.id) ?? free() }));
+      const { personas, ...rest } = next;
+      const blobs = next.personas.map((p, i) => [order[i].key, encode(p), p.name]);
+      const settings = encode({ ...rest, order });
+      if (!isSplit(root)) {
+        const value = { Settings: settings, Personas: Object.fromEntries(blobs.map(([k, v]) => [k, v])) };
+        checkSize([], value, "Initial settings");
+        return [{ path: [], value }];
+      }
+      const writes = [];
+      for (const [key, value, name] of blobs)
+        if (root.Personas[key] !== value) {
+          checkSize(["Personas", key], value, `Persona "${name}"`);
+          writes.push({ path: ["Personas", key], value });
+        }
+      if (root.Settings !== settings) {
+        checkSize(["Settings"], settings, "Settings");
+        writes.push({ path: ["Settings"], value: settings });
+      }
+      const kept = new Set(order.map((e) => e.key));
+      for (const key of keyOf.values())
+        if (!kept.has(key) && root.Personas[key]) writes.push({ path: ["Personas", key], value: "" });
+      return writes;
+    }
+    function persist(next) {
+      if (!host.Player?.ExtensionSettings) throw new Error("Player settings unavailable");
+      if (typeof host.ServerSend !== "function") throw new Error("ServerSend unavailable");
+      const writes = plan(next);
+      const previous = writes.map((w) => [w.path, clone({ v: get(w.path) }).v]);
+      try {
+        for (const { path, value } of writes) {
+          if (!path.length) set(path, clone(value));
+          else set(path, value);
+          host.ServerSend("AccountUpdate", { [fieldOf(path)]: path.length ? value : clone(value) });
+        }
+      } catch (error) {
+        for (const [path, value] of previous.reverse()) set(path, value);
+        throw error;
+      }
+    }
     return {
       get data() {
         return data;
@@ -1117,8 +1206,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
       load() {
         const raw = host.Player?.ExtensionSettings?.[ID];
         if (raw) {
-          const decoded = host.LZString.decompressFromBase64(raw);
-          data = validateData(JSON.parse(decoded));
+          data = read(raw);
           if (data.starterVersion < 1) {
             if (data.personas.length === 1 && data.personas[0].rules.length === 0) {
               data.personas[0].rules = starterPersona(
@@ -1130,8 +1218,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
                 data.personas[0].blackList.push(host.Player.MemberNumber);
             }
             data.starterVersion = 1;
-            host.Player.ExtensionSettings[ID] = host.LZString.compressToBase64(JSON.stringify(data));
-            host.ServerPlayerExtensionSettingsSync(ID);
+            persist(data);
           }
         } else data = defaults(host.Player?.MemberNumber, gameLanguage(host));
         loaded = true;
@@ -1142,17 +1229,7 @@ One of mods you are using is using an old version of SDK. It will work for now b
         const draft = clone(data);
         change(draft);
         const next = validateData(draft);
-        const encoded = host.LZString.compressToBase64(JSON.stringify(next));
-        if (encoded.length > 6e4) throw new Error("Settings too large (60 KB compressed limit)");
-        if (!host.Player?.ExtensionSettings) throw new Error("Player settings unavailable");
-        const old = host.Player.ExtensionSettings[ID];
-        host.Player.ExtensionSettings[ID] = encoded;
-        try {
-          host.ServerPlayerExtensionSettingsSync(ID);
-        } catch (error) {
-          host.Player.ExtensionSettings[ID] = old;
-          throw error;
-        }
+        persist(next);
         data = next;
         notify();
       },
@@ -1161,10 +1238,16 @@ One of mods you are using is using an old version of SDK. It will work for now b
       }
     };
   }
+  var MAX_TRANSFER_BYTES, KEY, utf8, fieldOf, transferBytes;
   var init_store = __esm({
     "src/core/store.js"() {
       init_language();
       init_model();
+      MAX_TRANSFER_BYTES = 15e4;
+      KEY = /^P\d+$/;
+      utf8 = (text) => new TextEncoder().encode(text).byteLength;
+      fieldOf = (path) => ["ExtensionSettings", ID, ...path].join(".");
+      transferBytes = (path, value) => utf8(JSON.stringify(["AccountUpdate", { [fieldOf(path)]: value }]));
     }
   });
 
@@ -4727,8 +4810,10 @@ One of mods you are using is using an old version of SDK. It will work for now b
 
   // src/core/import.js
   function decode(text, lz) {
-    if (typeof text !== "string" || !text.trim() || text.length > 1e6)
-      throw new Error("Invalid import size");
+    if (typeof text !== "string" || !text.trim()) throw new Error("Invalid import size");
+    const bytes = new TextEncoder().encode(text).byteLength;
+    if (bytes > MAX_IMPORT_BYTES)
+      throw new Error(`Import too large (${bytes} bytes; limit ${MAX_IMPORT_BYTES} bytes / 180 KB)`);
     try {
       return JSON.parse(text);
     } catch {
@@ -4848,9 +4933,11 @@ One of mods you are using is using an old version of SDK. It will work for now b
       JSON.stringify({ format: "Responsive_Liko", schemaVersion: 1, personas: [clone(p)] })
     );
   }
+  var MAX_IMPORT_BYTES;
   var init_import = __esm({
     "src/core/import.js"() {
       init_model();
+      MAX_IMPORT_BYTES = 18e4;
     }
   });
 
