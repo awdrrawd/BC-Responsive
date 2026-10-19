@@ -53,6 +53,7 @@ jobs:
           mkdir -p _site/dist
           cp -r dist/. _site/dist/
           cp -r licenses _site/licenses
+          cp -r assets _site/assets
           cp loader.user.js _site/loader.user.js
           touch _site/.nojekyll
 
