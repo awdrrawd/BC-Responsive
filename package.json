@@ -17,8 +17,8 @@
     "format:check": "prettier --check src Translation tests scripts dev integrations *.user.js"
   },
   "devDependencies": {
-    "esbuild": "0.25.9",
-    "prettier": "^3.9.6"
+    "esbuild": "0.28.2",
+    "prettier": "^3.9.10"
   },
   "dependencies": {
     "bondage-club-mod-sdk": "1.2.0",
