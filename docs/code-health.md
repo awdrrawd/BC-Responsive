@@ -40,3 +40,13 @@
 - LCE／WCE 動畫引擎攔截 `CharacterSetFacialExpression` 時（`lceAnimationEngineEnabled`／`bceAnimationEngineEnabled`），改以 Timer 秒數送出，引擎視為限時事件並自行到期；Responsive 不再另設還原計時器，也不再寫回「永久手動覆寫」。這不改變 `registerConsumer` 的接管協議（LCE 仍收到 `expressions: false`）。
 
 限制：引擎模式下取消（停用、離房）無法撤回已送出的限時事件，最長影響至該步驟的 `durationMs`。以上為離線測試（`tests/expression-layers.test.js`）驗證，尚待遊戲內與 HSC／LCE／WCE 同用實測。
+
+## 2026-10-19：遊戲原碼與 LCE 對照修正
+
+- `ChatRoomAttemptLeave`：遊戲在 `ChatRoomCanLeave()` 為 false 時直接返回，緩速離房事件現在同樣不觸發。
+- `ChatRoomSync`：遊戲會丟棄格式錯誤的資料，或對無效／重複房間再度離房。現在格式錯誤的資料不重置工作，只有 `ChatRoomData` 確實成為該筆資料才算 `join`。
+- 語癖：略過 MuStylePoses 的 `:` 表情語法，並不在 `SpeechGetOOCRanges` 回報的 OOC 區段插入語癖。
+- 口型：繪圖 hook 先檢查是否有進行中的動畫，再讀取 LCE 設定。
+- 訪客歡迎：同一個人在 15 秒內再次進房不會重複歡迎，不同人互不影響；只作用於 `visitor` 事件。
+- 表情（對齊 LCE）：事件優先權與同級後來者優先沿用 LCE `pushEvent` 的規則。引擎接管期間若取消（停用、離房、人格更新），改送一個 0.25 秒、帶先前表情的限時事件取代仍在跑的效果，到期後由引擎回到自己的自動表情；不寫入永久手動覆寫，HSC 控制的部位不寫入。此行為由離線測試驗證，尚待與實際 LCE 同用實測。
+- 驗證：`npm test` 90 通過、1 略過；`format:check` 通過；`dist/main.js` 已重新建置。

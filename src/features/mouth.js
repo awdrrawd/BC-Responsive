@@ -15,7 +15,7 @@ export function createMouth({ sdk, owns, host = globalThis }) {
     chars.forEach(refresh);
   }
   sdk.hookFunction('CommonDrawAppearanceBuild', 0, (args, next) => {
-    if (!mouthOn() || hscHoldsMouth(args[0])) return next(args);
+    if (!animations.size || !mouthOn() || hscHoldsMouth(args[0])) return next(args);
     const state = animations.get(args[0]?.MemberNumber);
     if (!state) return next(args);
     const item = host.InventoryGet(args[0], 'Mouth');

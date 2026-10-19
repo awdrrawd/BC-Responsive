@@ -21,7 +21,7 @@ export function initI18n(host = globalThis) {
       for (const [key, value] of Object.entries(table)) (strings[key] ??= {})[language] = value;
     }
     engine.register(ID, strings);
-    return key => engine.t(ID, key, undefined, normalize(host.TranslationLanguage));
+    return (key) => engine.t(ID, key, undefined, normalize(host.TranslationLanguage));
   }
   if (!host.Liko.I18N) {
     const registry = new Map();

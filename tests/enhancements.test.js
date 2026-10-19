@@ -397,3 +397,44 @@ test('wardrobe saves full state from a preview character without changing player
   assert.deepEqual(host.InformationSheetReturnScreen, ['Online', 'ChatRoom']);
   assert.equal(saved, null);
 });
+
+test('speech leaves MuStyle poses and out-of-character sections alone', () => {
+  const p = persona(),
+    r = rule();
+  r.trigger = { kind: 'speech', channel: 'all', chance: 100, severity: 'strong' };
+  r.choices[0].steps[0].text = '喵';
+  p.rules = [r];
+  let text = ':smile',
+    callback,
+    seen;
+  const host = {
+    CurrentScreen: 'ChatRoom',
+    ChatRoomTargetMemberNumber: -1,
+    Player: { ChatSettings: { MuStylePoses: true } },
+    // Same contract as BC's SpeechGetOOCRanges.
+    SpeechGetOOCRanges(message) {
+      const start = message.indexOf('(');
+      return start < 0 ? [] : [{ start, length: message.length - start }];
+    },
+    ElementValue: (_, v) => (v === undefined ? text : (text = v)),
+  };
+  installSpeech({
+    sdk: { hookFunction: (_, __, fn) => (callback = fn) },
+    store: { active: p },
+    host,
+    enabled: () => true,
+    random: () => 0,
+  });
+  callback([], () => (seen = text));
+  assert.equal(seen, ':smile', 'a MuStyle pose is an emote, never speech');
+  host.Player.ChatSettings.MuStylePoses = false;
+  text = 'hello there (ooc note here)';
+  callback([], () => (seen = text));
+  assert.ok(seen.endsWith('(ooc note here)'));
+  assert.ok(!seen.slice(seen.indexOf('(')).includes('喵'), 'nothing is inserted inside the OOC part');
+  assert.ok(seen.includes('喵'));
+  assert.equal(
+    petSpeech('(only ooc)', ['喵'], 'strong', () => 0, [[0, 10]]),
+    '(only ooc)',
+  );
+});

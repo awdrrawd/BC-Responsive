@@ -56,6 +56,9 @@ export function installEvents({ sdk, submit, mouth, reset, host = globalThis }) 
   };
   host.ChatRoomRegisterMessageHandler(handler);
   sdk.hookFunction('ChatRoomSync', 0, (args, next) => {
+    const data = args[0];
+    // BC ignores a malformed payload before touching its room state, so it is not a room change here either.
+    if (!data || typeof data !== 'object' || typeof data.SourceMemberNumber !== 'number') return next(args);
     lastRoomName = args[0]?.Name ?? host.ChatRoomData?.Name ?? '';
     syncing++;
     roomEpoch++;
@@ -64,7 +67,9 @@ export function installEvents({ sdk, submit, mouth, reset, host = globalThis }) 
       const result = next(args);
       const joined = () => {
         syncing--;
-        if (host.CurrentScreen === 'ChatRoom') submit(event('event', host.Player, { event: 'join' }));
+        // BC rejects invalid or duplicate rooms by leaving again; only an accepted room (the same object) is a join.
+        if (host.CurrentScreen === 'ChatRoom' && host.ChatRoomData === data)
+          submit(event('event', host.Player, { event: 'join' }));
       };
       if (result?.then)
         return result.then(
@@ -100,7 +105,13 @@ export function installEvents({ sdk, submit, mouth, reset, host = globalThis }) 
   });
   if (typeof host.ChatRoomAttemptLeave === 'function')
     sdk.hookFunction('ChatRoomAttemptLeave', 0, (args, next) => {
-      if (host.CurrentScreen === 'ChatRoom' && host.Player?.IsSlow?.() && !host.ChatRoomSlowtimer)
+      // BC returns early when the player cannot leave (leashed, cannot walk, locked room...): no leave attempt happens.
+      if (
+        host.CurrentScreen === 'ChatRoom' &&
+        host.Player?.IsSlow?.() &&
+        !host.ChatRoomSlowtimer &&
+        host.ChatRoomCanLeave?.() !== false
+      )
         submit(event('event', host.Player, { event: 'slowLeave' }));
       return next(args);
     });

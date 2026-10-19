@@ -18,25 +18,33 @@ const valueOf = (item) => item?.Property?.Expression ?? null;
  *   forgotten instead of restoring a stale value afterwards.
  * - When an animation engine (LCE/WCE) intercepts CharacterSetFacialExpression, the engine
  *   arbitrates and expires the effect: it is sent with a Timer so it is a timed event rather than
- *   a permanent manual override, and Responsive keeps no restore timer of its own.
+ *   a permanent manual override, and Responsive keeps no restore timer of its own. Cancelling such
+ *   an effect early hands the face back the way LCE arbitrates events: a newer event of the same
+ *   timed-manual priority wins, so a short timed event carrying the previous face supersedes it and
+ *   then expires, after which the engine resumes its own automatic expression.
  */
+// How long the hand-back event lasts. It is a timed event, never a permanent manual override.
+const HANDBACK_SECONDS = 0.25;
 export function createExpressionLayers({ host = globalThis, report = () => {} } = {}) {
   const later = (fn, ms) => (host.setTimeout ?? setTimeout)(fn, ms);
   const cancel = (timer) => (host.clearTimeout ?? clearTimeout)(timer);
   const slots = new Map(); // slot name -> { item, base, shown, layers: effect[] }
   const effects = new Set(); // effects with a pending timer
+  const engineEffects = new Set(); // timed events handed to an animation engine, which owns their expiry
   let nextId = 0;
   const current = (name) => host.InventoryGet(host.Player, name);
 
-  function write(names, values) {
+  function write(names, values, seconds) {
     if (!names.length) return;
+    const timer = seconds === undefined ? [] : [seconds]; // only engine hand-backs carry a Timer
     const pair = names.includes('Eyes') && names.includes('Eyes2') && values.Eyes === values.Eyes2;
     // One alias call keeps both eyes atomic; two calls would broadcast a mismatched face in between.
-    if (pair) host.CharacterSetFacialExpression(host.Player, 'Eyes', values.Eyes);
+    if (pair) host.CharacterSetFacialExpression(host.Player, 'Eyes', values.Eyes, ...timer);
     for (const name of names)
       if (!pair || (name !== 'Eyes' && name !== 'Eyes2'))
-        host.CharacterSetFacialExpression(host.Player, writeGroup(name), values[name]);
+        host.CharacterSetFacialExpression(host.Player, writeGroup(name), values[name], ...timer);
   }
+  const clock = () => (host.Date ?? Date).now();
   function detach(effect, name) {
     effect.names.delete(name);
     if (!effect.names.size) {
@@ -102,6 +110,12 @@ export function createExpressionLayers({ host = globalThis, report = () => {} } 
       if (expressionEngineIntercepts(host)) {
         // The engine owns arbitration and expiry; earlier local stacks must not write over it later.
         for (const name of allowed) drop(name);
+        const now = clock();
+        for (const entry of engineEffects) if (entry.until <= now) engineEffects.delete(entry);
+        engineEffects.add({
+          until: now + step.durationMs,
+          before: Object.fromEntries(allowed.map((name) => [name, valueOf(items[name])])),
+        });
         host.CharacterSetFacialExpression(host.Player, step.group, value, step.durationMs / 1000);
         return;
       }
@@ -132,6 +146,14 @@ export function createExpressionLayers({ host = globalThis, report = () => {} } 
     // Cancel every pending effect and give back the original face where this module still owns it.
     clear() {
       const held = hscExpressionGroups(host);
+      // Timed events still running inside an engine cannot be withdrawn; supersede them with the old face.
+      const now = clock();
+      const handBack = {};
+      for (const entry of engineEffects)
+        if (entry.until > now)
+          for (const [name, previous] of Object.entries(entry.before))
+            if (!held.has(name)) handBack[name] = previous;
+      engineEffects.clear();
       const writes = {};
       for (const [name, slot] of slots)
         if (ownsFace(name, slot, held) && slot.base !== slot.shown) writes[name] = slot.base;
@@ -140,6 +162,7 @@ export function createExpressionLayers({ host = globalThis, report = () => {} } 
       slots.clear();
       try {
         write(Object.keys(writes), writes);
+        if (expressionEngineIntercepts(host)) write(Object.keys(handBack), handBack, HANDBACK_SECONDS);
       } catch (error) {
         report(error);
       }

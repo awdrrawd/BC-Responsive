@@ -55,6 +55,8 @@ export function selectResponse(persona, event, random = Math.random) {
   }
   return { ...selected, steps, guaranteedSteps: guaranteed?.steps.map((s) => ({ ...s })) ?? [] };
 }
+// A person who keeps entering and leaving must not be greeted every time.
+export const VISITOR_COOLDOWN_MS = 15000;
 export function createScheduler({
   active,
   execute,
@@ -81,11 +83,17 @@ export function createScheduler({
       const time = now();
       const actorKey = `${event.room}|${event.actor}`;
       for (const [key, expires] of actorCooldowns) if (expires <= time) actorCooldowns.delete(key);
-      if (event.kind === 'activity' && actorCooldowns.has(actorKey)) return false;
+      const visitor = event.kind === 'event' && event.event === 'visitor';
+      if (
+        (event.kind === 'activity' || visitor) &&
+        actorCooldowns.has(actorKey + (visitor ? '|visitor' : ''))
+      )
+        return false;
       const selected = selectResponse(p, event, random);
       if (!selected) return false;
       // Shared across rules for this person; other people and room events are independent.
       if (event.kind === 'activity') actorCooldowns.set(actorKey, time + 300);
+      if (visitor) actorCooldowns.set(`${actorKey}|visitor`, time + VISITOR_COOLDOWN_MS);
       // The room and chat input disappear as soon as the leave hook returns.
       const leaving = event.kind === 'event' && event.event === 'leave';
       const token = generation;

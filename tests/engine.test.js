@@ -196,3 +196,18 @@ test('legacy rule cooldown is normalized without changing its response delay', (
   assert.equal(normalized.rules[0].delayMs, r.delayMs);
   assert.equal(r.dedupeMs, 60000, 'validation does not mutate imported input');
 });
+
+test('visitor welcomes have a per-person 15 s cooldown that does not affect others or other events', () => {
+  const { p, r } = fixture();
+  r.trigger = { kind: 'event', event: 'visitor', roomMode: 'any', roomNames: [] };
+  r.delayMs = 0;
+  let time = 0;
+  const scheduler = createScheduler({ active: () => p, valid: () => true, execute() {}, now: () => time });
+  const visitor = (actor) => ({ ...event(actor), kind: 'event', event: 'visitor' });
+  assert.equal(scheduler.submit(visitor(2)), true);
+  time = 14999;
+  assert.equal(scheduler.submit(visitor(2)), false, 'the same person re-entering is not greeted again');
+  assert.equal(scheduler.submit(visitor(3)), true, 'other people are independent');
+  time = 15000;
+  assert.equal(scheduler.submit(visitor(2)), true);
+});

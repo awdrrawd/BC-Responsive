@@ -76,9 +76,11 @@ test('bundled plugin registers with ModSDK and handles a visitor through actual 
     ChatRoomRegisterMessageHandler(config) {
       handler = config;
     },
-    ChatRoomSync() {
+    // Like BC: the received payload object becomes ChatRoomData.
+    ChatRoomSync(data) {
       sandbox.CurrentScreen = 'ChatRoom';
-      sandbox.ChatRoomData = { Name: 'Test' };
+      delete data.SourceMemberNumber;
+      sandbox.ChatRoomData = data;
       sandbox.ChatRoomCharacter = [sandbox.Player];
     },
     ChatRoomLeave() {
@@ -172,7 +174,7 @@ test('bundled plugin registers with ModSDK and handles a visitor through actual 
   setting.unload();
   sandbox.CurrentScreen = 'ChatSearch';
   for (const callback of intervals) callback();
-  sandbox.ChatRoomSync({ Name: 'Test' });
+  sandbox.ChatRoomSync({ Name: 'Test', SourceMemberNumber: 2 });
   for (const callback of intervals) callback();
   await new Promise((resolve) => setTimeout(resolve, 120));
   assert.deepEqual(calls, ['join primary', 'join response']);
@@ -193,10 +195,16 @@ test('bundled plugin registers with ModSDK and handles a visitor through actual 
   assert.equal(draft, 'draft');
   sandbox.ChatRoomSyncMemberLeave({ SourceMemberNumber: 2 });
   sandbox.ChatRoomAddCharacterToChatRoom({ MemberNumber: 2, Name: 'Friend' });
-  assert.equal(calls.length, 4);
+  assert.equal(
+    calls.length,
+    2,
+    'the same person re-entering within the visitor cooldown is not greeted again',
+  );
+  sandbox.ChatRoomAddCharacterToChatRoom({ MemberNumber: 3, Name: 'Another' });
+  assert.equal(calls.length, 4, 'another person is greeted independently');
   sandbox.Liko[ID].stop();
   assert.equal(intervals.size, 1, 'stop clears the plugin monitor; the shared i18n service remains');
-  sandbox.ChatRoomAddCharacterToChatRoom({ MemberNumber: 3, Name: 'Another' });
+  sandbox.ChatRoomAddCharacterToChatRoom({ MemberNumber: 4, Name: 'Late' });
   assert.equal(calls.length, 4);
   // Re-executing the userscript must not register a second SDK instance or run twice.
   vm.runInContext(script, context);

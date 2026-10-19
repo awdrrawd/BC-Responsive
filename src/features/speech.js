@@ -1,10 +1,16 @@
 // Modify outgoing speech before BC performs its usual speech processing.
-export function petSpeech(text, phrases, severity, random = Math.random) {
+// `blocked` lists [start, end) UTF-16 ranges (BC's OOC sections) that must stay untouched.
+export function petSpeech(text, phrases, severity, random = Math.random, blocked = []) {
   phrases = phrases.map((x) => x.trim()).filter(Boolean);
   if (!phrases.length || !text.trim() || /^[\/!*(@.]/.test(text.trimStart()) || /https?:\/\//i.test(text))
     return text;
-  const chars = [...text],
-    letters = chars.map((c, i) => (/[\p{L}\p{N}]/u.test(c) ? i : -1)).filter((i) => i >= 0);
+  const chars = [...text];
+  const protectedAt = [];
+  for (let i = 0, offset = 0; i < chars.length; offset += chars[i].length, i++)
+    protectedAt[i] = blocked.some(([from, to]) => offset >= from && offset < to);
+  const letters = chars
+    .map((c, i) => (!protectedAt[i] && /[\p{L}\p{N}]/u.test(c) ? i : -1))
+    .filter((i) => i >= 0);
   if (!letters.length) return text;
   const pick = () => phrases[Math.min(phrases.length - 1, Math.floor(random() * phrases.length))];
   const budget = Math.min(3, Math.max(1, Math.ceil(letters.length / 6)));
@@ -46,11 +52,19 @@ export function installSpeech({ sdk, store, enabled, host = globalThis, random =
     // Pick one applicable rule so overlapping rules cannot multiply insertions.
     const rule = rules[Math.floor(random() * rules.length)];
     if (!rule || random() * 100 >= rule.trigger.chance) return next(args);
+    // MuStyle poses (":smile") are emotes for BC, and "(...)" sections are out-of-character.
+    if (host.Player?.ChatSettings?.MuStylePoses && original.startsWith(':') && original.length > 3)
+      return next(args);
+    const blocked = (host.SpeechGetOOCRanges?.(original) ?? []).map(({ start, length }) => [
+      start,
+      start + length,
+    ]);
     const changed = petSpeech(
       original,
       rule.choices.flatMap((c) => c.steps.filter((s) => s.type === 'chat').map((s) => s.text)),
       rule.trigger.severity,
       random,
+      blocked,
     );
     host.ElementValue('InputChat', changed);
     try {

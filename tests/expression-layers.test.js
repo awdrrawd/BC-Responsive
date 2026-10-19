@@ -242,7 +242,51 @@ test('with an expression engine active the effect is sent as a timed event and n
   w.calls.length = 0;
   layers.clear();
   w.advance(10000);
-  assert.deepEqual(w.calls, [], 'no permanent manual override is written back');
+  assert.deepEqual(
+    w.calls,
+    [['Eyes', null, 0.25]],
+    'a cancelled engine effect is superseded by a short timed event, never a permanent manual override',
+  );
+});
+
+test('engine hand-back restores the previous face once, skips ended effects and respects hypnosis', () => {
+  const real = Date.now;
+  let clockNow = 1000;
+  Date.now = () => clockNow;
+  try {
+    const w = world({ lceAnimationEngineEnabled: () => true });
+    w.host.CharacterSetFacialExpression('x', 'Eyes', 'Closed'); // face before the effect
+    const layers = createExpressionLayers({ host: w.host });
+    layers.apply(step('Happy', 2000));
+    w.calls.length = 0;
+    clockNow += 2500; // the engine already expired it
+    layers.clear();
+    assert.deepEqual(w.calls, [], 'an effect that already ended has nothing to withdraw');
+
+    w.host.CharacterSetFacialExpression('x', 'Eyes', 'Closed'); // the engine put the previous face back
+    layers.apply(step('Happy', 2000));
+    w.calls.length = 0;
+    layers.clear();
+    layers.clear();
+    assert.deepEqual(w.calls, [['Eyes', 'Closed', 0.25]], 'handed back once, restoring the previous face');
+
+    layers.apply(step('Happy', 2000));
+    w.calls.length = 0;
+    const held = createExpressionLayers({
+      host: {
+        ...w.host,
+        Liko: {
+          HSC: {
+            expressions: { apiVersion: 1, getState: () => ({ active: true, groups: ['Eyes', 'Eyes2'] }) },
+          },
+        },
+      },
+    });
+    held.clear();
+    assert.deepEqual(w.calls, [], 'hypnosis-controlled groups are never written');
+  } finally {
+    Date.now = real;
+  }
 });
 
 test('engine detection reads LCE and WCE flags and tolerates errors', () => {
