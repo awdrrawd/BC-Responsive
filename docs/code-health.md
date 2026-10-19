@@ -50,3 +50,13 @@
 - 訪客歡迎：同一個人在 15 秒內再次進房不會重複歡迎，不同人互不影響；只作用於 `visitor` 事件。
 - 表情（對齊 LCE）：事件優先權與同級後來者優先沿用 LCE `pushEvent` 的規則。引擎接管期間若取消（停用、離房、人格更新），改送一個 0.25 秒、帶先前表情的限時事件取代仍在跑的效果，到期後由引擎回到自己的自動表情；不寫入永久手動覆寫，HSC 控制的部位不寫入。此行為由離線測試驗證，尚待與實際 LCE 同用實測。
 - 驗證：`npm test` 90 通過、1 略過；`format:check` 通過；`dist/main.js` 已重新建置。
+
+## 2026-10-19：建置產物改由倉庫合成
+
+- **發現的問題**：倉庫提交的 `dist/main.js` 比原始碼舊（缺少訪客 15 秒冷卻），使 `bundle.test.js` 在沒重建時失敗；本機重建後提交也容易與他人／CI 的版本衝突。
+- **改法（對照 LCE）**：`dist/` 加入 `.gitignore`，由 GitHub Actions 建置並部署到 Pages；建置輸出改為 `main.js`（約 0.6 KB，同步佔住命名空間作重複載入防護，沒有靜態 import/export，舊 loader 的一般 `<script>` 仍可載入）加 `app-<hash>.js`。loader 加時間戳並改為只讀 Pages（沒有已提交的 `dist/`，jsDelivr 後備不再可用）。
+- 測試不再讀 `dist/`：`bundle.test.js` 在記憶體內以同一份原始碼打單檔 IIFE；新增 `build.test.js`（輸出形態、舊檔清除）、`repo.test.js`（`dist/` 不得提交、發佈路徑與 loader 一致、README 版本）。
+- 補上 README 已提到但不存在的 `licenses/`（ModSDK、LZString），並在產物開頭加授權指引。
+- `integrations/lce-responsive-compat.js` 同步為 LCE 實際使用的版本（世代計數、監聽器錯誤隔離），新增對應測試。
+- 新增 PR 檢查（含 bundle 大小留言）、Dependabot、`npm run dev` 監看建置、`npm run check`。
+- 驗證：`npm test` 102 項中 101 通過、1 略過（缺本機 PTT 參考檔）；`format:check` 通過。未在真實 BC 頁面驗證跨網域動態 import；Pages 部署需在 GitHub 上實際跑一次確認。

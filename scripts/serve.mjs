@@ -4,6 +4,24 @@ import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 const root = new URL('../', import.meta.url);
 const identityPath = '/__responsive_preview';
+const staticRoutes = {
+  '/': ['dev/preview.html', 'text/html'],
+  '/preview.js': ['dev/preview.js', 'text/javascript'],
+  '/loader.user.js': ['loader.user.js', 'text/javascript'],
+  '/loader.local.user.js': ['loader.local.user.js', 'text/javascript'],
+};
+// 建置產物只開放 main.js 與 app-<hash>.js（含 .map）；檔名固定格式，不接受任何路徑片段。
+const bundleFile = /^\/((?:main|app-[A-Za-z0-9_-]+)\.js(\.map)?)$/;
+function routeFor(pathname) {
+  if (Object.hasOwn(staticRoutes, pathname)) return staticRoutes[pathname];
+  const match = bundleFile.exec(pathname);
+  if (match) return [`dist/${match[1]}`, match[2] ? 'application/json' : 'text/javascript'];
+}
+// Chrome 的 Private Network Access：公開 HTTPS 頁面讀取本機服務時需要明確允許。
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Private-Network': 'true',
+};
 function existingPreview(port, rootUrl) {
   return new Promise((resolve) => {
     const request = http.get(
@@ -38,19 +56,17 @@ function existingPreview(port, rootUrl) {
 export async function startPreview({ port = 5175, rootUrl = root, log = console.log } = {}) {
   const server = http.createServer(async (req, res) => {
     const pathname = new URL(req.url, 'http://localhost').pathname;
+    if (req.method === 'OPTIONS') {
+      res.writeHead(204, { ...corsHeaders, 'Access-Control-Allow-Methods': 'GET, OPTIONS' });
+      res.end();
+      return;
+    }
     if (pathname === identityPath) {
       res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' });
       res.end(JSON.stringify({ app: 'responsive-liko-preview', root: fileURLToPath(rootUrl) }));
       return;
     }
-    const allowed = {
-      '/': ['dev/preview.html', 'text/html'],
-      '/preview.js': ['dev/preview.js', 'text/javascript'],
-      '/main.js': ['dist/main.js', 'text/javascript'],
-      '/loader.user.js': ['loader.user.js', 'text/javascript'],
-      '/loader.local.user.js': ['loader.local.user.js', 'text/javascript'],
-    };
-    const route = allowed[pathname];
+    const route = routeFor(pathname);
     if (!route) {
       res.writeHead(404);
       res.end();
@@ -60,13 +76,13 @@ export async function startPreview({ port = 5175, rootUrl = root, log = console.
       const content = await readFile(new URL(route[0], rootUrl));
       res.writeHead(200, {
         'Content-Type': `${route[1]}; charset=utf-8`,
-        'Access-Control-Allow-Origin': '*',
+        ...corsHeaders,
         'Cache-Control': 'no-store',
       });
       res.end(content);
     } catch {
       res.writeHead(500);
-      res.end('Build the project first');
+      res.end('Build the project first: npm run build');
     }
   });
   try {

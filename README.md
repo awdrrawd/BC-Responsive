@@ -4,16 +4,18 @@
 
 倉庫：<https://github.com/awdrrawd/BC-Responsive>。程式、建置指令與 loader 都位於倉庫根目錄；`TEMP/` 是本機參考資料，不參與建置或 Git 追蹤。
 
+`dist/` 是建置產物，**不提交進倉庫**：`main.js`（極小入口，負責防重複載入）與 `app-<hash>.js`（實際程式）由 GitHub Actions 在 `main` 更新時建置並部署到 Pages。本機可隨時 `npm run build`，但產物被 `.gitignore` 排除，不會造成提交差異。
+
 ## 安裝與建置
 
 三種安裝方式擇一，避免同時開啟不同版本：
 
-- **正式 loader**：安裝根目錄的 `loader.user.js`，優先讀取 GitHub Pages 的 `https://awdrrawd.github.io/BC-Responsive/dist/main.js`，失敗或逾時才改用 jsDelivr。必須先把建置產物推送到 GitHub。
-- **本機測試 loader**：在根目錄執行 `npm run dev`，再安裝 `loader.local.user.js`。每次重新整理 BC，都從 `http://127.0.0.1:5175/main.js` 載入。
+- **正式 loader**：安裝根目錄的 `loader.user.js`，從 GitHub Pages 的 `https://awdrrawd.github.io/BC-Responsive/dist/main.js` 載入（加時間戳避免舊快取，失敗會再試一次）。Pages 由 Actions 部署，不需要手動推送建置產物；loader 本身也發佈在 `https://awdrrawd.github.io/BC-Responsive/loader.user.js`，已設定 `@updateURL`。
+- **本機測試 loader**：在根目錄執行 `npm run dev`，再安裝 `loader.local.user.js`。每次重新整理 BC，都從 `http://127.0.0.1:5175/main.js` 載入。`npm run dev` 會監看原始碼並自動重建，存檔後重新整理即可。
 
-載入後在偏好設定內開啟 **Responsive_Liko**。`npm run build` 只建立 `dist/main.js` 與 `dist/main.js.map`，不會修改任何 loader。正式與本機 loader 是獨立、人工維護的入口。
+載入後在偏好設定內開啟 **Responsive_Liko**。`npm run build` 只建立 `dist/`（`main.js`、`app-<hash>.js` 及各自的 `.map`，並自動清掉舊的 app 檔），不會修改任何 loader。正式與本機 loader 是獨立、人工維護的入口。
 
-其他插件管理器可優先載入 `https://awdrrawd.github.io/BC-Responsive/dist/main.js`，失敗時改載入 `https://cdn.jsdelivr.net/gh/awdrrawd/BC-Responsive@main/dist/main.js`。等待腳本完成後，可用 `window.Liko?.Responsive_Liko?.getState()` 確認初始化；重複載入會由插件自身阻止。
+其他插件管理器可載入 `https://awdrrawd.github.io/BC-Responsive/dist/main.js`（一般 `<script>` 即可，它會自行以相對路徑載入同目錄的 `app-<hash>.js`）。因為不再提交 `dist/`，沒有 jsDelivr 的 `gh/...@main/dist` 可用。等待腳本完成後，可用 `window.Liko?.Responsive_Liko?.getState()` 確認初始化；重複載入會由插件自身阻止。
 
 Loader 可防止重複載入，載入失敗時會在 console 記錄原因。`window.Liko.Responsive_LikoLoader` 提供下載狀態；引擎就緒狀態仍以 `window.Liko.Responsive_Liko.getState()` 為準。本機來源若被瀏覽器限制，需依瀏覽器提示處理 localhost 連線權限。
 
@@ -22,11 +24,21 @@ Loader 可防止重複載入，載入失敗時會在 console 記錄原因。`win
 ```sh
 npm ci --ignore-scripts
 npm test
-npm run build
-npm run serve
+npm run build      # 產生 dist/（不提交）
+npm run dev        # 監看建置 + 預覽伺服器
+npm run check      # format:check + test + build，推送前一次跑完
 ```
 
 預覽頁：`http://127.0.0.1:5175`。重複執行時會辨識並沿用同一專案的預覽服務，重新整理即可讀取最新建置；若埠被其他程式或舊版預覽占用，會提示先在原視窗按 Ctrl+C，並保留原服務。這是 BC API 模擬畫面，不連線、不向遊戲發送訊息。
+
+## 自動化
+
+- **Pages 部署**（`.github/workflows/static.yml`）：推送到 `main` 時執行格式檢查、測試、建置，並把 `dist/` 放到站台的 `dist/` 路徑（舊版已安裝的 loader 也讀這個路徑）、`loader.user.js` 與 `licenses/` 一併發佈。
+- **PR 檢查**（`.github/workflows/checks.yml`）：拒絕提交 `dist/`、格式檢查、測試、建置，並在 PR 留言比較 bundle 大小（`scripts/bundle-size.mjs`，每次推送更新同一則）。
+- **Dependabot**（`.github/dependabot.yml`）：每週一檢查 npm 與 GitHub Actions，小版本與修補版合併成一個 PR。
+- **倉庫規則測試**（`tests/repo.test.js`）：`dist/` 必須在 `.gitignore`、workflow 發佈路徑必須與 loader 請求路徑一致、README 標題版本必須等於 `package.json`。
+
+首次改成不提交 `dist/` 時，需要把已追蹤的產物從索引移除（檔案仍留在本機）：`git rm -r --cached dist`，再提交。同時到 GitHub 倉庫 Settings → Pages，把 Source 設為 **GitHub Actions**。
 
 ## 初版功能
 
@@ -115,4 +127,4 @@ BCX 預先檢查是保守阻擋：發言限制／必用詞／指定聲音等規�
 
 ## 授權
 
-新增程式沿用上層 MIT 授權。依賴 ModSDK 1.2.0（Jomshir98，MIT）、LZString 1.5.0（Pieroxy，MIT）。建置輸出包含依賴，相關授權見 `licenses/`。LCE 接收端為本專案新增程式，未複製其表情引擎或 BCAR 原始碼。
+新增程式沿用上層 MIT 授權。依賴 ModSDK 1.2.0（Jomshir98，MIT）、LZString 1.5.0（Pieroxy，MIT）。建置輸出包含依賴，授權全文見 `licenses/`（也隨 Pages 發佈），產物開頭另有指引註解。LCE 接收端為本專案新增程式，未複製其表情引擎或 BCAR 原始碼。

@@ -1,3 +1,10 @@
 node_modules/
 .npm-cache/
 TEMP/
+
+# 建置產物由 GitHub Actions 產生並部署到 Pages；本機可 npm run build，但不提交，避免與倉庫合成的版本衝突。
+dist/
+_site/
+.ci-base/
+*.log
+.DS_Store

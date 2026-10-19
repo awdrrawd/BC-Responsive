@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
-import { readFileSync } from 'node:fs';
 import { webcrypto } from 'node:crypto';
 import LZString from 'lz-string';
 import { defaults, ID, rule } from '../src/core/model.js';
+import { bundleSingleFile } from '../scripts/build.mjs';
 test('bundled plugin registers with ModSDK and handles a visitor through actual hooks', async () => {
   const data = defaults();
   data.settings.enabled = true;
@@ -158,7 +158,8 @@ test('bundled plugin registers with ModSDK and handles a visitor through actual 
   sandbox.ChatRoomCharacter = [sandbox.Player];
   const context = vm.createContext(sandbox);
   vm.runInContext('let MainCanvas = globalThis.__drawing;', context);
-  const script = readFileSync(new URL('../dist/main.js', import.meta.url), 'utf8');
+  // Bundle the current sources in memory: dist/ is a build artifact and may be absent or stale.
+  const script = await bundleSingleFile();
   vm.runInContext(script, context);
   await new Promise((resolve) => setImmediate(resolve));
   assert.equal(sandbox.Liko[ID].getState().ready, true);

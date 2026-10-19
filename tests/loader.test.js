@@ -41,10 +41,14 @@ function fixture(local = false) {
   return { sandbox, appended, timers, run };
 }
 
+const pagesMain = 'https://awdrrawd.github.io/BC-Responsive/dist/main.js';
+
 test('production loader targets the configured repository and prevents duplicates', () => {
   const f = fixture();
   f.run();
-  assert.equal(f.appended[0].src, 'https://awdrrawd.github.io/BC-Responsive/dist/main.js');
+  const url = new URL(f.appended[0].src);
+  assert.equal(url.origin + url.pathname, pagesMain);
+  assert.ok(url.searchParams.has('v'), 'main.js has no hash, so the loader cache-busts it');
   f.run();
   assert.equal(f.appended.length, 1);
   f.sandbox.Liko.Responsive_Liko = {};
@@ -55,16 +59,29 @@ test('production loader targets the configured repository and prevents duplicate
   assert.equal(f.appended.length, 1);
 });
 
-test('production loader falls back from Pages to jsDelivr', () => {
+test('production loader retries Pages once with a fresh cache-buster and never uses jsDelivr', () => {
   const f = fixture();
   f.run();
   f.appended[0].onerror();
   assert.equal(f.appended[0].removed, true);
-  assert.equal(f.appended[1].src, 'https://cdn.jsdelivr.net/gh/awdrrawd/BC-Responsive@main/dist/main.js');
+  assert.equal(f.appended.length, 2);
+  const [first, second] = f.appended.map((script) => new URL(script.src));
+  assert.equal(second.origin + second.pathname, pagesMain);
+  assert.notEqual(first.search, second.search);
   assert.equal(f.sandbox.Liko.Responsive_LikoLoader.attempt, 2);
   f.sandbox.Liko.Responsive_Liko = {};
   f.appended[1].onload();
   assert.equal(f.sandbox.Liko.Responsive_LikoLoader.status, 'loaded');
+});
+
+test('production loader reports an error after the retry also fails', () => {
+  const f = fixture();
+  f.run();
+  f.appended[0].onerror();
+  f.appended[1].onerror();
+  assert.equal(f.appended.length, 2);
+  assert.equal(f.sandbox.Liko.Responsive_LikoLoader.status, 'error');
+  assert.equal(f.timers.size, 0);
 });
 
 test('local loader cache-busts localhost and allows retry after a failed load', () => {

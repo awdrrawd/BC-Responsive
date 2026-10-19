@@ -392,7 +392,7 @@
             [
               'Core',
               'scripts',
-              ['scripts/build-action-variants.ps1', 'scripts/build.mjs', 'scripts/serve.mjs'],
+              ['scripts/build-action-variants.ps1', 'scripts/build.mjs', 'scripts/dev.mjs', 'scripts/serve.mjs'],
             ],
             [
               'Core',
@@ -550,9 +550,9 @@
           group: '維護',
           id: 'build',
           name: '建置、預覽與測試',
-          desc: 'esbuild 產生 dist/main.js；本機預覽每次讀最新建置，不自動替换已載入遊戲的腳本。',
+          desc: 'esbuild 產生 dist/main.js 與 app-<hash>.js（不提交，由 Actions 部署）；本機 npm run dev 監看重建，不自動替换已載入遊戲的腳本。',
           branches: [
-            ['Core', '命令與依賴', ['package.json', 'scripts/build.mjs', 'scripts/serve.mjs']],
+            ['Core', '命令與依賴', ['package.json', 'scripts/build.mjs', 'scripts/dev.mjs', 'scripts/serve.mjs']],
             ['UI', '離線預覽', ['dev/preview.html', 'dev/preview.js']],
             ['Core', '服務與回歸測試', ['tests/serve.test.js', 'tests/bundle.test.js']],
             ['Core', '維護紀錄', ['docs/code-health.md', 'docs/architecture-review.md']],

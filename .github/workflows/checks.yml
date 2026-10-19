@@ -1,0 +1,71 @@
+name: Responsive checks
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-build:
+    name: Test and build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      # 建置產物由 CI 產生，提交進來會與倉庫合成的版本衝突。
+      - name: Reject committed build output
+        run: |
+          tracked="$(git ls-files dist _site)"
+          if [ -n "$tracked" ]; then
+            echo "::error title=dist/ must not be committed::Run 'git rm -r --cached dist' and commit again. Tracked files:"
+            echo "$tracked"
+            exit 1
+          fi
+      - run: npm ci --ignore-scripts
+      - run: npm run format:check
+      - run: npm test
+      - run: npm run build
+      - name: Checkout PR base
+        if: github.event_name == 'pull_request'
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: .ci-base
+      - name: Build PR base
+        if: github.event_name == 'pull_request'
+        working-directory: .ci-base
+        run: npm ci --ignore-scripts && npm run build
+      - name: Compare PR bundle size
+        if: github.event_name == 'pull_request'
+        run: node scripts/bundle-size.mjs dist .ci-base/dist | tee "$RUNNER_TEMP/bundle-size.md"
+      # 把大小比較貼成 PR 留言，之後每次推送都更新同一則，不會洗版。
+      # fork 與 Dependabot 的 PR 沒有寫入權限，直接略過（結果仍在 Job Summary）；留言失敗也不影響檢查結果。
+      - name: Comment bundle size on PR
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          marker='<!-- responsive-bundle-size -->'
+          body="$(printf '%s\n%s\n' "$marker" "$(cat "$RUNNER_TEMP/bundle-size.md")")"
+          api="repos/$GITHUB_REPOSITORY/issues"
+          id="$(gh api "$api/$PR_NUMBER/comments" --paginate --jq ".[] | select(.body | startswith(\"$marker\")) | .id" | head -n1)"
+          if [ -n "$id" ]; then
+            gh api -X PATCH "$api/comments/$id" -f body="$body" >/dev/null
+          else
+            gh api "$api/$PR_NUMBER/comments" -f body="$body" >/dev/null
+          fi
+      - name: Report manual build size
+        if: github.event_name != 'pull_request'
+        run: node scripts/bundle-size.mjs
