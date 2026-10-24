@@ -1,0 +1,38 @@
+{
+  "gameVersion": "R133",
+  "commit": "0444daadce251b9529e1eaff1ccdde4f3bfea710",
+  "functions": {
+    "ChatRoomAddCharacterToChatRoom": {
+      "hash": "45D8160A",
+      "file": "Screens/Online/ChatRoom/ChatRoom.js"
+    },
+    "ChatRoomAttemptLeave": {
+      "hash": "843D31AE",
+      "file": "Screens/Online/ChatRoom/ChatRoom.js"
+    },
+    "ChatRoomLeave": {
+      "hash": "D43FC635",
+      "file": "Screens/Online/ChatRoom/ChatRoom.js"
+    },
+    "ChatRoomMessage": {
+      "hash": "42605304",
+      "file": "Screens/Online/ChatRoom/ChatRoom.js"
+    },
+    "ChatRoomSendChat": {
+      "hash": "B35AD170",
+      "file": "Screens/Online/ChatRoom/ChatRoom.js"
+    },
+    "ChatRoomSync": {
+      "hash": "DAEBD74D",
+      "file": "Screens/Online/ChatRoom/ChatRoom.js"
+    },
+    "CommonDrawAppearanceBuild": {
+      "hash": "A87EF679",
+      "file": "Scripts/CommonDraw.js"
+    },
+    "ServerSend": {
+      "hash": "A9337991",
+      "file": "Scripts/Server.js"
+    }
+  }
+}

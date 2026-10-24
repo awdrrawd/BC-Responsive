@@ -14,6 +14,8 @@
 
 // 統一多語引擎：window.Liko.__Sys_i18n__（介面字串）+ __Sys_L10N__（聊天在地化）。用法見 README-bc-i18n.md
 
+import { isTrustedScriptUrl } from './script-url.js';
+
 (function () {
   'use strict';
   if (typeof window === 'undefined') return;
@@ -537,8 +539,13 @@
   }
 
   // 抓一支 JS 並執行（合併字庫檔會自行呼叫 register 註冊）
+  // 抓來的內容會用 new Function 執行，所以先確認來源：只接受專案自己的 HTTPS 主機或本機回送位址。
   function loadScript(url) {
     if (!url || _loadedUrls.has(url)) return Promise.resolve(false);
+    if (!isTrustedScriptUrl(url)) {
+      console.warn(`🐈‍⬛ [Liko i18n] ⚠️ loadScript blocked untrusted URL: ${url}`);
+      return Promise.resolve(false);
+    }
     _loadedUrls.add(url);
     return fetch(_bust(url))
       .then((res) => {

@@ -14,9 +14,11 @@
     "dev": "node scripts/dev.mjs",
     "check": "npm run format:check && npm test && npm run build",
     "format": "prettier --write src Translation tests scripts dev integrations *.user.js",
-    "format:check": "prettier --check src Translation tests scripts dev integrations *.user.js"
+    "format:check": "prettier --check src Translation tests scripts dev integrations *.user.js",
+    "check:bc": "node scripts/check-bc-compat.mjs"
   },
   "devDependencies": {
+    "acorn": "^8.19.0",
     "esbuild": "0.28.2",
     "prettier": "^3.9.10"
   },

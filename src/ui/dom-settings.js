@@ -61,7 +61,7 @@ export function installSettings({ store, t, host = globalThis }) {
   const sw = (on, small = false) =>
     `<button class="rl-switch ${small ? 'rl-small-switch' : ''} ${on ? 'on' : ''}" aria-label="${esc(t(on ? 'on' : 'off'))}"></button>`;
   const relationButtons = (scope) =>
-    `<div class="rl-relation-buttons">${['owner', 'lover', 'submissive', 'bcWhitelist', 'friend'].map((key) => `<button data-relation="${key}" data-relation-scope="${scope}">${esc(t(`relation_${key}`))}</button>`).join('')}</div>`;
+    `<div class="rl-relation-buttons">${['owner', 'lover', 'submissive', 'bcWhitelist', 'friend'].map((key) => `<button data-relation="${key}" data-relation-scope="${esc(scope)}">${esc(t(`relation_${key}`))}</button>`).join('')}</div>`;
   function relationMembers(kind) {
     const p = host.Player ?? {},
       numbers = [];
@@ -266,7 +266,7 @@ export function installSettings({ store, t, host = globalThis }) {
     return `<div class="rl-animation-layout"><aside class="rl-animation-preview"><canvas width="800" height="1200" data-animation-preview aria-label="${esc(t('preview'))}"></canvas><p class="rl-muted">${esc(t('preview'))}</p></aside><div class="rl-animation-controls"><div class="rl-segments">${animationGroups()
       .map(
         (g) =>
-          `<button data-animation-group="${g}" class="${modal.tracks.some((x) => x.group === g) ? 'on' : ''}">${esc(groupLabel(g))}</button>`,
+          `<button data-animation-group="${esc(g)}" class="${modal.tracks.some((x) => x.group === g) ? 'on' : ''}">${esc(groupLabel(g))}</button>`,
       )
       .join('')}</div><div class="rl-animation-tracks">${modal.tracks
       .map(
@@ -292,7 +292,7 @@ export function installSettings({ store, t, host = globalThis }) {
       )
       .join(
         '',
-      )}</div><div class="rl-animation-grid"><span>${esc(t('animationCount'))}</span><input class="rl-input rl-number" type="number" min="1" max="100" data-animation-field="count" value="${modal.count}"><span>${esc(t('animationSeconds'))}</span><input class="rl-input rl-number" type="number" min="0.001" max="120" step="0.001" data-animation-seconds value="${modal.intervalMs / 1000}"></div><div class="rl-animation-message"><div class="rl-muted">${esc(t('animationMessageHint'))}</div><div class="rl-choice-row">${['chat', 'emote', 'action'].map((x) => `<button class="${modal.messageType === x ? 'on' : ''}" data-animation-message-type="${x}">${esc(t(x))}</button>`).join('')}<div class="rl-choice-tokens"><button data-animation-token="{Self}">${esc(t('insertSelfName'))}</button><button data-animation-token="{Other}">${esc(t('insertOtherName'))}</button></div></div><textarea class="rl-textarea" style="height:90px" data-animation-field="text">${esc(modal.text)}</textarea></div></div></div>`;
+      )}</div><div class="rl-animation-grid"><span>${esc(t('animationCount'))}</span><input class="rl-input rl-number" type="number" min="1" max="100" data-animation-field="count" value="${esc(modal.count)}"><span>${esc(t('animationSeconds'))}</span><input class="rl-input rl-number" type="number" min="0.001" max="120" step="0.001" data-animation-seconds value="${esc(modal.intervalMs / 1000)}"></div><div class="rl-animation-message"><div class="rl-muted">${esc(t('animationMessageHint'))}</div><div class="rl-choice-row">${['chat', 'emote', 'action'].map((x) => `<button class="${modal.messageType === x ? 'on' : ''}" data-animation-message-type="${x}">${esc(t(x))}</button>`).join('')}<div class="rl-choice-tokens"><button data-animation-token="{Self}">${esc(t('insertSelfName'))}</button><button data-animation-token="{Other}">${esc(t('insertOtherName'))}</button></div></div><textarea class="rl-textarea" style="height:90px" data-animation-field="text">${esc(modal.text)}</textarea></div></div></div>`;
   }
   function pickerHtml() {
     const zones = bodyZones(host.Player, host),
@@ -300,7 +300,7 @@ export function installSettings({ store, t, host = globalThis }) {
     const zoneHtml = zones
       .map(({ group, zone }) => {
         const [x, y, w, h] = zone;
-        return `<button class="rl-zone ${group === pickerGroup ? 'selected' : ''}" data-group="${group}" aria-label="${esc(groupLabel(group))}" title="${esc(groupLabel(group))}" style="left:${x / 5}%;top:${y / 10}%;width:${w / 5}%;height:${h / 10}%"></button>`;
+        return `<button class="rl-zone ${group === pickerGroup ? 'selected' : ''}" data-group="${esc(group)}" aria-label="${esc(groupLabel(group))}" title="${esc(groupLabel(group))}" style="left:${x / 5}%;top:${y / 10}%;width:${w / 5}%;height:${h / 10}%"></button>`;
       })
       .join('');
     const actions = pickerSearch ? '' : pickerActions(rows);

@@ -53,9 +53,25 @@ function existingPreview(port, rootUrl) {
     request.on('error', () => resolve(false));
   });
 }
+// 只接受以回送位址存取的請求。惡意網站可用 DNS rebinding 讓瀏覽器把自己的網域解析到 127.0.0.1，
+// 此時 Host 標頭會是攻擊者的網域；擋掉它，預覽服務就不會被當成跨站讀取本機檔案的跳板。
+const allowedHost = /^(?:127\.0\.0\.1|localhost|\[::1\])(?::\d{1,5})?$/i;
 export async function startPreview({ port = 5175, rootUrl = root, log = console.log } = {}) {
   const server = http.createServer(async (req, res) => {
-    const pathname = new URL(req.url, 'http://localhost').pathname;
+    if (!allowedHost.test(req.headers.host ?? '')) {
+      res.writeHead(403);
+      res.end();
+      return;
+    }
+    let pathname;
+    try {
+      pathname = new URL(req.url, 'http://localhost').pathname;
+    } catch {
+      // 例如 "//"：不是合法的請求目標，回 400，不讓例外把行程帶走。
+      res.writeHead(400);
+      res.end();
+      return;
+    }
     if (req.method === 'OPTIONS') {
       res.writeHead(204, { ...corsHeaders, 'Access-Control-Allow-Methods': 'GET, OPTIONS' });
       res.end();
