@@ -36,6 +36,7 @@ npm run check      # format:check + test + build，推送前一次跑完
 - **Pages 部署**（`.github/workflows/static.yml`）：推送到 `main` 時執行格式檢查、測試、建置，並把 `dist/` 放到站台的 `dist/` 路徑（舊版已安裝的 loader 也讀這個路徑）、`loader.user.js` 與 `licenses/` 一併發佈。
 - **PR 檢查**（`.github/workflows/checks.yml`）：拒絕提交 `dist/`、格式檢查、測試、建置，並在 PR 留言比較 bundle 大小（`scripts/bundle-size.mjs`，每次推送更新同一則）。
 - **Dependabot**（`.github/dependabot.yml`）：每週一檢查 npm 與 GitHub Actions，小版本與修補版合併成一個 PR。
+- **BC 函式掛鉤檢查**（`.github/workflows/bc-compat.yml`、`scripts/check-bc-compat.mjs`，移植自 AEE）：每週一抓 Bondage Club 程式碼鏡像，比對 Responsive 透過 ModSDK 掛鉤的函式（`ServerSend`、`ChatRoomSync`、`CommonDrawAppearanceBuild` 等）：函式是否還存在、內容雜湊是否與 `scripts/bc-compat-baseline.json` 相同。有差異時只開／更新一則 `bc-compat` 議題，不會擋 PR 或部署。本機執行 `npm run check:bc -- --bc-dir <BC 原始碼>`；確認掛鉤仍正確後，加上 `--update` 重寫基準。檢查器本身由 `tests/bc-compat-check.test.js` 測試，該測試也確認基準恰好涵蓋程式實際掛鉤的函式。
 - **倉庫規則測試**（`tests/repo.test.js`）：`dist/` 必須在 `.gitignore`、workflow 發佈路徑必須與 loader 請求路徑一致、README 標題版本必須等於 `package.json`。
 
 首次改成不提交 `dist/` 時，需要把已追蹤的產物從索引移除（檔案仍留在本機）：`git rm -r --cached dist`，再提交。同時到 GitHub 倉庫 Settings → Pages，把 Source 設為 **GitHub Actions**。
