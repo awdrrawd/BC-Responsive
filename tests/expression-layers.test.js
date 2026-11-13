@@ -329,6 +329,7 @@ test('output routes expression steps through the layers and clear() restores the
 test('mouth animation yields only the player face to HSC', () => {
   let hook;
   let held = true;
+  let ownershipReads = 0;
   const host = {
     Player: { MemberNumber: 1 },
     CurrentScreen: 'ChatRoom',
@@ -343,7 +344,10 @@ test('mouth animation yields only the player face to HSC', () => {
   host.ChatRoomCharacter.push(me, other);
   const mouth = createMouth({
     sdk: { hookFunction: (_n, _p, fn) => (hook = fn) },
-    owns: () => true,
+    owns: () => {
+      ownershipReads++;
+      return true;
+    },
     host,
   });
   const originalSetTimeout = globalThis.setTimeout;
@@ -351,6 +355,14 @@ test('mouth animation yields only the player face to HSC', () => {
   try {
     mouth.receive({ Type: 'Chat' }, me, 'hello');
     mouth.receive({ Type: 'Chat' }, other, 'hello');
+    const before = ownershipReads;
+    assert.equal(
+      hook([me], () => 'unchanged'),
+      'unchanged',
+    );
+    mouth.receive({ Type: 'Activity' }, other, 'hello');
+    mouth.receive({ Type: 'Chat', Target: 1 }, other, 'hello');
+    assert.equal(ownershipReads, before, 'inactive draws and non-public chat skip feature readers');
     const seen = [];
     for (const c of [me, other])
       hook([c], () => {

@@ -122,10 +122,11 @@ export function start(namespace, host = globalThis) {
               coordination.setReady(true);
             }
           }
-          const before = namespace.getState().capabilities;
+          const hadMouth = coordination.owns('mouth');
+          const hadExpressions = coordination.owns('expressions');
           coordination.refresh();
-          if (before.mouth && !coordination.owns('mouth')) mouth.clear();
-          if (before.expressions && !coordination.owns('expressions')) output.clear();
+          if (hadMouth && !coordination.owns('mouth')) mouth.clear();
+          if (hadExpressions && !coordination.owns('expressions')) output.clear();
         } catch (error) {
           report(error);
         }

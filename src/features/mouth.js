@@ -15,9 +15,8 @@ export function createMouth({ sdk, owns, host = globalThis }) {
     chars.forEach(refresh);
   }
   sdk.hookFunction('CommonDrawAppearanceBuild', 0, (args, next) => {
-    if (!animations.size || !mouthOn() || hscHoldsMouth(args[0])) return next(args);
     const state = animations.get(args[0]?.MemberNumber);
-    if (!state) return next(args);
+    if (!state || !mouthOn() || hscHoldsMouth(args[0])) return next(args);
     const item = host.InventoryGet(args[0], 'Mouth');
     if (!item) return next(args);
     const property = item.Property;
@@ -37,10 +36,10 @@ export function createMouth({ sdk, owns, host = globalThis }) {
     clear,
     receive(data, sender, message) {
       if (
-        !mouthOn() ||
         data.Type !== 'Chat' ||
         data.Target != null ||
         !sender ||
+        !mouthOn() ||
         hscHoldsMouth(sender) ||
         !message?.trim() ||
         /^[\/!*(@.]|^https?:/i.test(message.trimStart())

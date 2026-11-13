@@ -16,25 +16,22 @@ export function fuzzyMatch(haystack, needle) {
 function matchNormalized(text, query) {
   if (!query || text.includes(query)) return true;
   let cursor = 0;
-  for (const char of text) if (char === query[cursor]) cursor++;
-  return cursor === query.length;
+  for (const char of text) if (char === query[cursor] && ++cursor === query.length) return true;
+  return false;
 }
+const indexRow = (row) => ({
+  row,
+  texts: [...new Set([row.label, row.name, ...(row.searchLabels ?? [])].map(normalizeSearch))],
+});
 export function createActivitySearch(rows) {
-  const indexed = rows.map((row) => ({
-    row,
-    texts: [...new Set([row.label, row.name, ...(row.searchLabels ?? [])].map(normalizeSearch))],
-  }));
-  return searchIndex(rows, indexed);
+  return searchIndex(rows, rows.map(indexRow));
 }
 export async function createActivitySearchAsync(rows, cancelled = () => false) {
   const indexed = [];
   let deadline = performance.now() + 4;
   for (const row of rows) {
     if (cancelled()) return null;
-    indexed.push({
-      row,
-      texts: [...new Set([row.label, row.name, ...(row.searchLabels ?? [])].map(normalizeSearch))],
-    });
+    indexed.push(indexRow(row));
     if (performance.now() >= deadline) {
       await new Promise((resolve) => setTimeout(resolve, 0));
       deadline = performance.now() + 4;
@@ -53,8 +50,11 @@ function searchIndex(rows, indexed) {
   };
 }
 export function searchActivities(rows, query) {
-  if (!hasSearchText(query)) return rows;
+  const normalized = normalizeSearch(query);
+  if (!normalized) return rows;
   return rows.filter((row) =>
-    [row.label, row.name, ...(row.searchLabels ?? [])].some((text) => fuzzyMatch(text, query)),
+    [row.label, row.name, ...(row.searchLabels ?? [])].some((text) =>
+      matchNormalized(normalizeSearch(text), normalized),
+    ),
   );
 }

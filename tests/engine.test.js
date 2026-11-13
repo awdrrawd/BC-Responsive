@@ -33,6 +33,35 @@ test('one random choice can execute multiple steps in order', () => {
   assert.deepEqual(calls, ['chat', 'activity']);
 });
 
+test('selection preserves choice order, guaranteed fallback and saved steps', () => {
+  const { p, r } = fixture();
+  const choice = (text, always = false) => ({ always, steps: [{ type: 'chat', text }] });
+  r.choices = [choice('fixed', true), { steps: [] }, choice('first'), choice('second')];
+  const other = { ...r, choices: [choice('third')] };
+  p.rules.push(other);
+  for (const [draw, text] of [
+    [0, 'first'],
+    [0.5, 'second'],
+    [1, 'third'],
+  ]) {
+    const selected = selectResponse(p, event(2), () => draw);
+    assert.equal(selected.steps[0].text, text);
+    assert.deepEqual(
+      selected.guaranteedSteps.map((s) => s.text),
+      text === 'third' ? [] : ['fixed'],
+    );
+    selected.steps[0].text = 'changed';
+    assert.equal(selected.choice.steps[0].text, text);
+  }
+  r.choices = [choice('fixed', true), choice('other fixed', true)];
+  p.rules = [r];
+  const selected = selectResponse(p, event(2), () => 1);
+  assert.equal(selected.steps[0].text, 'other fixed');
+  assert.equal(selected.guaranteedSteps[0].text, 'fixed');
+  r.choices = [{ steps: [] }];
+  assert.equal(selectResponse(p, event(2)), null);
+});
+
 test('own room lifecycle bypasses member lists while visitor filters remain active', () => {
   const { p, r } = fixture();
   for (const mode of ['blacklist', 'whitelist']) {

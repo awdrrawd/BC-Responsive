@@ -31,7 +31,6 @@ export function createExpressionLayers({ host = globalThis, report = () => {} } 
   const slots = new Map(); // slot name -> { item, base, shown, layers: effect[] }
   const effects = new Set(); // effects with a pending timer
   const engineEffects = new Set(); // timed events handed to an animation engine, which owns their expiry
-  let nextId = 0;
   const current = (name) => host.InventoryGet(host.Player, name);
 
   function write(names, values, seconds) {
@@ -56,7 +55,7 @@ export function createExpressionLayers({ host = globalThis, report = () => {} } 
     const slot = slots.get(name);
     if (!slot) return;
     slots.delete(name);
-    for (const effect of [...slot.layers]) detach(effect, name);
+    for (const effect of slot.layers) detach(effect, name);
   }
   // True while the face is still exactly what this module last showed and nobody else controls it.
   const ownsFace = (name, slot, held = hscExpressionGroups(host)) =>
@@ -119,7 +118,7 @@ export function createExpressionLayers({ host = globalThis, report = () => {} } 
         host.CharacterSetFacialExpression(host.Player, step.group, value, step.durationMs / 1000);
         return;
       }
-      const effect = { id: ++nextId, value, names: new Set(allowed), timer: null };
+      const effect = { value, names: new Set(allowed), timer: null };
       for (const name of allowed) {
         let slot = slots.get(name);
         if (slot && !ownsFace(name, slot, held)) {

@@ -35,23 +35,30 @@ export function selectResponse(persona, event, random = Math.random) {
         : persona.blackList.includes(event.actor)))
   )
     return null;
-  const pool = persona.rules
-    .filter((r) => matches(r, event))
-    .flatMap((r) => r.choices.filter((c) => c.steps.length).map((choice) => ({ rule: r, choice })));
-  if (!pool.length) return null;
-  const ordinary = pool.filter((x) => !x.choice.always);
-  const draw = ordinary.length ? ordinary : pool;
+  const ordinary = [],
+    guaranteedOnly = [];
+  for (const rule of persona.rules) {
+    if (!matches(rule, event)) continue;
+    for (const choice of rule.choices) {
+      if (!choice.steps.length) continue;
+      (choice.always ? guaranteedOnly : ordinary).push({ rule, choice });
+    }
+  }
+  const draw = ordinary.length ? ordinary : guaranteedOnly;
+  if (!draw.length) return null;
   const selected = draw[Math.min(draw.length - 1, Math.floor(random() * draw.length))];
   const guaranteed = selected.rule.choices.find((c) => c.always && c !== selected.choice);
   const steps = selected.choice.steps.map((s) => ({ ...s }));
-  if (event.kind === 'activity') {
-    const prefixes = persona.rules
-      .filter((r) => matches(r, { ...event, kind: 'spicer' }))
-      .flatMap((r) => r.choices.flatMap((c) => c.steps.filter((s) => s.type === 'chat')));
-    if (prefixes.length) {
-      const chat = steps.find((s) => s.type === 'chat');
-      if (chat) chat.text = prefixes[Math.floor(random() * prefixes.length)].text + ' ' + chat.text;
+  const chat = event.kind === 'activity' && steps.find((s) => s.type === 'chat');
+  if (chat) {
+    const prefixes = [];
+    const spiceEvent = { ...event, kind: 'spicer' };
+    for (const rule of persona.rules) {
+      if (!matches(rule, spiceEvent)) continue;
+      for (const choice of rule.choices)
+        for (const step of choice.steps) if (step.type === 'chat') prefixes.push(step);
     }
+    if (prefixes.length) chat.text = prefixes[Math.floor(random() * prefixes.length)].text + ' ' + chat.text;
   }
   return { ...selected, steps, guaranteedSteps: guaranteed?.steps.map((s) => ({ ...s })) ?? [] };
 }
