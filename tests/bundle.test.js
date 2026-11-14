@@ -204,7 +204,7 @@ test('bundled plugin registers with ModSDK and handles a visitor through actual 
   sandbox.ChatRoomAddCharacterToChatRoom({ MemberNumber: 3, Name: 'Another' });
   assert.equal(calls.length, 4, 'another person is greeted independently');
   sandbox.Liko[ID].stop();
-  assert.equal(intervals.size, 1, 'stop clears the plugin monitor; the shared i18n service remains');
+  assert.equal(intervals.size, 0, 'stop clears the plugin monitor; i18n uses events without polling');
   sandbox.ChatRoomAddCharacterToChatRoom({ MemberNumber: 4, Name: 'Late' });
   assert.equal(calls.length, 4);
   // Re-executing the userscript must not register a second SDK instance or run twice.

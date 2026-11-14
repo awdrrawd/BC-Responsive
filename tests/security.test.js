@@ -33,7 +33,7 @@ test('the i18n engine checks the origin before fetching a script', () => {
   const engine = readFileSync(new URL('../src/core/i18n-engine.js', import.meta.url), 'utf8');
   const body = engine.slice(engine.indexOf('function loadScript(url)'));
   assert.ok(body.indexOf('isTrustedScriptUrl(') > 0);
-  assert.ok(body.indexOf('isTrustedScriptUrl(') < body.indexOf('fetch(_bust(url))'));
+  assert.ok(body.indexOf('isTrustedScriptUrl(') < body.indexOf('return _load('));
 });
 
 test('settings page escapes every interpolated attribute value', () => {
