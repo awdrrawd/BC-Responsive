@@ -1,6 +1,6 @@
 {
-  "gameVersion": "R133",
-  "commit": "0444daadce251b9529e1eaff1ccdde4f3bfea710",
+  "gameVersion": "R134",
+  "commit": "dcf8b3eb00649c8db67f09ef93d917c35b5f220e",
   "functions": {
     "ChatRoomAddCharacterToChatRoom": {
       "hash": "45D8160A",
@@ -15,7 +15,7 @@
       "file": "Screens/Online/ChatRoom/ChatRoom.js"
     },
     "ChatRoomMessage": {
-      "hash": "42605304",
+      "hash": "657E9417",
       "file": "Screens/Online/ChatRoom/ChatRoom.js"
     },
     "ChatRoomSendChat": {
@@ -23,7 +23,7 @@
       "file": "Screens/Online/ChatRoom/ChatRoom.js"
     },
     "ChatRoomSync": {
-      "hash": "DAEBD74D",
+      "hash": "6F5B5E1A",
       "file": "Screens/Online/ChatRoom/ChatRoom.js"
     },
     "CommonDrawAppearanceBuild": {
